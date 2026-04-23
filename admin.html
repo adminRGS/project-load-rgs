@@ -3,99 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Rose Garden Scan</title>
+    <title>Panel Rose Garden Scan - Definitivo</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; border: 2px solid #f06292; }
-        h2 { color: #d81b60; text-align: center; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
-        select, input, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
-        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 25px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; border: 2px solid #f06292; }
+        h2 { color: #d81b60; text-align: center; font-size: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; font-size: 14px; }
+        select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
+        textarea { height: 180px; resize: vertical; font-size: 13px; }
+        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button:hover { background-color: #d81b60; }
-        .mensaje { margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
+        #panelControl { display: none; }
+        .mensaje { margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🌹 Panel de Administración</h2>
-    
-    <label for="historia">Selecciona la historia:</label>
-    <select id="historia" required>
-        <option value="" disabled selected>-- Elige una historia --</option>
-        <option value="confesion">Confesión</option>
-        <option value="lobo">El Lobo</option>
-        <option value="matrimonio">Matrimonio por Contrato</option>
-        <option value="guarderia">La Guardería</option>
-        <option value="embarazada">Embarazada por Error</option>
-    </select>
+    <div id="login">
+        <h2>🔐 Acceso Administrativo</h2>
+        <input type="password" id="passInput" placeholder="Contraseña del Scan">
+        <button onclick="verificarPass()">Entrar al Panel</button>
+    </div>
 
-    <label for="capitulo">Número de Capítulo:</label>
-    <input type="number" id="capitulo" step="0.1" placeholder="Ej: 1" required>
+    <div id="panelControl">
+        <h2>🌹 Rose Garden Scan - Carga de Capítulos</h2>
+        
+        <label for="historia">Selecciona el Proyecto:</label>
+        <select id="historia">
+            <option value="confesion">Confesión</option>
+            <option value="lobo">Soy un lobo pero no te lastimaré</option>
+            <option value="matrimonio">Matrimonio de conveniencia una obsesión</option>
+            <option value="guarderia">La guardería de la villana</option>
+            <option value="embarazada">Fingí estar embarazada pero mi marido regresó</option>
+            <option value="princesa">No solo encanté a la princesa</option>
+            <option value="amigos">Los amigos no hacen esto</option>
+            <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
+            <option value="leopardo">La pequeña bebé leopardo de las nieves</option>
+            <option value="salvada">Salvada por la pequeña dama sin poderes</option>
+        </select>
 
-    <label for="link">Link de Google Drive:</label>
-    <input type="url" id="link" placeholder="Pega el link aquí" required>
+        <label for="capitulo">Número del Capítulo:</label>
+        <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2 o 2.5">
 
-    <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
-    <div id="mensaje" class="mensaje"></div>
+        <label for="links">Pega los links aquí (uno tras otro):</label>
+        <textarea id="links" placeholder="Pega aquí todos los links seguidos como lo hacías antes..."></textarea>
+
+        <button onclick="guardarCapitulo()">🚀 Publicar Capítulo</button>
+        <div id="mensaje" class="mensaje"></div>
+    </div>
 </div>
 
 <script>
-    // Tus datos reales de Firebase insertados correctamente
+    // Configuración real de tu Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
         projectId: "prgs-f2ef8",
         storageBucket: "prgs-f2ef8.firebasestorage.app",
         messagingSenderId: "639472415083",
-        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e",
-        measurementId: "G-Z2PNBL3X8V"
+        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
     };
     
-    // Inicialización
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
+
+    function verificarPass() {
+        const pass = document.getElementById('passInput').value;
+        if (pass === "Rose2026") {
+            document.getElementById('login').style.display = "none";
+            document.getElementById('panelControl').style.display = "block";
+        } else {
+            alert("Contraseña incorrecta");
+        }
+    }
 
     async function guardarCapitulo() {
         const historia = document.getElementById('historia').value;
         const numCap = document.getElementById('capitulo').value;
-        const linkDrive = document.getElementById('link').value;
+        const textoLinks = document.getElementById('links').value;
         const divMensaje = document.getElementById('mensaje');
 
-        if (!historia || !numCap || !linkDrive) {
-            alert("Completa todos los campos por favor.");
-            return;
-        }
+        if (!numCap || !textoLinks) { alert("¡Faltan datos!"); return; }
 
-        const docId = "capitulo_" + numCap;
+        // Procesa los links sin importar si tienen espacios o saltos de línea
+        const listaLinks = textoLinks.split(/[\s\n]+/).filter(l => l.trim() !== "");
 
         try {
-            // BLINDAJE: { merge: false } borra el error anterior de "imagenes" 
-            // y escribe el campo "link" que tu web necesita.
-            await db.collection(historia).doc(docId).set({
+            // El truco: Guardamos "imagenes" para el visor y "link" (el primero) para activar el botón
+            await db.collection(historia).doc("capitulo_" + numCap).set({
                 numero: parseFloat(numCap),
-                link: linkDrive,
+                imagenes: listaLinks,
+                link: listaLinks[0], // Esto habilita el botón rosa en tu web
                 fecha: new Date().toISOString()
-            }, { merge: false });
+            }, { merge: false }); // merge: false limpia cualquier error viejo
 
             divMensaje.style.display = "block";
             divMensaje.style.backgroundColor = "#c8e6c9";
             divMensaje.style.color = "#2e7d32";
-            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " guardado con éxito!";
+            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " subido! Ya puedes revisar la web.";
             
-            // Limpiamos campos
+            // Limpia para el siguiente
             document.getElementById('capitulo').value = "";
-            document.getElementById('link').value = "";
-            
-        } catch (error) {
-            console.error(error);
+            document.getElementById('links').value = "";
+        } catch (e) {
             divMensaje.style.display = "block";
             divMensaje.style.backgroundColor = "#ffcdd2";
-            divMensaje.innerHTML = "❌ Error: " + error.message;
+            divMensaje.innerHTML = "❌ Error: " + e.message;
         }
     }
 </script>
