@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Rose Garden</title>
+    <style>
+        body { font-family: sans-serif; background: #0f0f0f; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
+        
+        /* PANTALLA DE BLOQUEO */
+        #login-screen { text-align: center; background: #1a1a1a; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 350px; }
+        #login-screen h2 { color: #ff66b2; margin-bottom: 20px; }
+        input[type="password"] { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #333; background: #222; color: white; text-align: center; box-sizing: border-box; }
+        
+        /* PANEL DE CARGA */
+        #admin-panel { display: none; width: 95%; max-width: 450px; background: #1a1a1a; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        
+        h1 { color: #ff66b2; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
+
+        label { display: block; margin-top: 15px; color: #ff66b2; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* ESTILO DEL SELECTOR Y ENTRADAS */
+        select, input, textarea { 
+            width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; 
+            border: 1px solid #444; background: #252525; color: white; 
+            box-sizing: border-box; font-size: 1rem; appearance: none;
+        }
+        
+        select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 20px; }
+
+        input:focus, textarea:focus, select:focus { border-color: #ff66b2; outline: none; background: #2a2a2a; }
+        
+        textarea { height: 150px; resize: none; font-size: 0.8rem; }
+        
+        button { width: 100%; padding: 15px; margin-top: 25px; background: #ff66b2; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        button:active { transform: scale(0.95); background: #e6559d; }
+        .btn-login { background: #ff66b2; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>Panel de Control</h2>
+        <p style="color: #888; font-size: 0.8rem; margin-bottom: 20px;">Introduce la clave de acceso</p>
+        <input type="password" id="passInput" placeholder="Contraseña...">
+        <button class="btn-login" onclick="verificarClave()">Entrar</button>
+    </div>
+
+    <div id="admin-panel">
+        <h1>Cargar Capítulos</h1>
+
+        <label>Selecciona la Historia</label>
+        <select id="historiaID">
+            <option value="" disabled selected>-- Elige un Manhwa --</option>
+            <option value="guarderia">La guardería de la villana</option>
+            <option value="confesion">Confesión</option>
+            <option value="embarazada">Fingí estar embarazada...</option>
+            <option value="salvada">Salvada por la pequeña dama...</option>
+            <option value="leopardo">La pequeña leopardo de las nieves...</option>
+            <option value="lobo">Soy un lobo pero no te lastimaré</option>
+            <option value="princesa">No solo encanté a la princesa</option>
+            <option value="matrimonio">Matrimonio de conveniencia...</option>
+            <option value="amigos">Los amigos no hacen esto</option>
+            <option value="hermana">Mi hermana ahora me ama</option>
+        </select>
+
+        <label>Número de Capítulo</label>
+        <input type="number" id="capNum" placeholder="Ej: 1">
+
+        <label>Links de Imágenes (Drive)</label>
+        <textarea id="linksRaw" placeholder="Pega aquí los links que copiaste de Drive..."></textarea>
+
+        <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
+        <p id="status" style="text-align:center; margin-top:20px; font-size:0.9rem; font-weight: bold;"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const CLAVE_CORRECTA = "Rose2026";
+
+        window.verificarClave = function() {
+            const input = document.getElementById('passInput').value;
+            if(input === CLAVE_CORRECTA) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        window.guardarCapitulo = async function() {
+            const id = document.getElementById('historiaID').value;
+            const num = document.getElementById('capNum').value;
+            const rawText = document.getElementById('linksRaw').value;
+            const status = document.getElementById('status');
+
+            if(!id) { alert("Selecciona una historia de la lista"); return; }
+            if(!num || !rawText) { alert("Completa el capítulo y los links"); return; }
+
+            status.style.color = "#ffd700";
+            status.innerText = "Subiendo capítulo...";
+            
+            const regex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view\?usp=drivesdk/g;
+            let linksLimpios = [];
+            let match;
+
+            while ((match = regex.exec(rawText)) !== null) {
+                // Usando el link directo lh3 que es más estable
+                linksLimpios.push(`https://lh3.googleusercontent.com/d/${match[1]}=s1600`);
+            }
+
+            if(linksLimpios.length === 0) {
+                alert("No se detectaron links de Drive válidos.");
+                status.innerText = "";
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, id, "capitulo_" + num), {
+                    imagenes: linksLimpios
+                });
+                status.style.color = "#00ff00";
+                status.innerText = "✅ ¡Capítulo " + num + " guardado con éxito!";
+                document.getElementById('linksRaw').value = "";
+                document.getElementById('capNum').value = "";
+            } catch (e) {
+                status.style.color = "#ff0000";
+                status.innerText = "❌ Error: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>

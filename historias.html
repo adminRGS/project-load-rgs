@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historias - Rose Garden Scan</title>
+    <style>
+        body { margin: 0; padding: 0; background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); color: white; font-family: 'serif'; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
+        
+        header { padding: 60px 20px 20px 20px; text-align: center; position: relative; width: 100%; max-width: 1000px; }
+        
+        /* BOTÓN DE INICIO */
+        .btn-inicio { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #ffb3d9; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border: 1px solid #ffb3d9; padding: 8px 15px; border-radius: 20px; transition: 0.3s; z-index: 10; }
+        .btn-inicio:hover { background: #ffb3d9; color: #1a0a1a; box-shadow: 0 0 10px #ffb3d9; }
+
+        /* FRASE EN CURSIVA Y DEGRADADO */
+        .frase-biblioteca { 
+            font-style: italic;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: shine 3s linear infinite;
+            margin: 20px 0;
+            font-family: 'Georgia', serif;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .seccion-titulo { width: 90%; max-width: 1000px; margin: 30px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ffb3d9; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+
+        .grid-historias { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 95%; max-width: 1000px; padding: 10px 10px 40px 10px; }
+        
+        .card { background: #161616; border-radius: 10px; overflow: hidden; transition: 0.3s; text-decoration: none; color: white; text-align: center; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.3); }
+        
+        /* ETIQUETAS ESTILO CAPTURA */
+        .estado-tag { position: absolute; top: 8px; left: 8px; padding: 3px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; z-index: 2; letter-spacing: 1px; }
+        .tag-emision { background: #4caf50; color: white; } /* Verde como tu captura */
+        .tag-finalizado { background: #ff66b2; color: white; }
+        .tag-hiatus { background: #ffd700; color: black; }
+
+        .portada { width: 100%; height: 240px; object-fit: cover; background: #222; }
+        
+        .info { padding: 15px 8px; font-size: 0.85rem; font-weight: normal; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.3; background: #1a1a1a; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="btn-inicio">🏠 Inicio</a>
+    <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
+</header>
+
+<div class="seccion-titulo">En Emisión</div>
+<div class="grid-historias">
+    <a href="confesion.html" class="card">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="confesion.jpg" class="portada">
+        <div class="info">Confesión</div>
+    </a>
+    <a href="embarazada.html" class="card">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="embarazada.jpg" class="portada">
+        <div class="info">Fingí estar embarazada pero mi marido regresó</div>
+    </a>
+    <a href="salvada.html" class="card">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="salvada.jpg" class="portada">
+        <div class="info">Salvada por la pequeña dama sin poderes</div>
+    </a>
+    <a href="leopardo.html" class="card">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="leopardo.jpg" class="portada">
+        <div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div>
+    </a>
+</div>
+
+<div class="seccion-titulo">En Hiatus</div>
+<div class="grid-historias">
+    <a href="guarderia.html" class="card">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="guarderia.jpg" class="portada">
+        <div class="info">La guardería de la villana</div>
+    </a>
+    <a href="hermana.html" class="card">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="hermana.jpg" class="portada">
+        <div class="info">Mi hermana que era mi enemiga ahora me ama</div>
+    </a>
+    <a href="amigos.html" class="card">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="amigos.jpg" class="portada">
+        <div class="info">Los amigos no hacen esto</div>
+    </a>
+</div>
+
+<div class="seccion-titulo">Finalizados</div>
+<div class="grid-historias">
+    <a href="matrimonio.html" class="card">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="matrimonio.jpg" class="portada">
+        <div class="info">Matrimonio de conveniencia a una obsesión</div>
+    </a>
+    <a href="princesa.html" class="card">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="princesa.jpg" class="portada">
+        <div class="info">¡No, solo encanté a la princesa!</div>
+    </a>
+    <a href="lobo.html" class="card">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="lobo.jpg" class="portada">
+        <div class="info">Soy un lobo pero no te lastimaré</div>
+    </a>
+</div>
+
+</body>
+</html>

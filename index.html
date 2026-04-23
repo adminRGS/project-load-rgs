@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Rose Garden Scan - Inicio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: #000; color: white; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        /* CONTENEDOR DE BUCLE INFINITO (SOLO 4 IMÁGENES, SIN CORTES) */
+        #bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: #000; }
+        .bg-slide { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            opacity: 0; transition: opacity 2s ease-in-out; 
+        }
+        .bg-slide.active { opacity: 0.55; } /* Opacidad para que el texto resalte */
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.3); z-index: -1; }
+
+        /* CONTENIDO PRINCIPAL */
+        .content { position: relative; z-index: 10; text-align: center; width: 95%; max-width: 450px; }
+        
+        /* TÍTULO Y SUBTÍTULO (Diseño que ya te gustaba) */
+        h1.titulo-principal { 
+            font-family: 'Dancing Script', cursive; font-size: 3.5rem; font-weight: 500; margin-bottom: 0px;
+            background: linear-gradient(90deg, #ff0000, #ff66b2, #800080, #ff0000);
+            background-size: 200% auto; -webkit-background-clip: text; color: transparent;
+            animation: shine 5s linear infinite; filter: drop-shadow(0 0 8px rgba(255, 102, 178, 0.4));
+        }
+
+        p.subtitulo { 
+            font-family: 'Dancing Script', cursive; font-size: 1.6rem; margin-bottom: 30px; /* Reduje el espacio abajo */
+            background: linear-gradient(90deg, #ff0000, #ff66b2, #800080, #ff0000);
+            background-size: 200% auto; -webkit-background-clip: text; color: transparent;
+            animation: shine 5s linear infinite; opacity: 0.9;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* --- BOTONES MÁS DELICADOS Y ESTILIZADOS --- */
+        .btn { 
+            display: block; width: 85%; /* Menos anchos */
+            margin: 0 auto 15px auto; /* Centrados y con menos espacio entre ellos */
+            padding: 12px; /* Mucho menos altos, más finos */
+            background: #ff3385; color: white; text-decoration: none; border-radius: 50px; 
+            font-size: 0.9rem; /* Texto interno más pequeño y delicado */
+            font-weight: bold; border: none; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(255, 51, 133, 0.3); /* Sombra más suave */
+            transition: 0.3s;
+        }
+        .btn:active { transform: scale(0.98); }
+
+        /* PANTALLA PRÓXIMAMENTE */
+        #proximamente-screen { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; 
+            align-items: center; flex-direction: column; text-align: center; padding: 20px;
+        }
+        
+        #proximamente-screen h2 { 
+            font-family: 'Dancing Script', cursive; font-size: 3rem; margin-bottom: 15px;
+            background: linear-gradient(90deg, #ff0000, #ff66b2, #800080);
+            -webkit-background-clip: text; color: transparent;
+        }
+
+        .btn-regresar { padding: 10px 20px; background: white; color: black; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-container">
+        <div class="bg-slide active" style="background-image: url('guarderia.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('embarazada.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('leopardo.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('confesion.jpg');"></div>
+    </div>
+    
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h1 class="titulo-principal">Rose Garden Scan</h1>
+        <p class="subtitulo">Manhwas de fans para fans</p>
+        
+        <a href="historias.html" class="btn">Nuestras Historias</a>
+        <button class="btn" onclick="mostrarProximamente()">One Shots</button>
+    </div>
+
+    <div id="proximamente-screen">
+        <h2>Próximamente</h2>
+        <p style="color: #bbb; margin-bottom: 25px; font-family: 'Dancing Script', cursive; font-size: 1.2rem;">Preparando historias mágicas...</p>
+        <button class="btn-regresar" onclick="ocultarProximamente()">✦ Regresar ✦</button>
+    </div>
+
+    <script>
+        // Lógica del Bucle Infinito (Corregida para 4 imágenes)
+        const slides = document.querySelectorAll('.bg-slide');
+        let currentSlide = 0;
+
+        function changeSlide() {
+            // Quitamos la clase active de la imagen actual
+            slides[currentSlide].classList.remove('active');
+            
+            // Calculamos la siguiente posición circularmente (0, 1, 2, 3, y vuelve a 0)
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            // Ponemos active a la nueva imagen
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Cambia de imagen cada 5 segundos
+        // La transición de 2s en CSS hace que se fundan suavemente
+        setInterval(changeSlide, 5000);
+
+        function mostrarProximamente() {
+            document.getElementById('proximamente-screen').style.display = 'flex';
+        }
+        function ocultarProximamente() {
+            document.getElementById('proximamente-screen').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
