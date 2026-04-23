@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; padding: 20px; display: flex; justify-content: center; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; display: flex; justify-content: center; padding: 20px; }
         .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; border: 2px solid #f06292; }
         h2 { color: #d81b60; text-align: center; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
@@ -20,7 +20,7 @@
 <body>
 
 <div class="container">
-    <h2>🌹 Panel de Carga Correcto</h2>
+    <h2>🌹 Panel de Administración</h2>
     
     <label for="historia">Selecciona la historia:</label>
     <select id="historia" required>
@@ -43,16 +43,18 @@
 </div>
 
 <script>
-    // IMPORTANTE: PEGA AQUÍ TUS DATOS DE FIREBASE
+    // Tus datos reales de Firebase insertados correctamente
     const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "tu-proyecto.firebaseapp.com",
-        projectId: "tu-proyecto-id",
-        storageBucket: "tu-proyecto.appspot.com",
-        messagingSenderId: "tu-id",
-        appId: "tu-app-id"
+        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+        authDomain: "prgs-f2ef8.firebaseapp.com",
+        projectId: "prgs-f2ef8",
+        storageBucket: "prgs-f2ef8.firebasestorage.app",
+        messagingSenderId: "639472415083",
+        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e",
+        measurementId: "G-Z2PNBL3X8V"
     };
     
+    // Inicialización
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -65,26 +67,27 @@
         const divMensaje = document.getElementById('mensaje');
 
         if (!historia || !numCap || !linkDrive) {
-            alert("Llena todos los campos.");
+            alert("Completa todos los campos por favor.");
             return;
         }
 
-        // El ID del documento será capitulo_1, capitulo_2, etc.
         const docId = "capitulo_" + numCap;
 
         try {
-            // USAMOS .set PARA CREAR EL DOCUMENTO LIMPIO
+            // BLINDAJE: { merge: false } borra el error anterior de "imagenes" 
+            // y escribe el campo "link" que tu web necesita.
             await db.collection(historia).doc(docId).set({
                 numero: parseFloat(numCap),
-                link: linkDrive, // AQUÍ FORZAMOS EL NOMBRE "link"
+                link: linkDrive,
                 fecha: new Date().toISOString()
-            });
+            }, { merge: false });
 
             divMensaje.style.display = "block";
             divMensaje.style.backgroundColor = "#c8e6c9";
             divMensaje.style.color = "#2e7d32";
-            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " guardado perfectamente!";
+            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " guardado con éxito!";
             
+            // Limpiamos campos
             document.getElementById('capitulo').value = "";
             document.getElementById('link').value = "";
             
