@@ -7,12 +7,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fce4ec; color: #333; display: flex; justify-content: center; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; padding: 20px; display: flex; justify-content: center; }
         .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; border: 2px solid #f06292; }
-        h2 { color: #d81b60; text-align: center; margin-bottom: 20px; }
+        h2 { color: #d81b60; text-align: center; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
         select, input, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
-        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 25px; transition: 0.3s; }
+        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 25px; }
         button:hover { background-color: #d81b60; }
         .mensaje { margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
     </style>
@@ -20,7 +20,7 @@
 <body>
 
 <div class="container">
-    <h2>🌹 Panel de Carga</h2>
+    <h2>🌹 Panel de Carga Correcto</h2>
     
     <label for="historia">Selecciona la historia:</label>
     <select id="historia" required>
@@ -32,20 +32,18 @@
         <option value="embarazada">Embarazada por Error</option>
     </select>
 
-    <label for="capitulo">Número de Capítulo (ej: 2 o 4.5):</label>
-    <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2" required>
+    <label for="capitulo">Número de Capítulo:</label>
+    <input type="number" id="capitulo" step="0.1" placeholder="Ej: 1" required>
 
     <label for="link">Link de Google Drive:</label>
     <input type="url" id="link" placeholder="Pega el link aquí" required>
 
     <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
-    
     <div id="mensaje" class="mensaje"></div>
 </div>
 
 <script>
-    // --- TU CONFIGURACIÓN DE FIREBASE ---
-    // (Asegúrate de que estos datos sean los mismos de tu proyecto)
+    // IMPORTANTE: PEGA AQUÍ TUS DATOS DE FIREBASE
     const firebaseConfig = {
         apiKey: "TU_API_KEY",
         authDomain: "tu-proyecto.firebaseapp.com",
@@ -55,7 +53,6 @@
         appId: "tu-app-id"
     };
     
-    // Inicializar Firebase si no se ha hecho
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -68,38 +65,36 @@
         const divMensaje = document.getElementById('mensaje');
 
         if (!historia || !numCap || !linkDrive) {
-            alert("Por favor, llena todos los campos.");
+            alert("Llena todos los campos.");
             return;
         }
 
+        // El ID del documento será capitulo_1, capitulo_2, etc.
         const docId = "capitulo_" + numCap;
 
         try {
-            // Esto guarda en la carpeta (colección) correcta sin tildes
+            // USAMOS .set PARA CREAR EL DOCUMENTO LIMPIO
             await db.collection(historia).doc(docId).set({
                 numero: parseFloat(numCap),
-                link: linkDrive,
+                link: linkDrive, // AQUÍ FORZAMOS EL NOMBRE "link"
                 fecha: new Date().toISOString()
             });
 
             divMensaje.style.display = "block";
             divMensaje.style.backgroundColor = "#c8e6c9";
             divMensaje.style.color = "#2e7d32";
-            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " guardado con éxito!";
+            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " guardado perfectamente!";
             
-            // Limpiar campos
             document.getElementById('capitulo').value = "";
             document.getElementById('link').value = "";
             
         } catch (error) {
-            console.error("Error al guardar: ", error);
+            console.error(error);
             divMensaje.style.display = "block";
             divMensaje.style.backgroundColor = "#ffcdd2";
-            divMensaje.style.color = "#c62828";
-            divMensaje.innerHTML = "❌ Error al guardar. Revisa la consola.";
+            divMensaje.innerHTML = "❌ Error: " + error.message;
         }
     }
 </script>
-
 </body>
 </html>
