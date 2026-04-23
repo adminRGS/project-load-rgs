@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Rose Garden Scan - Definitivo</title>
+    <title>Panel Rose Garden - FINAL FIX</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; border: 2px solid #f06292; }
-        h2 { color: #d81b60; text-align: center; font-size: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; font-size: 14px; }
+        body { font-family: sans-serif; background-color: #fce4ec; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 2px solid #f06292; }
+        h2 { color: #d81b60; text-align: center; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
         select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
-        textarea { height: 180px; resize: vertical; font-size: 13px; }
-        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        button:hover { background-color: #d81b60; }
+        textarea { height: 150px; }
+        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
         #panelControl { display: none; }
-        .mensaje { margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="login">
-        <h2>🔐 Acceso Administrativo</h2>
-        <input type="password" id="passInput" placeholder="Contraseña del Scan">
-        <button onclick="verificarPass()">Entrar al Panel</button>
+        <h2>🔐 Rose Garden Scan</h2>
+        <input type="password" id="passInput" placeholder="Contraseña">
+        <button onclick="verificarPass()">Entrar</button>
     </div>
 
     <div id="panelControl">
-        <h2>🌹 Rose Garden Scan - Carga de Capítulos</h2>
-        
-        <label for="historia">Selecciona el Proyecto:</label>
+        <h2>🌹 Cargar Capítulo</h2>
+        <label>Proyecto:</label>
         <select id="historia">
             <option value="confesion">Confesión</option>
             <option value="lobo">Soy un lobo pero no te lastimaré</option>
@@ -41,23 +38,22 @@
             <option value="princesa">No solo encanté a la princesa</option>
             <option value="amigos">Los amigos no hacen esto</option>
             <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
-            <option value="leopardo">La pequeña bebé leopardo de las nieves</option>
+            <option value="leopardo">La pequeña bebé leopardo</option>
             <option value="salvada">Salvada por la pequeña dama sin poderes</option>
         </select>
 
-        <label for="capitulo">Número del Capítulo:</label>
-        <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2 o 2.5">
+        <label>Número de Capítulo (Solo el número):</label>
+        <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2">
 
-        <label for="links">Pega los links aquí (uno tras otro):</label>
-        <textarea id="links" placeholder="Pega aquí todos los links seguidos como lo hacías antes..."></textarea>
+        <label>Links de las imágenes (uno tras otro):</label>
+        <textarea id="links" placeholder="Link1 Link2..."></textarea>
 
-        <button onclick="guardarCapitulo()">🚀 Publicar Capítulo</button>
-        <div id="mensaje" class="mensaje"></div>
+        <button onclick="guardarCapitulo()">🚀 ACTIVAR BOTÓN Y PUBLICAR</button>
+        <div id="mensaje" style="display:none; margin-top:15px; text-align:center; font-weight:bold; color: #2e7d32;"></div>
     </div>
 </div>
 
 <script>
-    // Configuración real de tu Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -66,53 +62,40 @@
         messagingSenderId: "639472415083",
         appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
     };
-    
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     function verificarPass() {
-        const pass = document.getElementById('passInput').value;
-        if (pass === "Rose2026") {
+        if (document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login').style.display = "none";
             document.getElementById('panelControl').style.display = "block";
-        } else {
-            alert("Contraseña incorrecta");
-        }
+        } else { alert("Contraseña incorrecta"); }
     }
 
     async function guardarCapitulo() {
         const historia = document.getElementById('historia').value;
         const numCap = document.getElementById('capitulo').value;
         const textoLinks = document.getElementById('links').value;
-        const divMensaje = document.getElementById('mensaje');
-
-        if (!numCap || !textoLinks) { alert("¡Faltan datos!"); return; }
-
-        // Procesa los links sin importar si tienen espacios o saltos de línea
         const listaLinks = textoLinks.split(/[\s\n]+/).filter(l => l.trim() !== "");
 
+        if (!numCap || listaLinks.length === 0) {
+            alert("Por favor pon el número de capítulo y los links");
+            return;
+        }
+
         try {
-            // El truco: Guardamos "imagenes" para el visor y "link" (el primero) para activar el botón
+            // FORZAMOS LA CREACIÓN DEL CAMPO 'link' QUE LA WEB NECESITA
             await db.collection(historia).doc("capitulo_" + numCap).set({
                 numero: parseFloat(numCap),
                 imagenes: listaLinks,
-                link: listaLinks[0], // Esto habilita el botón rosa en tu web
-                fecha: new Date().toISOString()
-            }, { merge: false }); // merge: false limpia cualquier error viejo
+                link: listaLinks[0], // <--- ESTO ES LO QUE ACTIVA EL BOTÓN ROSA
+                id: "capitulo_" + numCap
+            }, { merge: false });
 
-            divMensaje.style.display = "block";
-            divMensaje.style.backgroundColor = "#c8e6c9";
-            divMensaje.style.color = "#2e7d32";
-            divMensaje.innerHTML = "✅ ¡Capítulo " + numCap + " subido! Ya puedes revisar la web.";
-            
-            // Limpia para el siguiente
-            document.getElementById('capitulo').value = "";
-            document.getElementById('links').value = "";
-        } catch (e) {
-            divMensaje.style.display = "block";
-            divMensaje.style.backgroundColor = "#ffcdd2";
-            divMensaje.innerHTML = "❌ Error: " + e.message;
-        }
+            const msg = document.getElementById('mensaje');
+            msg.style.display = "block";
+            msg.innerHTML = "✅ ¡BOTÓN ACTIVADO! Refresca la web de lectores ahora.";
+        } catch (e) { alert("Error de conexión: " + e.message); }
     }
 </script>
 </body>
