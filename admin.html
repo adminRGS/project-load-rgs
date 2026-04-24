@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Rose Garden - FINAL FIX</title>
+    <title>Panel Rose Garden - SOLUCIÓN FINAL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -42,13 +42,13 @@
             <option value="salvada">Salvada por la pequeña dama sin poderes</option>
         </select>
 
-        <label>Número de Capítulo (Solo el número):</label>
+        <label>Número de Capítulo:</label>
         <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2">
 
-        <label>Links de las imágenes (uno tras otro):</label>
-        <textarea id="links" placeholder="Link1 Link2..."></textarea>
+        <label>Links (uno tras otro):</label>
+        <textarea id="links"></textarea>
 
-        <button onclick="guardarCapitulo()">🚀 ACTIVAR BOTÓN Y PUBLICAR</button>
+        <button onclick="guardarCapitulo()">🚀 FORZAR ACTUALIZACIÓN</button>
         <div id="mensaje" style="display:none; margin-top:15px; text-align:center; font-weight:bold; color: #2e7d32;"></div>
     </div>
 </div>
@@ -69,7 +69,7 @@
         if (document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login').style.display = "none";
             document.getElementById('panelControl').style.display = "block";
-        } else { alert("Contraseña incorrecta"); }
+        } else { alert("Clave incorrecta"); }
     }
 
     async function guardarCapitulo() {
@@ -78,24 +78,28 @@
         const textoLinks = document.getElementById('links').value;
         const listaLinks = textoLinks.split(/[\s\n]+/).filter(l => l.trim() !== "");
 
-        if (!numCap || listaLinks.length === 0) {
-            alert("Por favor pon el número de capítulo y los links");
-            return;
-        }
+        if (!numCap || listaLinks.length === 0) { alert("Llena los campos"); return; }
 
         try {
-            // FORZAMOS LA CREACIÓN DEL CAMPO 'link' QUE LA WEB NECESITA
-            await db.collection(historia).doc("capitulo_" + numCap).set({
+            // ENVIAMOS LA INFORMACIÓN EN DOS FORMATOS PARA "PESCAR" EL ERROR
+            const datos = {
                 numero: parseFloat(numCap),
+                num: parseFloat(numCap), // A veces la web busca 'num'
                 imagenes: listaLinks,
-                link: listaLinks[0], // <--- ESTO ES LO QUE ACTIVA EL BOTÓN ROSA
+                link: listaLinks[0],
                 id: "capitulo_" + numCap
-            }, { merge: false });
+            };
+
+            // Intento 1: Como "capitulo_2"
+            await db.collection(historia).doc("capitulo_" + numCap).set(datos);
+            
+            // Intento 2: Como solo "2" (por si la web lo busca así)
+            await db.collection(historia).doc(numCap.toString()).set(datos);
 
             const msg = document.getElementById('mensaje');
             msg.style.display = "block";
-            msg.innerHTML = "✅ ¡BOTÓN ACTIVADO! Refresca la web de lectores ahora.";
-        } catch (e) { alert("Error de conexión: " + e.message); }
+            msg.innerHTML = "✅ ¡Súper Guardado! Revisa la web ahora.";
+        } catch (e) { alert("Error: " + e.message); }
     }
 </script>
 </body>
