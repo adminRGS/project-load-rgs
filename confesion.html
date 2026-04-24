@@ -15,7 +15,7 @@
         .grid-caps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 90%; max-width: 500px; padding-bottom: 50px; }
         .cap-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #444; text-align: center; padding: 18px 0; border-radius: 12px; font-weight: bold; position: relative; overflow: hidden; transition: 0.3s; }
         
-        /* ESTADO ACTIVO (ROSADO) */
+        /* BOTÓN ACTIVO */
         .disponible { border: 1px solid #ff66b2 !important; color: white !important; background: rgba(255, 102, 178, 0.2) !important; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); cursor: pointer; }
         
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
@@ -52,29 +52,36 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const historiaID = "confesion"; // <-- Cambia esto en las otras historias
+    const historiaID = "confesion"; 
     const grid = document.getElementById('grid');
 
-    // 1. Crear los 200 botones (todos grises al inicio)
-    const botones = {};
+    // Función para arreglar links de Drive sobre la marcha
+    function arreglarLink(url) {
+        if (url.includes('drive.google.com')) {
+            let id = "";
+            if (url.includes('id=')) { id = url.split('id=')[1].split('&')[0]; }
+            else { id = url.split('/d/')[1].split('/')[0]; }
+            return `https://lh3.googleusercontent.com/u/0/d/${id}`;
+        }
+        return url;
+    }
+
     for (let i = 1; i <= 200; i++) {
         const btn = document.createElement('div');
         btn.innerText = i;
         btn.className = 'cap-btn';
         btn.id = "btn-" + i;
         grid.appendChild(btn);
-        botones[i] = btn;
     }
 
-    // 2. FUNCIÓN MÁGICA: Buscar en Firebase qué capítulos existen realmente
     async function activarCapitulos() {
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                // Si el documento tiene imágenes, activamos el botón correspondiente
+                // Si el documento tiene el campo 'imagenes', lo activamos
                 if (data.imagenes && data.imagenes.length > 0) {
-                    const num = data.numero; 
+                    const num = data.numero || parseInt(doc.id.replace("capitulo_", ""));
                     const boton = document.getElementById("btn-" + num);
                     if (boton) {
                         boton.classList.add('disponible');
@@ -82,26 +89,34 @@
                     }
                 }
             });
-        } catch (e) { console.error("Error activando:", e); }
+        } catch (e) { console.error(e); }
     }
 
-    // Ejecutar la búsqueda al cargar la página
     activarCapitulos();
 
     window.abrirLector = async function(num) {
         const lector = document.getElementById('lector');
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block';
-        contenedor.innerHTML = "<p style='text-align:center; margin-top:50px;'>Cargando...</p>";
+        contenedor.innerHTML = "<p style='text-align:center; margin-top:50px;'>Cargando capítulo...</p>";
 
         try {
-            const docRef = doc(db, historiaID, "capitulo_" + num);
-            const docSnap = await getDoc(docRef);
+            // Intentamos buscar de las dos formas que se pudieron haber guardado
+            let docRef = doc(db, historiaID, "capitulo_" + num);
+            let docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                docRef = doc(db, historiaID, num.toString());
+                docSnap = await getDoc(docRef);
+            }
+
             if (docSnap.exists()) {
                 contenedor.innerHTML = "";
-                docSnap.data().imagenes.forEach(url => {
+                const data = docSnap.data();
+                data.imagenes.forEach(url => {
                     const img = document.createElement('img');
-                    img.src = url;
+                    // AQUÍ ESTÁ EL TRUCO: El código arregla el link antes de mostrarlo
+                    img.src = arreglarLink(url);
                     contenedor.appendChild(img);
                 });
             }
