@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Rose Garden - FORZAR LINKS DRIVE</title>
+    <title>Panel Rose Garden - CARGA MASIVA</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #fce4ec; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 2px solid #f06292; }
-        h2 { color: #d81b60; text-align: center; }
+        .container { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 500px; border: 2px solid #f06292; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h2 { color: #d81b60; text-align: center; margin-bottom: 20px; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
-        select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
-        textarea { height: 150px; }
-        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; font-size: 14px; }
+        textarea { height: 200px; font-family: monospace; font-size: 12px; }
+        button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        button:hover { background-color: #d81b60; }
         #panelControl { display: none; }
+        #mensaje { display:none; margin-top:15px; text-align:center; font-weight:bold; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -28,6 +30,7 @@
 
     <div id="panelControl">
         <h2>🌹 Cargar Capítulo</h2>
+        
         <label>Proyecto:</label>
         <select id="historia">
             <option value="confesion">Confesión</option>
@@ -43,13 +46,13 @@
         </select>
 
         <label>Número de Capítulo:</label>
-        <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2">
+        <input type="number" id="capitulo" step="0.1" placeholder="Ej: 4">
 
-        <label>Links de Drive o Directos:</label>
-        <textarea id="links" placeholder="Pega aquí los links..."></textarea>
+        <label>Pegar todos los links aquí:</label>
+        <textarea id="links" placeholder="Pega todos los links aquí. Pueden estar separados por espacios, comas o saltos de línea..."></textarea>
 
-        <button onclick="guardarCapitulo()">🚀 FORZAR LINKS Y PUBLICAR</button>
-        <div id="mensaje" style="display:none; margin-top:15px; text-align:center; font-weight:bold; color: #2e7d32;"></div>
+        <button id="btnPublicar" onclick="guardarCapitulo()">🚀 CARGAR TODAS LAS IMÁGENES</button>
+        <div id="mensaje"></div>
     </div>
 </div>
 
@@ -72,16 +75,16 @@
         } else { alert("Clave incorrecta"); }
     }
 
-    // FUNCIÓN PARA CONVERTIR LINKS DE DRIVE A DIRECTOS
+    // REPARADOR DE LINKS MEJORADO
     function forzarLinkDirecto(url) {
         if (url.includes('drive.google.com')) {
             let id = "";
             if (url.includes('id=')) {
                 id = url.split('id=')[1].split('&')[0];
-            } else {
+            } else if (url.includes('/d/')) {
                 id = url.split('/d/')[1].split('/')[0];
             }
-            return `https://lh3.googleusercontent.com/d/${id}`;
+            return id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : url;
         }
         return url;
     }
@@ -90,34 +93,52 @@
         const historia = document.getElementById('historia').value;
         const numCap = document.getElementById('capitulo').value;
         const textoLinks = document.getElementById('links').value;
-        
-        // Limpiamos y convertimos cada link
-        const listaLinks = textoLinks.split(/[\s\n]+/)
-            .filter(l => l.trim() !== "")
+        const btn = document.getElementById('btnPublicar');
+        const msg = document.getElementById('mensaje');
+
+        // EXPRESIÓN REGULAR para separar links por comas, espacios o saltos de línea
+        const listaLinks = textoLinks.split(/[\s,]+/)
+            .filter(l => l.trim().length > 10) // Evita textos basura
             .map(l => forzarLinkDirecto(l.trim()));
 
-        if (!numCap || listaLinks.length === 0) { alert("Llena los campos"); return; }
+        if (!numCap || listaLinks.length === 0) { 
+            alert("Por favor, ingresa el número de capítulo y pega los links."); 
+            return; 
+        }
+
+        btn.disabled = true;
+        btn.innerText = "⏳ Procesando " + listaLinks.length + " imágenes...";
 
         try {
+            const idDoc = "capitulo_" + numCap;
             const datos = {
+                id: idDoc,
                 numero: parseFloat(numCap),
                 num: parseFloat(numCap),
-                imagenes: listaLinks,
-                link: listaLinks[0],
-                id: "capitulo_" + numCap
+                imagenes: listaLinks, // ESTO ES LO MÁS IMPORTANTE
+                total: listaLinks.length,
+                fechaCarga: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            // Guardamos con ambos IDs para asegurar que la web lo encuentre
-            await db.collection(historia).doc("capitulo_" + numCap).set(datos);
+            // Guardamos el documento
+            await db.collection(historia).doc(idDoc).set(datos);
+            // También guardamos una copia con el número solo por si acaso
             await db.collection(historia).doc(numCap.toString()).set(datos);
 
-            const msg = document.getElementById('mensaje');
             msg.style.display = "block";
-            msg.innerHTML = "✅ ¡Links convertidos y publicados!";
+            msg.style.backgroundColor = "#e8f5e9";
+            msg.style.color = "#2e7d32";
+            msg.innerHTML = "✅ ¡Éxito! Se publicaron " + listaLinks.length + " imágenes en el capítulo " + numCap;
             
-            // Limpiar el campo para la próxima carga
             document.getElementById('links').value = "";
-        } catch (e) { alert("Error: " + e.message); }
+            btn.disabled = false;
+            btn.innerText = "🚀 CARGAR TODAS LAS IMÁGENES";
+
+        } catch (e) { 
+            alert("Error: " + e.message); 
+            btn.disabled = false;
+            btn.innerText = "🚀 REINTENTAR";
+        }
     }
 </script>
 </body>
