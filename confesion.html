@@ -6,26 +6,20 @@
     <title>Confesión - Rose Garden Scan</title>
     <style>
         body { margin: 0; padding: 0; background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); color: white; font-family: 'serif'; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; }
-        
-        /* Efecto de estrellas de fondo */
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; animation: starsMove 100s linear infinite; z-index: -1; }
         @keyframes starsMove { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-        
         header { padding: 40px 10px; text-align: center; width: 100%; }
         .btn-volver { text-decoration: none; color: #ffb3d9; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
-        
         h1 { font-size: 1.8rem; margin: 15px 0; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shine 3s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
-        
         .grid-caps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 90%; max-width: 500px; padding-bottom: 50px; }
-        .cap-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #444; text-align: center; padding: 18px 0; border-radius: 12px; font-weight: bold; position: relative; overflow: hidden; }
+        .cap-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #444; text-align: center; padding: 18px 0; border-radius: 12px; font-weight: bold; position: relative; overflow: hidden; transition: 0.3s; }
         
-        /* Botón de capítulo cuando ya tiene imágenes cargadas */
-        .disponible { border: 1px solid #ff66b2; color: white; background: rgba(255, 102, 178, 0.1); box-shadow: 0 0 15px rgba(255, 102, 178, 0.3); cursor: pointer; pointer-events: auto; }
+        /* ESTADO ACTIVO (ROSADO) */
+        .disponible { border: 1px solid #ff66b2 !important; color: white !important; background: rgba(255, 102, 178, 0.2) !important; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); cursor: pointer; }
         
-        /* El Lector de imágenes */
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
-        .btn-cerrar { position: fixed; top: 20px; right: 20px; background: #ff66b2; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; z-index: 101; box-shadow: 0 0 15px #ff66b2; cursor: pointer; }
+        .btn-cerrar { position: fixed; top: 20px; right: 20px; background: #ff66b2; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; z-index: 101; cursor: pointer; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
     </style>
 </head>
@@ -45,7 +39,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -58,30 +52,47 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // Conectamos con la carpeta "confesion" en tu Firebase
-    const historiaID = "confesion"; 
+    const historiaID = "confesion"; // <-- Cambia esto en las otras historias
     const grid = document.getElementById('grid');
 
-    // Generamos los botones de los capítulos
+    // 1. Crear los 200 botones (todos grises al inicio)
+    const botones = {};
     for (let i = 1; i <= 200; i++) {
         const btn = document.createElement('div');
         btn.innerText = i;
         btn.className = 'cap-btn';
-        
-        // El capítulo 1 aparece activado por defecto
-        if (i === 1) { 
-            btn.classList.add('disponible');
-            btn.onclick = () => abrirLector(i);
-        }
+        btn.id = "btn-" + i;
         grid.appendChild(btn);
+        botones[i] = btn;
     }
+
+    // 2. FUNCIÓN MÁGICA: Buscar en Firebase qué capítulos existen realmente
+    async function activarCapitulos() {
+        try {
+            const querySnapshot = await getDocs(collection(db, historiaID));
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                // Si el documento tiene imágenes, activamos el botón correspondiente
+                if (data.imagenes && data.imagenes.length > 0) {
+                    const num = data.numero; 
+                    const boton = document.getElementById("btn-" + num);
+                    if (boton) {
+                        boton.classList.add('disponible');
+                        boton.onclick = () => abrirLector(num);
+                    }
+                }
+            });
+        } catch (e) { console.error("Error activando:", e); }
+    }
+
+    // Ejecutar la búsqueda al cargar la página
+    activarCapitulos();
 
     window.abrirLector = async function(num) {
         const lector = document.getElementById('lector');
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block';
-        contenedor.innerHTML = "<p style='text-align:center; margin-top:50px;'>Cargando imágenes...</p>";
+        contenedor.innerHTML = "<p style='text-align:center; margin-top:50px;'>Cargando...</p>";
 
         try {
             const docRef = doc(db, historiaID, "capitulo_" + num);
@@ -93,11 +104,8 @@
                     img.src = url;
                     contenedor.appendChild(img);
                 });
-            } else {
-                alert("Aún no se han cargado tiras para este capítulo en el panel.");
-                cerrarLector();
             }
-        } catch (e) { alert("Error al cargar: " + e.message); }
+        } catch (e) { alert("Error: " + e.message); }
     }
 
     window.cerrarLector = function() {
