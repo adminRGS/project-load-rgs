@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Rose Garden - SOLUCIÓN FINAL</title>
+    <title>Panel Rose Garden - FORZAR LINKS DRIVE</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -45,10 +45,10 @@
         <label>Número de Capítulo:</label>
         <input type="number" id="capitulo" step="0.1" placeholder="Ej: 2">
 
-        <label>Links (uno tras otro):</label>
-        <textarea id="links"></textarea>
+        <label>Links de Drive o Directos:</label>
+        <textarea id="links" placeholder="Pega aquí los links..."></textarea>
 
-        <button onclick="guardarCapitulo()">🚀 FORZAR ACTUALIZACIÓN</button>
+        <button onclick="guardarCapitulo()">🚀 FORZAR LINKS Y PUBLICAR</button>
         <div id="mensaje" style="display:none; margin-top:15px; text-align:center; font-weight:bold; color: #2e7d32;"></div>
     </div>
 </div>
@@ -72,33 +72,51 @@
         } else { alert("Clave incorrecta"); }
     }
 
+    // FUNCIÓN PARA CONVERTIR LINKS DE DRIVE A DIRECTOS
+    function forzarLinkDirecto(url) {
+        if (url.includes('drive.google.com')) {
+            let id = "";
+            if (url.includes('id=')) {
+                id = url.split('id=')[1].split('&')[0];
+            } else {
+                id = url.split('/d/')[1].split('/')[0];
+            }
+            return `https://lh3.googleusercontent.com/d/${id}`;
+        }
+        return url;
+    }
+
     async function guardarCapitulo() {
         const historia = document.getElementById('historia').value;
         const numCap = document.getElementById('capitulo').value;
         const textoLinks = document.getElementById('links').value;
-        const listaLinks = textoLinks.split(/[\s\n]+/).filter(l => l.trim() !== "");
+        
+        // Limpiamos y convertimos cada link
+        const listaLinks = textoLinks.split(/[\s\n]+/)
+            .filter(l => l.trim() !== "")
+            .map(l => forzarLinkDirecto(l.trim()));
 
         if (!numCap || listaLinks.length === 0) { alert("Llena los campos"); return; }
 
         try {
-            // ENVIAMOS LA INFORMACIÓN EN DOS FORMATOS PARA "PESCAR" EL ERROR
             const datos = {
                 numero: parseFloat(numCap),
-                num: parseFloat(numCap), // A veces la web busca 'num'
+                num: parseFloat(numCap),
                 imagenes: listaLinks,
                 link: listaLinks[0],
                 id: "capitulo_" + numCap
             };
 
-            // Intento 1: Como "capitulo_2"
+            // Guardamos con ambos IDs para asegurar que la web lo encuentre
             await db.collection(historia).doc("capitulo_" + numCap).set(datos);
-            
-            // Intento 2: Como solo "2" (por si la web lo busca así)
             await db.collection(historia).doc(numCap.toString()).set(datos);
 
             const msg = document.getElementById('mensaje');
             msg.style.display = "block";
-            msg.innerHTML = "✅ ¡Súper Guardado! Revisa la web ahora.";
+            msg.innerHTML = "✅ ¡Links convertidos y publicados!";
+            
+            // Limpiar el campo para la próxima carga
+            document.getElementById('links').value = "";
         } catch (e) { alert("Error: " + e.message); }
     }
 </script>
