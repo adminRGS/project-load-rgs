@@ -13,7 +13,7 @@
             overflow-x: hidden; min-height: 100vh; 
         }
         
-        /* FONDO DE BRILLITOS ANIMADOS (ESTILO CANVA) */
+        /* FONDO DE BRILLITOS ANIMADOS */
         body::after {
             content: "";
             position: fixed;
@@ -34,7 +34,6 @@
             to { transform: translateY(-150px); }
         }
 
-        /* BOTÓN VOLVER A HISTORIAS */
         .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
         .btn-catalogo { 
             text-decoration: none; color: #ff66b2; 
@@ -61,7 +60,6 @@
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
-        /* LISTADO DE NÚMEROS */
         .grid-caps { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
             gap: 15px; width: 92%; max-width: 500px; 
@@ -82,12 +80,11 @@
             position: relative;
         }
         
-        /* EFECTO DE RESPLANDOR (BRILLITOS AL TOCAR) */
         .disponible:hover {
             transform: translateY(-5px) scale(1.05);
             box-shadow: 0 0 30px rgba(255, 102, 178, 0.8);
             background: rgba(255, 102, 178, 0.4) !important;
-            border-color: #ffd700 !important; /* Brillo dorado al tocar */
+            border-color: #ffd700 !important;
         }
 
         /* LECTOR */
@@ -153,8 +150,8 @@
         return url;
     }
 
-    // Generar botones de capítulos
-    for (let i = 1; i <= 40; i++) {
+    // MODIFICADO: Ahora genera 150 botones automáticamente
+    for (let i = 1; i <= 150; i++) {
         const btn = document.createElement('div');
         btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
         document.getElementById('grid').appendChild(btn);
