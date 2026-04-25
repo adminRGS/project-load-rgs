@@ -5,37 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fingí estar embarazada - Rose Garden Scan</title>
     <style>
-        body { margin: 0; padding: 0; background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); color: white; font-family: 'serif'; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; animation: starsMove 100s linear infinite; z-index: -1; }
-        @keyframes starsMove { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-        header { padding: 40px 10px; text-align: center; width: 100%; }
-        .btn-volver { text-decoration: none; color: #ffb3d9; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-size: 1.8rem; margin: 15px 0; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shine 3s linear infinite; }
-        @keyframes shine { to { background-position: 200% center; } }
-        .grid-caps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 90%; max-width: 500px; padding-bottom: 50px; }
-        .cap-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #444; text-align: center; padding: 18px 0; border-radius: 12px; font-weight: bold; position: relative; overflow: hidden; transition: 0.3s; }
+        body { 
+            margin: 0; padding: 0; 
+            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
+            color: white; font-family: 'serif'; 
+            display: flex; flex-direction: column; align-items: center; 
+            overflow-x: hidden; min-height: 100vh; 
+        }
         
-        /* BOTÓN ACTIVADO AUTOMÁTICAMENTE */
-        .disponible { border: 1px solid #ff66b2 !important; color: white !important; background: rgba(255, 102, 178, 0.2) !important; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); cursor: pointer; }
-        
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
-        .btn-cerrar { position: fixed; top: 20px; right: 20px; background: #ff66b2; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; z-index: 101; cursor: pointer; }
+        /* FONDO DE BRILLITOS ANIMADOS ESTILO CANVA */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle, #fff 1px, transparent 1px),
+                radial-gradient(circle, #fff 1.5px, transparent 1.5px);
+            background-size: 80px 80px, 150px 150px;
+            background-position: 0 0, 75px 75px;
+            opacity: 0.2;
+            animation: moveStars 30s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes moveStars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-150px); }
+        }
+
+        /* BOTÓN VOLVER A HISTORIAS */
+        .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
+        .btn-catalogo { 
+            text-decoration: none; color: #ff66b2; 
+            border: 2px solid #ff66b2; padding: 10px 22px; 
+            border-radius: 30px; font-weight: bold; font-size: 0.95rem; 
+            transition: 0.3s; display: flex; align-items: center; gap: 10px; 
+            background: rgba(255, 102, 178, 0.1);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
+        }
+        .btn-catalogo:hover { 
+            background: #ff66b2; color: white; 
+            box-shadow: 0 0 25px rgba(255, 102, 178, 0.8); 
+            transform: scale(1.05);
+        }
+
+        header { padding: 15px; text-align: center; z-index: 10; }
+        h1 { 
+            font-size: 2.2rem; 
+            background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
+            background-size: 200% auto; -webkit-background-clip: text; 
+            color: transparent; animation: shineText 4s linear infinite; margin: 10px 0; 
+            text-shadow: 0 0 15px rgba(255, 102, 178, 0.3);
+        }
+        @keyframes shineText { to { background-position: 200% center; } }
+
+        /* GRID DE CAPÍTULOS */
+        .grid-caps { 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; width: 92%; max-width: 500px; 
+            padding-bottom: 60px; margin-top: 25px; z-index: 10;
+        }
+        .cap-btn { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            color: #555; text-align: center; padding: 20px 0; 
+            border-radius: 15px; font-weight: bold; transition: 0.4s ease; 
+        }
+        .disponible { 
+            border: 1px solid #ff66b2 !important; 
+            color: white !important; 
+            background: rgba(255, 102, 178, 0.15) !important; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .disponible:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 102, 178, 0.8);
+            background: rgba(255, 102, 178, 0.4) !important;
+            border-color: #ffd700 !important;
+        }
+
+        /* LECTOR */
+        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
+        
+        .nav-lector { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.9); 
+            padding: 12px 25px; border-radius: 35px; border: 1px solid #ff66b2; 
+            backdrop-filter: blur(10px); z-index: 102; 
+            box-shadow: 0 0 30px rgba(255, 102, 178, 0.5); 
+        }
+        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .nav-btn:active { transform: scale(0.9); }
+        .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div id="lector">
-    <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
-    <div id="contenido-imagenes"></div>
-</div>
+    <div class="contenedor-regreso">
+        <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
+    </div>
 
-<header>
-    <a href="index.html" class="btn-volver">✦ Regresar al Inicio ✦</a>
-    <h1>Fingí estar embarazada...</h1>
-</header>
+    <header>
+        <h1>Fingí estar embarazada...</h1>
+    </header>
 
-<div class="grid-caps" id="grid"></div>
+    <div id="lector">
+        <div class="nav-lector">
+            <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
+            <button class="nav-btn" style="background:#ff4d4d" onclick="cerrarLector()">✕</button>
+            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">Sig. →</button>
+        </div>
+        <div id="contenido-imagenes"></div>
+    </div>
+
+    <div class="grid-caps" id="grid"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -52,78 +140,73 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // ID de la historia para Firebase
     const historiaID = "embarazada"; 
-    const grid = document.getElementById('grid');
+    let capActual = 1;
 
-    // Función para limpiar links de Drive
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/u/0/d/${id}`;
+            return `https://lh3.googleusercontent.com/d/$${id}`;
         }
         return url;
     }
 
-    // Crear los botones (del 1 al 200)
-    for (let i = 1; i <= 200; i++) {
+    // Generar 150 botones
+    for (let i = 1; i <= 150; i++) {
         const btn = document.createElement('div');
-        btn.innerText = i;
-        btn.className = 'cap-btn';
-        btn.id = "btn-" + i;
-        grid.appendChild(btn);
+        btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
+        document.getElementById('grid').appendChild(btn);
     }
 
-    // Activar los que tengan contenido en Firebase
     async function activarCapitulos() {
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
             querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.imagenes && data.imagenes.length > 0) {
-                    const num = data.numero || parseInt(doc.id.replace("capitulo_", ""));
-                    const boton = document.getElementById("btn-" + num);
-                    if (boton) {
-                        boton.classList.add('disponible');
-                        boton.onclick = () => abrirLector(num);
-                    }
+                const numStr = doc.id.replace("capitulo_", "");
+                const num = parseFloat(numStr);
+                const boton = document.getElementById("btn-" + num);
+                if (boton) { 
+                    boton.classList.add('disponible'); 
+                    boton.onclick = () => abrirLector(num); 
                 }
             });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Error:", e); }
     }
-
     activarCapitulos();
 
     window.abrirLector = async function(num) {
+        capActual = num;
         const lector = document.getElementById('lector');
         const contenedor = document.getElementById('contenido-imagenes');
-        lector.style.display = 'block';
-        contenedor.innerHTML = "<p style='text-align:center; margin-top:50px;'>Cargando tiras...</p>";
+        lector.style.display = 'block'; 
+        lector.scrollTop = 0;
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando tiras... ✨</p>";
+
+        document.getElementById('btn-ant').disabled = (num <= 1);
+        const sigExiste = document.getElementById("btn-" + (num + 1))?.classList.contains('disponible');
+        document.getElementById('btn-sig').disabled = !sigExiste;
 
         try {
-            let docRef = doc(db, historiaID, "capitulo_" + num);
-            let docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
-                docRef = doc(db, historiaID, num.toString());
-                docSnap = await getDoc(docRef);
-            }
-
+            const docSnap = await getDoc(doc(db, historiaID, "capitulo_" + num));
             if (docSnap.exists()) {
+                const data = docSnap.data();
                 contenedor.innerHTML = "";
-                docSnap.data().imagenes.forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = arreglarLink(url);
-                    contenedor.appendChild(img);
+                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
+
+                imgs.forEach(url => {
+                    if (url.trim().length > 5) {
+                        const img = document.createElement('img');
+                        img.src = arreglarLink(url.trim());
+                        contenedor.appendChild(img);
+                    }
                 });
             }
-        } catch (e) { alert("Error: " + e.message); }
+        } catch (e) { console.error("Error:", e); }
     }
 
-    window.cerrarLector = function() {
-        document.getElementById('lector').style.display = 'none';
-        document.getElementById('contenido-imagenes').innerHTML = "";
-    }
+    window.capAnterior = () => { if(capActual > 1) abrirLector(capActual - 1); };
+    window.capSiguiente = () => { abrirLector(capActual + 1); };
+    window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
 </script>
 </body>
 </html>
