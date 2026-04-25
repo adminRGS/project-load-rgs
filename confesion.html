@@ -13,76 +13,81 @@
             overflow-x: hidden; min-height: 100vh; 
         }
         
-        /* FONDO DE BRILLITOS (ESTILO CANVA) */
-        body::before {
+        /* FONDO DE BRILLITOS ANIMADOS (ESTILO CANVA) */
+        body::after {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                radial-gradient(circle, white 1px, transparent 1px),
-                radial-gradient(circle, white 1px, transparent 1px);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px;
-            opacity: 0.1;
-            animation: stars 10s linear infinite;
+                radial-gradient(circle, #fff 1px, transparent 1px),
+                radial-gradient(circle, #fff 1.5px, transparent 1.5px);
+            background-size: 80px 80px, 150px 150px;
+            background-position: 0 0, 75px 75px;
+            opacity: 0.2;
+            animation: moveStars 30s linear infinite;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
         }
 
-        @keyframes stars {
+        @keyframes moveStars {
             from { transform: translateY(0); }
-            to { transform: translateY(-50px); }
+            to { transform: translateY(-150px); }
         }
 
-        /* BOTÓN VOLVER A BIBLIOTECA */
+        /* BOTÓN VOLVER A HISTORIAS */
         .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
         .btn-catalogo { 
             text-decoration: none; color: #ff66b2; 
-            border: 1px solid #ff66b2; padding: 8px 18px; 
-            border-radius: 20px; font-weight: bold; font-size: 0.9rem; 
-            transition: 0.3s; display: flex; align-items: center; gap: 8px; 
-            background: rgba(255, 102, 178, 0.05);
+            border: 2px solid #ff66b2; padding: 10px 22px; 
+            border-radius: 30px; font-weight: bold; font-size: 0.95rem; 
+            transition: 0.3s; display: flex; align-items: center; gap: 10px; 
+            background: rgba(255, 102, 178, 0.1);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
         }
         .btn-catalogo:hover { 
             background: #ff66b2; color: white; 
-            box-shadow: 0 0 15px rgba(255, 102, 178, 0.8); 
+            box-shadow: 0 0 25px rgba(255, 102, 178, 0.8); 
+            transform: scale(1.05);
         }
 
-        header { padding: 10px 20px; text-align: center; z-index: 10; }
+        header { padding: 15px; text-align: center; z-index: 10; }
         h1 { 
-            font-size: 2.2rem; 
+            font-size: 2.5rem; 
             background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
             background-size: 200% auto; -webkit-background-clip: text; 
-            color: transparent; animation: shine 3s linear infinite; margin: 10px 0; 
+            color: transparent; animation: shineText 4s linear infinite; margin: 10px 0; 
+            text-shadow: 0 0 15px rgba(255, 102, 178, 0.3);
         }
-        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes shineText { to { background-position: 200% center; } }
 
-        /* GRID CON EFECTO DE DESTELLO */
+        /* LISTADO DE NÚMEROS */
         .grid-caps { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; width: 90%; max-width: 500px; 
-            padding-bottom: 50px; margin-top: 20px; z-index: 10;
+            gap: 15px; width: 92%; max-width: 500px; 
+            padding-bottom: 60px; margin-top: 25px; z-index: 10;
         }
         .cap-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            color: #444; text-align: center; padding: 18px 0; 
-            border-radius: 12px; font-weight: bold; transition: 0.4s; 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            color: #555; text-align: center; padding: 20px 0; 
+            border-radius: 15px; font-weight: bold; transition: 0.4s ease; 
         }
         .disponible { 
             border: 1px solid #ff66b2 !important; 
             color: white !important; 
-            background: rgba(255, 102, 178, 0.2) !important; 
+            background: rgba(255, 102, 178, 0.15) !important; 
             cursor: pointer; 
-            box-shadow: 0 0 10px rgba(255, 102, 178, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             position: relative;
-            overflow: hidden;
         }
         
-        /* EFECTO BRILLITO AL PASAR SOBRE LOS NÚMEROS */
+        /* EFECTO DE RESPLANDOR (BRILLITOS AL TOCAR) */
         .disponible:hover {
-            box-shadow: 0 0 20px rgba(255, 102, 178, 0.6);
-            transform: scale(1.05);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 102, 178, 0.8);
+            background: rgba(255, 102, 178, 0.4) !important;
+            border-color: #ffd700 !important; /* Brillo dorado al tocar */
         }
 
         /* LECTOR */
@@ -90,21 +95,21 @@
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
         .nav-lector { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.85); 
-            padding: 10px 20px; border-radius: 30px; border: 1px solid #ff66b2; 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.9); 
+            padding: 12px 25px; border-radius: 35px; border: 1px solid #ff66b2; 
             backdrop-filter: blur(10px); z-index: 102; 
-            box-shadow: 0 0 20px rgba(255, 102, 178, 0.3); 
+            box-shadow: 0 0 30px rgba(255, 102, 178, 0.5); 
         }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .nav-btn:active { transform: scale(0.9); }
-        .nav-btn:disabled { background: #444; opacity: 0.5; cursor: not-allowed; }
+        .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div class="contenedor-regreso">
-        <a href="index.html" class="btn-catalogo">🏠 Volver a la Biblioteca</a>
+        <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
     </div>
 
     <header>
@@ -143,12 +148,13 @@
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/u/0/d/$${id}`;
+            return `https://lh3.googleusercontent.com/d/${id}`;
         }
         return url;
     }
 
-    for (let i = 1; i <= 36; i++) {
+    // Generar botones de capítulos
+    for (let i = 1; i <= 40; i++) {
         const btn = document.createElement('div');
         btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
         document.getElementById('grid').appendChild(btn);
@@ -176,7 +182,7 @@
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando el arte... ✨</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando magia... ✨</p>";
 
         document.getElementById('btn-ant').disabled = (num <= 1);
         const sigExiste = document.getElementById("btn-" + (num + 1))?.classList.contains('disponible');
@@ -187,10 +193,7 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                let imgs = [];
-                if (Array.isArray(data.imagenes)) { imgs = data.imagenes; }
-                else if (typeof data.imagenes === 'string') { imgs = data.imagenes.split(','); }
-                else if (data.link) { imgs = [data.link]; }
+                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
 
                 imgs.forEach(url => {
                     if (url.trim().length > 5) {
