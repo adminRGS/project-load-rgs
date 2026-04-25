@@ -5,26 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confesión - Rose Garden Scan</title>
     <style>
-        body { margin: 0; padding: 0; background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); color: white; font-family: 'serif'; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; }
+        body { 
+            margin: 0; padding: 0; 
+            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
+            color: white; font-family: 'serif'; 
+            display: flex; flex-direction: column; align-items: center; 
+            overflow-x: hidden; min-height: 100vh; 
+        }
         
-        /* BOTÓN VOLVER AL CATÁLOGO */
-        .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; }
-        .btn-catalogo { text-decoration: none; color: #ff66b2; border: 1px solid #ff66b2; padding: 8px 18px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .btn-catalogo:hover { background: #ff66b2; color: white; box-shadow: 0 0 15px rgba(255, 102, 178, 0.5); }
+        /* FONDO DE BRILLITOS (ESTILO CANVA) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle, white 1px, transparent 1px),
+                radial-gradient(circle, white 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            opacity: 0.1;
+            animation: stars 10s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-        header { padding: 10px 20px; text-align: center; }
-        h1 { font-size: 2.2rem; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shine 3s linear infinite; margin: 10px 0; }
+        @keyframes stars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-50px); }
+        }
+
+        /* BOTÓN VOLVER A BIBLIOTECA */
+        .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
+        .btn-catalogo { 
+            text-decoration: none; color: #ff66b2; 
+            border: 1px solid #ff66b2; padding: 8px 18px; 
+            border-radius: 20px; font-weight: bold; font-size: 0.9rem; 
+            transition: 0.3s; display: flex; align-items: center; gap: 8px; 
+            background: rgba(255, 102, 178, 0.05);
+        }
+        .btn-catalogo:hover { 
+            background: #ff66b2; color: white; 
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.8); 
+        }
+
+        header { padding: 10px 20px; text-align: center; z-index: 10; }
+        h1 { 
+            font-size: 2.2rem; 
+            background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
+            background-size: 200% auto; -webkit-background-clip: text; 
+            color: transparent; animation: shine 3s linear infinite; margin: 10px 0; 
+        }
         @keyframes shine { to { background-position: 200% center; } }
 
-        .grid-caps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 90%; max-width: 500px; padding-bottom: 50px; margin-top: 20px; }
-        .cap-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #444; text-align: center; padding: 18px 0; border-radius: 12px; font-weight: bold; transition: 0.3s; }
-        .disponible { border: 1px solid #ff66b2 !important; color: white !important; background: rgba(255, 102, 178, 0.2) !important; cursor: pointer; box-shadow: 0 0 10px rgba(255, 102, 178, 0.3); }
+        /* GRID CON EFECTO DE DESTELLO */
+        .grid-caps { 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; width: 90%; max-width: 500px; 
+            padding-bottom: 50px; margin-top: 20px; z-index: 10;
+        }
+        .cap-btn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: #444; text-align: center; padding: 18px 0; 
+            border-radius: 12px; font-weight: bold; transition: 0.4s; 
+        }
+        .disponible { 
+            border: 1px solid #ff66b2 !important; 
+            color: white !important; 
+            background: rgba(255, 102, 178, 0.2) !important; 
+            cursor: pointer; 
+            box-shadow: 0 0 10px rgba(255, 102, 178, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* EFECTO BRILLITO AL PASAR SOBRE LOS NÚMEROS */
+        .disponible:hover {
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.6);
+            transform: scale(1.05);
+        }
 
         /* LECTOR */
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        .nav-lector { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0, 0, 0, 0.85); padding: 10px 20px; border-radius: 30px; border: 1px solid #ff66b2; backdrop-filter: blur(10px); z-index: 102; box-shadow: 0 0 20px rgba(255, 102, 178, 0.3); }
+        .nav-lector { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.85); 
+            padding: 10px 20px; border-radius: 30px; border: 1px solid #ff66b2; 
+            backdrop-filter: blur(10px); z-index: 102; 
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.3); 
+        }
         .nav-btn { background: #ff66b2; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #444; opacity: 0.5; cursor: not-allowed; }
@@ -33,7 +104,7 @@
 <body>
 
     <div class="contenedor-regreso">
-        <a href="index.html" class="btn-catalogo">🏠 Volver al Catálogo</a>
+        <a href="index.html" class="btn-catalogo">🏠 Volver a la Biblioteca</a>
     </div>
 
     <header>
@@ -72,13 +143,12 @@
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/u/0/d/${id}`;
+            return `https://lh3.googleusercontent.com/u/0/d/$${id}`;
         }
         return url;
     }
 
-    // Generamos los botones del grid
-    for (let i = 1; i <= 40; i++) {
+    for (let i = 1; i <= 36; i++) {
         const btn = document.createElement('div');
         btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
         document.getElementById('grid').appendChild(btn);
@@ -96,7 +166,7 @@
                     boton.onclick = () => abrirLector(num); 
                 }
             });
-        } catch (e) { console.error("Error activando caps:", e); }
+        } catch (e) { console.error("Error:", e); }
     }
     activarCapitulos();
 
@@ -106,9 +176,8 @@
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando arte ✨</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando el arte... ✨</p>";
 
-        // Configurar botones de navegación
         document.getElementById('btn-ant').disabled = (num <= 1);
         const sigExiste = document.getElementById("btn-" + (num + 1))?.classList.contains('disponible');
         document.getElementById('btn-sig').disabled = !sigExiste;
@@ -118,8 +187,6 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                
-                // BLINDAJE: Detecta si es lista, texto o link único
                 let imgs = [];
                 if (Array.isArray(data.imagenes)) { imgs = data.imagenes; }
                 else if (typeof data.imagenes === 'string') { imgs = data.imagenes.split(','); }
@@ -133,15 +200,12 @@
                     }
                 });
             }
-        } catch (e) { console.error("Error en lector:", e); }
+        } catch (e) { console.error("Error:", e); }
     }
 
     window.capAnterior = () => { if(capActual > 1) abrirLector(capActual - 1); };
     window.capSiguiente = () => { abrirLector(capActual + 1); };
-    window.cerrarLector = () => { 
-        document.getElementById('lector').style.display = 'none'; 
-        document.getElementById('contenido-imagenes').innerHTML = "";
-    };
+    window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
 </script>
 </body>
 </html>
