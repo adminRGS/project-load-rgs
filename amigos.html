@@ -13,7 +13,6 @@
             overflow-x: hidden; min-height: 100vh; 
         }
         
-        /* FONDO DE BRILLITOS ANIMADOS (ESTILO CANVA) */
         body::after {
             content: "";
             position: fixed;
@@ -34,7 +33,6 @@
             to { transform: translateY(-150px); }
         }
 
-        /* BOTÓN VOLVER A HISTORIAS */
         .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
         .btn-catalogo { 
             text-decoration: none; color: #ff66b2; 
@@ -61,34 +59,26 @@
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
-        /* GRID DE CAPÍTULOS */
         .grid-caps { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
             gap: 15px; width: 92%; max-width: 500px; 
             padding-bottom: 60px; margin-top: 25px; z-index: 10;
         }
         .cap-btn { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            color: #555; text-align: center; padding: 20px 0; 
+            background: rgba(255, 102, 178, 0.15); 
+            border: 1px solid #ff66b2; 
+            color: white; text-align: center; padding: 20px 0; 
             border-radius: 15px; font-weight: bold; transition: 0.4s ease; 
-        }
-        .disponible { 
-            border: 1px solid #ff66b2 !important; 
-            color: white !important; 
-            background: rgba(255, 102, 178, 0.15) !important; 
             cursor: pointer; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            position: relative;
         }
-        .disponible:hover {
+        .cap-btn:hover {
             transform: translateY(-5px) scale(1.05);
             box-shadow: 0 0 30px rgba(255, 102, 178, 0.8);
-            background: rgba(255, 102, 178, 0.4) !important;
-            border-color: #ffd700 !important;
+            background: rgba(255, 102, 178, 0.4);
+            border-color: #ffd700;
         }
 
-        /* LECTOR */
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
@@ -142,37 +132,45 @@
     const db = getFirestore(app);
     const historiaID = "amigos"; 
     let capActual = 1;
+    let listaCapitulos = []; // Aquí guardaremos los números de caps disponibles
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/d/$${id}`;
+            return `https://lh3.googleusercontent.com/d/${id}`;
         }
         return url;
     }
 
-    // Generar 150 botones
-    for (let i = 1; i <= 150; i++) {
-        const btn = document.createElement('div');
-        btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
-        document.getElementById('grid').appendChild(btn);
-    }
-
-    async function activarCapitulos() {
+    async function cargarCapitulos() {
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
+            listaCapitulos = [];
+            
             querySnapshot.forEach((doc) => {
                 const numStr = doc.id.replace("capitulo_", "");
-                const num = parseFloat(numStr);
-                const boton = document.getElementById("btn-" + num);
-                if (boton) { 
-                    boton.classList.add('disponible'); 
-                    boton.onclick = () => abrirLector(num); 
-                }
+                listaCapitulos.push(parseFloat(numStr));
             });
-        } catch (e) { console.error("Error:", e); }
+
+            // Ordenar los capítulos de menor a mayor (0, 1, 2, 13.5, 14...)
+            listaCapitulos.sort((a, b) => a - b);
+
+            const grid = document.getElementById('grid');
+            grid.innerHTML = ""; // Limpiamos el grid
+
+            listaCapitulos.forEach(num => {
+                const btn = document.createElement('div');
+                // Si el número es 0, mostramos "Prólogo", si no, el número
+                btn.innerText = num === 0 ? "0" : num; 
+                btn.className = 'cap-btn';
+                btn.onclick = () => abrirLector(num);
+                grid.appendChild(btn);
+            });
+
+        } catch (e) { console.error("Error cargando capítulos:", e); }
     }
-    activarCapitulos();
+
+    cargarCapitulos();
 
     window.abrirLector = async function(num) {
         capActual = num;
@@ -182,9 +180,10 @@
         lector.scrollTop = 0;
         contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando magia... ✨</p>";
 
-        document.getElementById('btn-ant').disabled = (num <= 1);
-        const sigExiste = document.getElementById("btn-" + (num + 1))?.classList.contains('disponible');
-        document.getElementById('btn-sig').disabled = !sigExiste;
+        // Lógica de botones Sig/Ant basada en la lista ordenada
+        const indexActual = listaCapitulos.indexOf(num);
+        document.getElementById('btn-ant').disabled = (indexActual <= 0);
+        document.getElementById('btn-sig').disabled = (indexActual >= listaCapitulos.length - 1);
 
         try {
             const docSnap = await getDoc(doc(db, historiaID, "capitulo_" + num));
@@ -201,11 +200,19 @@
                     }
                 });
             }
-        } catch (e) { console.error("Error:", e); }
+        } catch (e) { console.error("Error abriendo lector:", e); }
     }
 
-    window.capAnterior = () => { if(capActual > 1) abrirLector(capActual - 1); };
-    window.capSiguiente = () => { abrirLector(capActual + 1); };
+    window.capAnterior = () => { 
+        const indexActual = listaCapitulos.indexOf(capActual);
+        if (indexActual > 0) abrirLector(listaCapitulos[indexActual - 1]);
+    };
+
+    window.capSiguiente = () => { 
+        const indexActual = listaCapitulos.indexOf(capActual);
+        if (indexActual < listaCapitulos.length - 1) abrirLector(listaCapitulos[indexActual + 1]);
+    };
+
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
 </script>
 </body>
