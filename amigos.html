@@ -82,10 +82,10 @@
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        /* BARRA DE NAVEGACIÓN UNIFICADA (Estilo esquema usuario) */
+        /* BARRA DE NAVEGACIÓN ACTUALIZADA */
         .nav-lector { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; align-items: center; gap: 8px; 
+            display: flex; align-items: center; gap: 10px; 
             background: rgba(0, 0, 0, 0.95); 
             padding: 8px 15px; border-radius: 40px; border: 1px solid #ff66b2; 
             backdrop-filter: blur(10px); z-index: 102; 
@@ -94,46 +94,48 @@
         .nav-btn { 
             background: #ff66b2; color: white; border: none; 
             padding: 10px 15px; border-radius: 25px; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
         }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
 
-        /* BOTÓN DE REACCIONES (Morado/Rosa integrado) */
-        .contenedor-reacciones {
-            position: relative;
-            display: flex; align-items: center; gap: 5px;
-            background: #7a288a; /* Morado como pediste */
-            padding: 8px 12px; border-radius: 25px;
-            cursor: pointer; transition: 0.3s;
-            border: 1px solid #ff66b2;
-        }
-        .contenedor-reacciones:hover { background: #9b30ad; transform: scale(1.05); }
-        .label-reacc { font-size: 0.8rem; font-weight: bold; }
-        #count-total { font-size: 0.85rem; font-weight: bold; min-width: 15px; }
+        .btn-cerrar { background: #ff4d4d; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: none; color: white; cursor: pointer; }
 
-        /* MENÚ DESPLEGABLE DE EMOJIS */
-        .menu-emojis {
+        /* BOTÓN PULGAR ROSADO */
+        .btn-pulgar {
+            position: relative;
+            background: rgba(255, 102, 178, 0.2);
+            border: 1px solid #ff66b2;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-pulgar:hover { background: rgba(255, 102, 178, 0.4); }
+        .icono-pulgar { font-size: 1.2rem; filter: hue-rotate(300deg); } /* Efecto rosado al emoji */
+
+        /* MENÚ DE REACCIONES */
+        .menu-reacciones {
             display: none;
             position: absolute;
             bottom: 55px; left: 50%; transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.95);
+            background: rgba(20, 20, 20, 0.98);
             border: 1px solid #ff66b2;
-            padding: 10px; border-radius: 30px;
+            padding: 10px 15px; border-radius: 30px;
             gap: 15px; z-index: 110;
             box-shadow: 0 0 20px rgba(255, 102, 178, 0.6);
         }
-        .menu-emojis.visible { display: flex; animation: slideUp 0.3s ease-out; }
+        .menu-reacciones.visible { display: flex; animation: bounceUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translate(-50%, 15px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+        @keyframes bounceUp {
+            from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
         }
 
-        .emoji { font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-        .emoji:hover { transform: scale(1.4); }
+        .emoji-option { font-size: 1.6rem; cursor: pointer; transition: 0.2s; }
+        .emoji-option:hover { transform: scale(1.4); }
 
-        .btn-cerrar { background: #ff4d4d; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        /* CONTADOR TOTAL PEQUEÑO */
+        #count-total { font-size: 0.75rem; font-weight: bold; color: #ff66b2; position: absolute; top: -5px; right: -5px; background: black; border-radius: 10px; padding: 2px 5px; border: 1px solid #ff66b2; }
     </style>
 </head>
 <body>
@@ -149,21 +151,19 @@
     <div id="lector">
         <div class="nav-lector">
             <button id="btn-ant" class="nav-btn" onclick="capAnterior()">←</button>
-            
-            <button class="nav-btn btn-cerrar" onclick="cerrarLector()">✕</button>
+            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">→</button>
+            <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
 
-            <div class="contenedor-reacciones" onclick="toggleMenu(event)">
-                <span class="label-reacc">Reaccionar</span>
+            <div class="btn-pulgar" onclick="toggleReacciones(event)">
+                <span class="icono-pulgar">👍</span>
                 <span id="count-total">0</span>
 
-                <div class="menu-emojis" id="lista-emojis">
-                    <span class="emoji" onclick="enviarReaccion('loves', event)">❤️</span>
-                    <span class="emoji" onclick="enviarReaccion('likes', event)">👍</span>
-                    <span class="emoji" onclick="enviarReaccion('haha', event)">😂</span>
+                <div class="menu-reacciones" id="pop-emojis">
+                    <span class="emoji-option" onclick="procesarVoto('loves', event)">❤️</span>
+                    <span class="emoji-option" onclick="procesarVoto('likes', event)">👍</span>
+                    <span class="emoji-option" onclick="procesarVoto('haha', event)">😂</span>
                 </div>
             </div>
-
-            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">→</button>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
@@ -238,8 +238,6 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                
-                // Sumar todos los tipos de reacciones para el total
                 const total = (data.loves || 0) + (data.likes || 0) + (data.haha || 0);
                 document.getElementById('count-total').innerText = total;
 
@@ -255,22 +253,20 @@
         } catch (e) { console.error(e); }
     }
 
-    // ABRIR/CERRAR MENÚ EMOJIS
-    window.toggleMenu = (e) => {
+    window.toggleReacciones = (e) => {
         e.stopPropagation();
-        document.getElementById('lista-emojis').classList.toggle('visible');
+        document.getElementById('pop-emojis').classList.toggle('visible');
     };
 
-    // REACCIONAR Y GUARDAR
-    window.enviarReaccion = async (tipo, e) => {
+    window.procesarVoto = async (tipo, e) => {
         e.stopPropagation();
         const docRef = doc(db, historiaID, "capitulo_" + capActual);
         try {
             await updateDoc(docRef, { [tipo]: increment(1) });
-            const p = document.getElementById('count-total');
-            p.innerText = parseInt(p.innerText) + 1;
-            document.getElementById('lista-emojis').classList.remove('visible');
-        } catch (err) { console.log("Error al reaccionar"); }
+            const count = document.getElementById('count-total');
+            count.innerText = parseInt(count.innerText) + 1;
+            document.getElementById('pop-emojis').classList.remove('visible');
+        } catch (err) { console.log("Error al votar"); }
     };
 
     window.capAnterior = () => { 
@@ -285,9 +281,8 @@
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
 
-    // Cerrar menú si se hace clic fuera
     document.addEventListener('click', () => {
-        document.getElementById('lista-emojis').classList.remove('visible');
+        document.getElementById('pop-emojis').classList.remove('visible');
     });
 </script>
 </body>
