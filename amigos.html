@@ -82,60 +82,60 @@
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        /* BARRA DE NAVEGACIÓN ACTUALIZADA */
+        /* BARRA DE NAVEGACIÓN ARMÓNICA */
         .nav-lector { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; align-items: center; gap: 10px; 
-            background: rgba(0, 0, 0, 0.95); 
-            padding: 8px 15px; border-radius: 40px; border: 1px solid #ff66b2; 
-            backdrop-filter: blur(10px); z-index: 102; 
-            box-shadow: 0 0 25px rgba(255, 102, 178, 0.4); 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; align-items: center; gap: 8px; 
+            background: rgba(0, 0, 0, 0.96); 
+            padding: 6px 14px; border-radius: 40px; border: 1px solid #ff66b2; 
+            backdrop-filter: blur(12px); z-index: 102; 
+            box-shadow: 0 0 30px rgba(255, 102, 178, 0.4); 
+            width: fit-content; max-width: 95vw;
         }
         .nav-btn { 
             background: #ff66b2; color: white; border: none; 
-            padding: 10px 15px; border-radius: 25px; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+            padding: 8px 12px; border-radius: 20px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; font-size: 0.8rem;
         }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
 
-        .btn-cerrar { background: #ff4d4d; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: none; color: white; cursor: pointer; }
+        .btn-cerrar { background: #ff4d4d; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: none; color: white; cursor: pointer; }
 
-        /* BOTÓN PULGAR ROSADO */
-        .btn-pulgar {
+        /* CONTENEDOR DE REACCIONES INTEGRADO */
+        .btn-reacciones-stats {
             position: relative;
-            background: rgba(255, 102, 178, 0.2);
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255, 102, 178, 0.15);
             border: 1px solid #ff66b2;
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            padding: 6px 12px; border-radius: 25px;
             cursor: pointer; transition: 0.3s;
         }
-        .btn-pulgar:hover { background: rgba(255, 102, 178, 0.4); }
-        .icono-pulgar { font-size: 1.2rem; filter: hue-rotate(300deg); } /* Efecto rosado al emoji */
+        .btn-reacciones-stats:hover { background: rgba(255, 102, 178, 0.3); }
+        
+        .stat-item { display: flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: bold; color: #ffcce6; }
+        .pulgar-main { font-size: 1rem; filter: hue-rotate(300deg); margin-right: 2px; }
 
-        /* MENÚ DE REACCIONES */
-        .menu-reacciones {
+        /* MENÚ DE SELECCIÓN (FLOTANDO HACIA ARRIBA) */
+        .menu-pop {
             display: none;
             position: absolute;
-            bottom: 55px; left: 50%; transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.98);
+            bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 15, 15, 0.98);
             border: 1px solid #ff66b2;
             padding: 10px 15px; border-radius: 30px;
             gap: 15px; z-index: 110;
             box-shadow: 0 0 20px rgba(255, 102, 178, 0.6);
         }
-        .menu-reacciones.visible { display: flex; animation: bounceUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .menu-pop.visible { display: flex; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        @keyframes bounceUp {
-            from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, 15px) scale(0.8); }
             to { opacity: 1; transform: translate(-50%, 0) scale(1); }
         }
 
-        .emoji-option { font-size: 1.6rem; cursor: pointer; transition: 0.2s; }
-        .emoji-option:hover { transform: scale(1.4); }
-
-        /* CONTADOR TOTAL PEQUEÑO */
-        #count-total { font-size: 0.75rem; font-weight: bold; color: #ff66b2; position: absolute; top: -5px; right: -5px; background: black; border-radius: 10px; padding: 2px 5px; border: 1px solid #ff66b2; }
+        .emoji-opt { font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .emoji-opt:hover { transform: scale(1.4); }
     </style>
 </head>
 <body>
@@ -154,14 +154,16 @@
             <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">→</button>
             <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
 
-            <div class="btn-pulgar" onclick="toggleReacciones(event)">
-                <span class="icono-pulgar">👍</span>
-                <span id="count-total">0</span>
+            <div class="btn-reacciones-stats" onclick="toggleMenu(event)">
+                <span class="pulgar-main">👍</span>
+                <div class="stat-item">❤️ <span id="val-loves">0</span></div>
+                <div class="stat-item">👍 <span id="val-likes">0</span></div>
+                <div class="stat-item">😂 <span id="val-haha">0</span></div>
 
-                <div class="menu-reacciones" id="pop-emojis">
-                    <span class="emoji-option" onclick="procesarVoto('loves', event)">❤️</span>
-                    <span class="emoji-option" onclick="procesarVoto('likes', event)">👍</span>
-                    <span class="emoji-option" onclick="procesarVoto('haha', event)">😂</span>
+                <div class="menu-pop" id="menu-emojis">
+                    <span class="emoji-opt" onclick="votar('loves', event)">❤️</span>
+                    <span class="emoji-opt" onclick="votar('likes', event)">👍</span>
+                    <span class="emoji-opt" onclick="votar('haha', event)">😂</span>
                 </div>
             </div>
         </div>
@@ -226,7 +228,7 @@
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando magia... ✨</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Abriendo páginas... ✨</p>";
 
         const indexActual = listaCapitulos.indexOf(num);
         document.getElementById('btn-ant').disabled = (indexActual <= 0);
@@ -238,8 +240,11 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                const total = (data.loves || 0) + (data.likes || 0) + (data.haha || 0);
-                document.getElementById('count-total').innerText = total;
+                
+                // Cargar valores individuales
+                document.getElementById('val-loves').innerText = data.loves || 0;
+                document.getElementById('val-likes').innerText = data.likes || 0;
+                document.getElementById('val-haha').innerText = data.haha || 0;
 
                 let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
                 imgs.forEach(url => {
@@ -253,19 +258,19 @@
         } catch (e) { console.error(e); }
     }
 
-    window.toggleReacciones = (e) => {
+    window.toggleMenu = (e) => {
         e.stopPropagation();
-        document.getElementById('pop-emojis').classList.toggle('visible');
+        document.getElementById('menu-emojis').classList.toggle('visible');
     };
 
-    window.procesarVoto = async (tipo, e) => {
+    window.votar = async (tipo, e) => {
         e.stopPropagation();
         const docRef = doc(db, historiaID, "capitulo_" + capActual);
         try {
             await updateDoc(docRef, { [tipo]: increment(1) });
-            const count = document.getElementById('count-total');
-            count.innerText = parseInt(count.innerText) + 1;
-            document.getElementById('pop-emojis').classList.remove('visible');
+            const el = document.getElementById('val-' + tipo);
+            el.innerText = parseInt(el.innerText) + 1;
+            document.getElementById('menu-emojis').classList.remove('visible');
         } catch (err) { console.log("Error al votar"); }
     };
 
@@ -282,7 +287,7 @@
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
 
     document.addEventListener('click', () => {
-        document.getElementById('pop-emojis').classList.remove('visible');
+        document.getElementById('menu-emojis').classList.remove('visible');
     });
 </script>
 </body>
