@@ -92,6 +92,37 @@
         .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
+
+        /* ESTILO DEL BOTÓN ME ENCANTA BRILLANTE */
+        .btn-love-float {
+            position: fixed;
+            bottom: 100px; /* Arriba de la barra nav */
+            right: 20px;
+            background: rgba(255, 102, 178, 0.2);
+            border: 2px solid #ff66b2;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            z-index: 105;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.4);
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(255, 102, 178, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(255, 102, 178, 0.8), 0 0 10px #ffd700; }
+            100% { box-shadow: 0 0 10px rgba(255, 102, 178, 0.4); }
+        }
+
+        .btn-love-float:active { transform: scale(1.2); }
+        
+        .corazon { font-size: 1.5rem; filter: drop-shadow(0 0 5px #ff66b2); }
+        #count-love { font-weight: bold; color: white; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -105,6 +136,11 @@
     </header>
 
     <div id="lector">
+        <div class="btn-love-float" onclick="darAmor()">
+            <span class="corazon">💖</span>
+            <span id="count-love">0</span>
+        </div>
+
         <div class="nav-lector">
             <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
             <button class="nav-btn" style="background:#ff4d4d" onclick="cerrarLector()">✕</button>
@@ -117,7 +153,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -132,7 +168,7 @@
     const db = getFirestore(app);
     const historiaID = "amigos"; 
     let capActual = 1;
-    let listaCapitulos = []; // Aquí guardaremos los números de caps disponibles
+    let listaCapitulos = [];
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
@@ -146,28 +182,21 @@
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
             listaCapitulos = [];
-            
             querySnapshot.forEach((doc) => {
                 const numStr = doc.id.replace("capitulo_", "");
                 listaCapitulos.push(parseFloat(numStr));
             });
-
-            // Ordenar los capítulos de menor a mayor (0, 1, 2, 13.5, 14...)
             listaCapitulos.sort((a, b) => a - b);
-
             const grid = document.getElementById('grid');
-            grid.innerHTML = ""; // Limpiamos el grid
-
+            grid.innerHTML = ""; 
             listaCapitulos.forEach(num => {
                 const btn = document.createElement('div');
-                // Si el número es 0, mostramos "Prólogo", si no, el número
                 btn.innerText = num === 0 ? "0" : num; 
                 btn.className = 'cap-btn';
                 btn.onclick = () => abrirLector(num);
                 grid.appendChild(btn);
             });
-
-        } catch (e) { console.error("Error cargando capítulos:", e); }
+        } catch (e) { console.error(e); }
     }
 
     cargarCapitulos();
@@ -180,18 +209,21 @@
         lector.scrollTop = 0;
         contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando magia... ✨</p>";
 
-        // Lógica de botones Sig/Ant basada en la lista ordenada
         const indexActual = listaCapitulos.indexOf(num);
         document.getElementById('btn-ant').disabled = (indexActual <= 0);
         document.getElementById('btn-sig').disabled = (indexActual >= listaCapitulos.length - 1);
 
         try {
-            const docSnap = await getDoc(doc(db, historiaID, "capitulo_" + num));
+            const docRef = doc(db, historiaID, "capitulo_" + num);
+            const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
+                
+                // Mostrar contador de amores
+                document.getElementById('count-love').innerText = data.loves || 0;
 
+                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
                 imgs.forEach(url => {
                     if (url.trim().length > 5) {
                         const img = document.createElement('img');
@@ -200,7 +232,30 @@
                     }
                 });
             }
-        } catch (e) { console.error("Error abriendo lector:", e); }
+        } catch (e) { console.error(e); }
+    }
+
+    // FUNCIÓN PARA DAR "ME ENCANTA"
+    window.darAmor = async function() {
+        const docRef = doc(db, historiaID, "capitulo_" + capActual);
+        try {
+            // Animación rápida al hacer clic
+            const btn = document.querySelector('.btn-love-float');
+            btn.style.transform = "scale(1.4)";
+            setTimeout(() => btn.style.transform = "scale(1)", 200);
+
+            // Guardar en Firebase (incrementa en 1 el campo 'loves')
+            await updateDoc(docRef, {
+                loves: increment(1)
+            });
+
+            // Actualizar el número en pantalla
+            const nuevoConteo = parseInt(document.getElementById('count-love').innerText) + 1;
+            document.getElementById('count-love').innerText = nuevoConteo;
+
+        } catch (e) {
+            console.log("Tip: Si el capítulo no tiene el campo 'loves', créalo en Firebase con valor 0");
+        }
     }
 
     window.capAnterior = () => { 
