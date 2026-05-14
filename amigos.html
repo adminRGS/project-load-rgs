@@ -82,36 +82,58 @@
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        /* BARRA DE NAVEGACIÓN ARMONIOSA */
+        /* BARRA DE NAVEGACIÓN UNIFICADA (Estilo esquema usuario) */
         .nav-lector { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; align-items: center; gap: 10px; 
+            display: flex; align-items: center; gap: 8px; 
             background: rgba(0, 0, 0, 0.95); 
-            padding: 8px 18px; border-radius: 40px; border: 1px solid #ff66b2; 
+            padding: 8px 15px; border-radius: 40px; border: 1px solid #ff66b2; 
             backdrop-filter: blur(10px); z-index: 102; 
             box-shadow: 0 0 25px rgba(255, 102, 178, 0.4); 
         }
         .nav-btn { 
             background: #ff66b2; color: white; border: none; 
-            padding: 10px 18px; border-radius: 25px; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+            padding: 10px 15px; border-radius: 25px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; font-size: 0.85rem;
         }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
 
-        /* BOTÓN DE CORAZÓN INTEGRADO */
-        .btn-love-inline {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 8px 14px; border-radius: 20px;
+        /* BOTÓN DE REACCIONES (Morado/Rosa integrado) */
+        .contenedor-reacciones {
+            position: relative;
+            display: flex; align-items: center; gap: 5px;
+            background: #7a288a; /* Morado como pediste */
+            padding: 8px 12px; border-radius: 25px;
             cursor: pointer; transition: 0.3s;
-            border: 1px solid transparent;
+            border: 1px solid #ff66b2;
         }
-        .btn-love-inline:hover { background: rgba(255, 102, 178, 0.2); border-color: #ff66b2; }
-        .corazon-simple { font-size: 1.2rem; }
-        #count-love { font-size: 0.95rem; font-weight: bold; color: #ff66b2; min-width: 20px; text-align: center; }
+        .contenedor-reacciones:hover { background: #9b30ad; transform: scale(1.05); }
+        .label-reacc { font-size: 0.8rem; font-weight: bold; }
+        #count-total { font-size: 0.85rem; font-weight: bold; min-width: 15px; }
 
-        .btn-cerrar { background: #ff4d4d; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; }
+        /* MENÚ DESPLEGABLE DE EMOJIS */
+        .menu-emojis {
+            display: none;
+            position: absolute;
+            bottom: 55px; left: 50%; transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid #ff66b2;
+            padding: 10px; border-radius: 30px;
+            gap: 15px; z-index: 110;
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.6);
+        }
+        .menu-emojis.visible { display: flex; animation: slideUp 0.3s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translate(-50%, 15px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .emoji { font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .emoji:hover { transform: scale(1.4); }
+
+        .btn-cerrar { background: #ff4d4d; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -128,13 +150,20 @@
         <div class="nav-lector">
             <button id="btn-ant" class="nav-btn" onclick="capAnterior()">←</button>
             
-            <div class="btn-love-inline" onclick="darAmor()">
-                <span class="corazon-simple">❤️</span>
-                <span id="count-love">0</span>
+            <button class="nav-btn btn-cerrar" onclick="cerrarLector()">✕</button>
+
+            <div class="contenedor-reacciones" onclick="toggleMenu(event)">
+                <span class="label-reacc">Reaccionar</span>
+                <span id="count-total">0</span>
+
+                <div class="menu-emojis" id="lista-emojis">
+                    <span class="emoji" onclick="enviarReaccion('loves', event)">❤️</span>
+                    <span class="emoji" onclick="enviarReaccion('likes', event)">👍</span>
+                    <span class="emoji" onclick="enviarReaccion('haha', event)">😂</span>
+                </div>
             </div>
 
             <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">→</button>
-            <button class="nav-btn btn-cerrar" onclick="cerrarLector()">✕</button>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
@@ -158,7 +187,7 @@
     const db = getFirestore(app);
     const historiaID = "amigos"; 
     let capActual = 1;
-    let listaCapitulos = []; 
+    let listaCapitulos = [];
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
@@ -209,7 +238,10 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                document.getElementById('count-love').innerText = data.loves || 0;
+                
+                // Sumar todos los tipos de reacciones para el total
+                const total = (data.loves || 0) + (data.likes || 0) + (data.haha || 0);
+                document.getElementById('count-total').innerText = total;
 
                 let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
                 imgs.forEach(url => {
@@ -223,14 +255,23 @@
         } catch (e) { console.error(e); }
     }
 
-    window.darAmor = async function() {
+    // ABRIR/CERRAR MENÚ EMOJIS
+    window.toggleMenu = (e) => {
+        e.stopPropagation();
+        document.getElementById('lista-emojis').classList.toggle('visible');
+    };
+
+    // REACCIONAR Y GUARDAR
+    window.enviarReaccion = async (tipo, e) => {
+        e.stopPropagation();
         const docRef = doc(db, historiaID, "capitulo_" + capActual);
         try {
-            await updateDoc(docRef, { loves: increment(1) });
-            const p = document.getElementById('count-love');
+            await updateDoc(docRef, { [tipo]: increment(1) });
+            const p = document.getElementById('count-total');
             p.innerText = parseInt(p.innerText) + 1;
-        } catch (e) { console.log("Error al dar amor"); }
-    }
+            document.getElementById('lista-emojis').classList.remove('visible');
+        } catch (err) { console.log("Error al reaccionar"); }
+    };
 
     window.capAnterior = () => { 
         const indexActual = listaCapitulos.indexOf(capActual);
@@ -243,6 +284,11 @@
     };
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
+
+    // Cerrar menú si se hace clic fuera
+    document.addEventListener('click', () => {
+        document.getElementById('lista-emojis').classList.remove('visible');
+    });
 </script>
 </body>
 </html>
