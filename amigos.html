@@ -82,47 +82,36 @@
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
+        /* BARRA DE NAVEGACIÓN ARMONIOSA */
         .nav-lector { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.9); 
-            padding: 12px 25px; border-radius: 35px; border: 1px solid #ff66b2; 
+            display: flex; align-items: center; gap: 10px; 
+            background: rgba(0, 0, 0, 0.95); 
+            padding: 8px 18px; border-radius: 40px; border: 1px solid #ff66b2; 
             backdrop-filter: blur(10px); z-index: 102; 
-            box-shadow: 0 0 30px rgba(255, 102, 178, 0.5); 
+            box-shadow: 0 0 25px rgba(255, 102, 178, 0.4); 
         }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .nav-btn { 
+            background: #ff66b2; color: white; border: none; 
+            padding: 10px 18px; border-radius: 25px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
         .nav-btn:active { transform: scale(0.9); }
         .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
 
-        /* ESTILO DEL BOTÓN ME ENCANTA BRILLANTE */
-        .btn-love-float {
-            position: fixed;
-            bottom: 100px; /* Arriba de la barra nav */
-            right: 20px;
-            background: rgba(255, 102, 178, 0.2);
-            border: 2px solid #ff66b2;
-            padding: 10px 15px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            z-index: 105;
-            backdrop-filter: blur(10px);
-            transition: 0.3s;
-            box-shadow: 0 0 15px rgba(255, 102, 178, 0.4);
-            animation: pulseGlow 2s infinite;
+        /* BOTÓN DE CORAZÓN INTEGRADO */
+        .btn-love-inline {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 14px; border-radius: 20px;
+            cursor: pointer; transition: 0.3s;
+            border: 1px solid transparent;
         }
+        .btn-love-inline:hover { background: rgba(255, 102, 178, 0.2); border-color: #ff66b2; }
+        .corazon-simple { font-size: 1.2rem; }
+        #count-love { font-size: 0.95rem; font-weight: bold; color: #ff66b2; min-width: 20px; text-align: center; }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 10px rgba(255, 102, 178, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(255, 102, 178, 0.8), 0 0 10px #ffd700; }
-            100% { box-shadow: 0 0 10px rgba(255, 102, 178, 0.4); }
-        }
-
-        .btn-love-float:active { transform: scale(1.2); }
-        
-        .corazon { font-size: 1.5rem; filter: drop-shadow(0 0 5px #ff66b2); }
-        #count-love { font-weight: bold; color: white; font-size: 1rem; }
+        .btn-cerrar { background: #ff4d4d; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; }
     </style>
 </head>
 <body>
@@ -136,15 +125,16 @@
     </header>
 
     <div id="lector">
-        <div class="btn-love-float" onclick="darAmor()">
-            <span class="corazon">💖</span>
-            <span id="count-love">0</span>
-        </div>
-
         <div class="nav-lector">
-            <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
-            <button class="nav-btn" style="background:#ff4d4d" onclick="cerrarLector()">✕</button>
-            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">Sig. →</button>
+            <button id="btn-ant" class="nav-btn" onclick="capAnterior()">←</button>
+            
+            <div class="btn-love-inline" onclick="darAmor()">
+                <span class="corazon-simple">❤️</span>
+                <span id="count-love">0</span>
+            </div>
+
+            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">→</button>
+            <button class="nav-btn btn-cerrar" onclick="cerrarLector()">✕</button>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
@@ -168,7 +158,7 @@
     const db = getFirestore(app);
     const historiaID = "amigos"; 
     let capActual = 1;
-    let listaCapitulos = [];
+    let listaCapitulos = []; 
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
@@ -219,8 +209,6 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 contenedor.innerHTML = "";
-                
-                // Mostrar contador de amores
                 document.getElementById('count-love').innerText = data.loves || 0;
 
                 let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
@@ -235,27 +223,13 @@
         } catch (e) { console.error(e); }
     }
 
-    // FUNCIÓN PARA DAR "ME ENCANTA"
     window.darAmor = async function() {
         const docRef = doc(db, historiaID, "capitulo_" + capActual);
         try {
-            // Animación rápida al hacer clic
-            const btn = document.querySelector('.btn-love-float');
-            btn.style.transform = "scale(1.4)";
-            setTimeout(() => btn.style.transform = "scale(1)", 200);
-
-            // Guardar en Firebase (incrementa en 1 el campo 'loves')
-            await updateDoc(docRef, {
-                loves: increment(1)
-            });
-
-            // Actualizar el número en pantalla
-            const nuevoConteo = parseInt(document.getElementById('count-love').innerText) + 1;
-            document.getElementById('count-love').innerText = nuevoConteo;
-
-        } catch (e) {
-            console.log("Tip: Si el capítulo no tiene el campo 'loves', créalo en Firebase con valor 0");
-        }
+            await updateDoc(docRef, { loves: increment(1) });
+            const p = document.getElementById('count-love');
+            p.innerText = parseInt(p.innerText) + 1;
+        } catch (e) { console.log("Error al dar amor"); }
     }
 
     window.capAnterior = () => { 
