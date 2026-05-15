@@ -1,4 +1,4 @@
-// --- 1. LOGICA DE TEMAS GLOBALES ---
+// --- 1. LÓGICA DE TEMAS GLOBALES MEJORADOS ---
 function aplicarTemaGlobal(tema) {
     const root = document.documentElement;
     
@@ -7,11 +7,12 @@ function aplicarTemaGlobal(tema) {
         root.style.setProperty('--texto-rose', '#ffffff');
         root.style.setProperty('--panel-rose', 'rgba(44, 44, 44, 0.95)');
     } else if (tema === 'sepia') {
-        root.style.setProperty('--fondo-rose', '#f4ecd8');
-        root.style.setProperty('--texto-rose', '#5b4636');
-        root.style.setProperty('--panel-rose', 'rgba(244, 236, 216, 0.95)');
+        // Nuevo Sepia Pastel Romántico y Luminoso
+        root.style.setProperty('--fondo-rose', '#fdf6e3');
+        root.style.setProperty('--texto-rose', '#5c4738');
+        root.style.setProperty('--panel-rose', 'rgba(253, 246, 227, 0.96)');
     } else {
-        // Modo Oscuro por defecto
+        // Modo Oscuro Original
         root.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
         root.style.setProperty('--texto-rose', '#ffffff');
         root.style.setProperty('--panel-rose', 'rgba(0, 0, 0, 0.96)');
@@ -19,7 +20,7 @@ function aplicarTemaGlobal(tema) {
     localStorage.setItem('tema-rose-garden', tema);
 }
 
-// Auto-ejecutar al cargar la página
+// Ejecutar inmediatamente al cargar para evitar parpadeos negros
 (function() {
     const temaGuardado = localStorage.getItem('tema-rose-garden') || 'dark';
     aplicarTemaGlobal(temaGuardado);
@@ -38,13 +39,13 @@ window.toggleMenuColores = function(e) {
     }
 };
 
-// Cerrar menús si hacen clic afuera
+// Cerrar menús automáticamente si hacen clic fuera
 document.addEventListener('click', () => {
     const menuColores = document.getElementById('sub-menu-colores');
     if (menuColores) menuColores.classList.remove('visible-rose');
 });
 
-// --- 3. BARRA DE PROGRESO ---
+// --- 3. BARRA DE PROGRESO DE LECTURA ---
 window.addEventListener('scroll', () => {
     const barra = document.getElementById('barra-progreso-rose');
     if (barra) {
