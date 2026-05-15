@@ -52,3 +52,37 @@ body {
     border: none;
     cursor: pointer;
   }
+/* --- MENÚ DESPLEGABLE DE COLORES --- */
+.menu-colores-flotante {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sub-menu-colores {
+    display: none;
+    position: absolute;
+    bottom: 55px; /* Aparece arriba del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-rose, rgba(15, 15, 15, 0.98));
+    border: 1px solid #ff66b2;
+    padding: 10px;
+    border-radius: 25px;
+    flex-direction: column; /* Círculos en vertical */
+    gap: 10px;
+    z-index: 120;
+    box-shadow: 0 0 20px rgba(255, 102, 178, 0.5);
+}
+
+/* Animación de aparición */
+.sub-menu-colores.visible-rose {
+    display: flex;
+    animation: aparecerArriba 0.3s ease-out;
+}
+
+@keyframes aparecerArriba {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
