@@ -1,41 +1,55 @@
-// --- 1. BARRA DE PROGRESO INTELIGENTE ---
-window.onscroll = function() {
-    let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-    let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    let scrolled = (winScroll / height) * 100;
+// --- 1. LOGICA DE TEMAS GLOBALES ---
+function aplicarTemaGlobal(tema) {
+    const root = document.documentElement;
     
-    // Busca la barra rosa y la estira según el scroll
-    let bar = document.getElementById("barra-progreso-rose");
-    if (bar) {
-        bar.style.width = scrolled + "%";
+    if (tema === 'gris') {
+        root.style.setProperty('--fondo-rose', '#2c2c2c');
+        root.style.setProperty('--texto-rose', '#ffffff');
+        root.style.setProperty('--panel-rose', 'rgba(44, 44, 44, 0.95)');
+    } else if (tema === 'sepia') {
+        root.style.setProperty('--fondo-rose', '#f4ecd8');
+        root.style.setProperty('--texto-rose', '#5b4636');
+        root.style.setProperty('--panel-rose', 'rgba(244, 236, 216, 0.95)');
+    } else {
+        // Modo Oscuro por defecto
+        root.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
+        root.style.setProperty('--texto-rose', '#ffffff');
+        root.style.setProperty('--panel-rose', 'rgba(0, 0, 0, 0.96)');
     }
-};
-
-// --- 2. CAMBIADOR DE TEMAS (NEGRO, GRIS, SEPIA) ---
-function cambiarTemaRose(tema) {
-    const cuerpo = document.body;
-    
-    // Limpiamos temas anteriores
-    cuerpo.classList.remove('tema-gris', 'tema-sepia');
-    
-    // Aplicamos el nuevo si no es el negro (que es el normal)
-    if (tema === 'gris') cuerpo.classList.add('tema-gris');
-    if (tema === 'sepia') cuerpo.classList.add('tema-sepia');
-    
-    // GUARDAR PREFERENCIA: Para que no se borre al cambiar de página
     localStorage.setItem('tema-rose-garden', tema);
 }
 
-// --- 3. AUTO-CARGA AL ENTRAR ---
-window.onload = function() {
-    // Revisa si el usuario ya tenía un color favorito guardado
-    const temaGuardado = localStorage.getItem('tema-rose-garden');
-    if (temaGuardado) {
-        cambiarTemaRose(temaGuardado);
-    }
-    
-    console.log("Rose Garden Scan: Cerebro activado 🌹");
+// Auto-ejecutar al cargar la página
+(function() {
+    const temaGuardado = localStorage.getItem('tema-rose-garden') || 'dark';
+    aplicarTemaGlobal(temaGuardado);
+})();
+
+window.cambiarTemaRose = function(tema) {
+    aplicarTemaGlobal(tema);
 };
 
-// --- 4. ESPACIO PARA CARGA DE IMÁGENES (PRÓXIMO PASO) ---
-// Aquí conectaremos tu Firebase para que las imágenes vuelen
+// --- 2. MOSTRAR / OCULTAR MENÚ DE COLORES ---
+window.toggleMenuColores = function(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('sub-menu-colores');
+    if (menu) {
+        menu.classList.toggle('visible-rose');
+    }
+};
+
+// Cerrar menús si hacen clic afuera
+document.addEventListener('click', () => {
+    const menuColores = document.getElementById('sub-menu-colores');
+    if (menuColores) menuColores.classList.remove('visible-rose');
+});
+
+// --- 3. BARRA DE PROGRESO ---
+window.addEventListener('scroll', () => {
+    const barra = document.getElementById('barra-progreso-rose');
+    if (barra) {
+        const altura = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progreso = (window.scrollY / altura) * 100;
+        barra.style.width = progreso + '%';
+    }
+});
