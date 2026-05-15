@@ -13,7 +13,6 @@
             overflow-x: hidden; min-height: 100vh; 
         }
         
-        /* FONDO DE BRILLITOS ANIMADOS ESTILO CANVA */
         body::after {
             content: "";
             position: fixed;
@@ -22,7 +21,6 @@
                 radial-gradient(circle, #fff 1px, transparent 1px),
                 radial-gradient(circle, #fff 1.5px, transparent 1.5px);
             background-size: 80px 80px, 150px 150px;
-            background-position: 0 0, 75px 75px;
             opacity: 0.2;
             animation: moveStars 30s linear infinite;
             pointer-events: none;
@@ -34,7 +32,6 @@
             to { transform: translateY(-150px); }
         }
 
-        /* BOTÓN VOLVER A HISTORIAS */
         .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
         .btn-catalogo { 
             text-decoration: none; color: #ff66b2; 
@@ -45,11 +42,7 @@
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
         }
-        .btn-catalogo:hover { 
-            background: #ff66b2; color: white; 
-            box-shadow: 0 0 25px rgba(255, 102, 178, 0.8); 
-            transform: scale(1.05);
-        }
+        .btn-catalogo:hover { background: #ff66b2; color: white; transform: scale(1.05); }
 
         header { padding: 15px; text-align: center; z-index: 10; }
         h1 { 
@@ -57,11 +50,9 @@
             background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
             background-size: 200% auto; -webkit-background-clip: text; 
             color: transparent; animation: shineText 4s linear infinite; margin: 10px 0; 
-            text-shadow: 0 0 15px rgba(255, 102, 178, 0.3);
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
-        /* GRID DE CAPÍTULOS */
         .grid-caps { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
             gap: 15px; width: 92%; max-width: 500px; 
@@ -79,29 +70,52 @@
             background: rgba(255, 102, 178, 0.15) !important; 
             cursor: pointer; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            position: relative;
-        }
-        .disponible:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 102, 178, 0.8);
-            background: rgba(255, 102, 178, 0.4) !important;
-            border-color: #ffd700 !important;
         }
 
-        /* LECTOR */
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
+        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
+        /* BARRA FINAL MEJORADA */
         .nav-lector { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.9); 
-            padding: 12px 25px; border-radius: 35px; border: 1px solid #ff66b2; 
-            backdrop-filter: blur(10px); z-index: 102; 
-            box-shadow: 0 0 30px rgba(255, 102, 178, 0.5); 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; align-items: center; gap: 12px; 
+            background: rgba(0, 0, 0, 0.96); 
+            padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
+            backdrop-filter: blur(12px); z-index: 102; 
+            box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
         }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .nav-btn:active { transform: scale(0.9); }
-        .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
+
+        .grupo-navegacion { display: flex; gap: 8px; }
+        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+        .nav-btn:disabled { background: #333; opacity: 0.4; }
+
+        .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
+
+        /* PULGAR ROSADO */
+        .btn-votar-pink {
+            position: relative;
+            background: rgba(255, 102, 178, 0.2);
+            border: 1.5px solid #ff66b2;
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .thumb-pink { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
+
+        /* POPUP REACCIONES */
+        .pop-stats {
+            display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
+            background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2;
+            padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110;
+            box-shadow: 0 0 25px rgba(255, 102, 178, 0.7);
+        }
+        .pop-stats.active { display: flex; animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes bounceIn { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+
+        .stat-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .emoji-res { font-size: 1.5rem; }
+        .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
+        .num { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
     </style>
 </head>
 <body>
@@ -116,9 +130,30 @@
 
     <div id="lector">
         <div class="nav-lector">
-            <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
-            <button class="nav-btn" style="background:#ff4d4d" onclick="cerrarLector()">✕</button>
-            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">Sig. →</button>
+            <div class="grupo-navegacion">
+                <button id="btn-ant" class="nav-btn">← Ant.</button>
+                <button id="btn-sig" class="nav-btn">Sig. →</button>
+            </div>
+            
+            <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
+
+            <div class="btn-votar-pink" onclick="toggleStats(event)">
+                <span class="thumb-pink">👍</span>
+                <div class="pop-stats" id="menu-stats">
+                    <div class="stat-btn" onclick="votar('loves', event)">
+                        <span class="emoji-res pink-fx">❤️</span>
+                        <span id="val-loves" class="num">0</span>
+                    </div>
+                    <div class="stat-btn" onclick="votar('likes', event)">
+                        <span class="emoji-res pink-fx">👍</span>
+                        <span id="val-likes" class="num">0</span>
+                    </div>
+                    <div class="stat-btn" onclick="votar('haha', event)">
+                        <span class="emoji-res">😂</span>
+                        <span id="val-haha" class="num">0</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
@@ -127,7 +162,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -141,17 +176,17 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const historiaID = "embarazada"; 
-    let capActual = 1;
+    let capsOrdenados = [];
+    let idCapActual = "";
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/d/$${id}`;
+            return `https://lh3.googleusercontent.com/d/${id}`;
         }
         return url;
     }
 
-    // Generar 150 botones
     for (let i = 1; i <= 150; i++) {
         const btn = document.createElement('div');
         btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
@@ -159,54 +194,75 @@
     }
 
     async function activarCapitulos() {
-        try {
-            const querySnapshot = await getDocs(collection(db, historiaID));
-            querySnapshot.forEach((doc) => {
-                const numStr = doc.id.replace("capitulo_", "");
-                const num = parseFloat(numStr);
-                const boton = document.getElementById("btn-" + num);
-                if (boton) { 
-                    boton.classList.add('disponible'); 
-                    boton.onclick = () => abrirLector(num); 
-                }
-            });
-        } catch (e) { console.error("Error:", e); }
+        const querySnapshot = await getDocs(collection(db, historiaID));
+        let disponibles = [];
+        querySnapshot.forEach((docSnap) => {
+            const idReal = docSnap.id.replace("capitulo_", "");
+            disponibles.push(idReal);
+            let boton = document.getElementById("btn-" + idReal);
+            if (!boton) {
+                boton = document.createElement('div');
+                boton.className = 'cap-btn disponible';
+                boton.id = "btn-" + idReal;
+                boton.innerText = idReal;
+                const anteriorID = Math.floor(parseFloat(idReal));
+                const btnRef = document.getElementById("btn-" + anteriorID);
+                if (btnRef) btnRef.after(boton); else document.getElementById('grid').appendChild(boton);
+            } else {
+                boton.classList.add('disponible');
+            }
+            boton.onclick = () => abrirLector(idReal);
+        });
+        capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
     }
     activarCapitulos();
 
-    window.abrirLector = async function(num) {
-        capActual = num;
+    window.abrirLector = async function(idCap) {
+        idCapActual = idCap;
         const lector = document.getElementById('lector');
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando tiras... ✨</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px;'>Abriendo capítulo " + idCap + "...</p>";
 
-        document.getElementById('btn-ant').disabled = (num <= 1);
-        const sigExiste = document.getElementById("btn-" + (num + 1))?.classList.contains('disponible');
-        document.getElementById('btn-sig').disabled = !sigExiste;
+        const idx = capsOrdenados.indexOf(idCap.toString());
+        document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[idx - 1]);
+        document.getElementById('btn-sig').onclick = () => abrirLector(capsOrdenados[idx + 1]);
+        document.getElementById('btn-ant').disabled = (idx <= 0);
+        document.getElementById('btn-sig').disabled = (idx >= capsOrdenados.length - 1);
 
-        try {
-            const docSnap = await getDoc(doc(db, historiaID, "capitulo_" + num));
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                contenedor.innerHTML = "";
-                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
-
-                imgs.forEach(url => {
-                    if (url.trim().length > 5) {
-                        const img = document.createElement('img');
-                        img.src = arreglarLink(url.trim());
-                        contenedor.appendChild(img);
-                    }
-                });
-            }
-        } catch (e) { console.error("Error:", e); }
+        const snap = await getDoc(doc(db, historiaID, "capitulo_" + idCap));
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('val-loves').innerText = data.loves || 0;
+            document.getElementById('val-likes').innerText = data.likes || 0;
+            document.getElementById('val-haha').innerText = data.haha || 0;
+            
+            contenedor.innerHTML = "";
+            let imgs = Array.isArray(data.imagenes) ? data.imagenes : [data.link];
+            imgs.forEach(url => {
+                const img = document.createElement('img');
+                img.src = arreglarLink(url.trim());
+                contenedor.appendChild(img);
+            });
+        }
     }
 
-    window.capAnterior = () => { if(capActual > 1) abrirLector(capActual - 1); };
-    window.capSiguiente = () => { abrirLector(capActual + 1); };
+    window.votar = async (tipo, e) => {
+        e.stopPropagation();
+        const docRef = doc(db, historiaID, "capitulo_" + idCapActual);
+        await updateDoc(docRef, { [tipo]: increment(1) });
+        const el = document.getElementById('val-' + tipo);
+        el.innerText = parseInt(el.innerText) + 1;
+    }
+
+    window.toggleStats = (e) => {
+        e.stopPropagation();
+        document.getElementById('menu-stats').classList.toggle('active');
+    }
+
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
+    document.addEventListener('click', () => document.getElementById('menu-stats').classList.remove('active'));
 </script>
 </body>
 </html>
