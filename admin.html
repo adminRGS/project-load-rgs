@@ -30,6 +30,7 @@
 
     <div id="panelControl">
         <h2>🌹 Cargar Capítulo</h2>
+        
         <label>Proyecto:</label>
         <select id="historia">
             <option value="confesion">Confesión</option>
@@ -42,6 +43,13 @@
             <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
             <option value="leopardo">La pequeña bebé leopardo</option>
             <option value="salvada">Salvada por la pequeña dama sin poderes</option>
+        </select>
+
+        <label>Estado actual del Proyecto:</label>
+        <select id="estadoProyecto">
+            <option value="emision">🟢 En Emisión (Activo)</option>
+            <option value="hiatus">🟡 En Hiatus</option>
+            <option value="finalizado">🔴 Terminado (Finalizado)</option>
         </select>
 
         <label>Número de Capítulo:</label>
@@ -86,6 +94,7 @@
 
     async function guardarCapitulo() {
         const historia = document.getElementById('historia').value;
+        const estado = document.getElementById('estadoProyecto').value; // Captura el estado elegido
         const numCap = document.getElementById('capitulo').value;
         const textoLinks = document.getElementById('links').value;
         const btn = document.getElementById('btnPublicar');
@@ -105,10 +114,15 @@
                 imagenes: listaLinks,
                 fechaCarga: firebase.firestore.FieldValue.serverTimestamp()
             };
+            
+            // Guarda el capítulo
             await db.collection(historia).doc(idDoc).set(datos);
             
+            // Actualiza también el estado global de la historia en la base de datos
+            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
+            
             msg.style.display = "block"; msg.style.backgroundColor = "#e8f5e9"; msg.style.color = "#2e7d32";
-            msg.innerHTML = "✅ Publicado: " + listaLinks.length + " imágenes.";
+            msg.innerHTML = "✅ Publicado y Estado Actualizado: " + listaLinks.length + " imágenes.";
             document.getElementById('links').value = "";
         } catch (e) { alert("Error: " + e.message); }
         btn.disabled = false; btn.innerText = "🚀 CARGAR CAPÍTULO COMPLETO";
