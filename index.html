@@ -7,9 +7,23 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="estilos-rose.css">
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: sans-serif; background: #000; color: white; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        
+        /* Modificado para que responda a los temas globales (Gris / Sepia / Negro) */
+        body { 
+            font-family: sans-serif; 
+            background: var(--fondo-rose, #000); 
+            color: var(--texto-rose, white); 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            transition: background 0.3s ease;
+        }
 
         /* CONTENEDOR DE BUCLE INFINITO (SOLO 4 IMÁGENES, SIN CORTES) */
         #bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: #000; }
@@ -25,7 +39,7 @@
         /* CONTENIDO PRINCIPAL */
         .content { position: relative; z-index: 10; text-align: center; width: 95%; max-width: 450px; }
         
-        /* TÍTULO Y SUBTÍTULO (Diseño que ya te gustaba) */
+        /* TÍTULO Y SUBTÍTULO */
         h1.titulo-principal { 
             font-family: 'Dancing Script', cursive; font-size: 3.5rem; font-weight: 500; margin-bottom: 0px;
             background: linear-gradient(90deg, #ff0000, #ff66b2, #800080, #ff0000);
@@ -34,7 +48,7 @@
         }
 
         p.subtitulo { 
-            font-family: 'Dancing Script', cursive; font-size: 1.6rem; margin-bottom: 30px; /* Reduje el espacio abajo */
+            font-family: 'Dancing Script', cursive; font-size: 1.6rem; margin-bottom: 30px; 
             background: linear-gradient(90deg, #ff0000, #ff66b2, #800080, #ff0000);
             background-size: 200% auto; -webkit-background-clip: text; color: transparent;
             animation: shine 5s linear infinite; opacity: 0.9;
@@ -44,14 +58,15 @@
 
         /* --- BOTONES MÁS DELICADOS Y ESTILIZADOS --- */
         .btn { 
-            display: block; width: 85%; /* Menos anchos */
-            margin: 0 auto 15px auto; /* Centrados y con menos espacio entre ellos */
-            padding: 12px; /* Mucho menos altos, más finos */
+            display: block; width: 85%; 
+            margin: 0 auto 15px auto; 
+            padding: 12px; 
             background: #ff3385; color: white; text-decoration: none; border-radius: 50px; 
-            font-size: 0.9rem; /* Texto interno más pequeño y delicado */
+            font-size: 0.9rem; 
             font-weight: bold; border: none; cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(255, 51, 133, 0.3); /* Sombra más suave */
+            box-shadow: 0 4px 10px rgba(255, 51, 133, 0.3); 
             transition: 0.3s;
+            text-align: center;
         }
         .btn:active { transform: scale(0.98); }
 
@@ -96,24 +111,32 @@
         <button class="btn-regresar" onclick="ocultarProximamente()">✦ Regresar ✦</button>
     </div>
 
+    <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 9999;">
+        
+        <button onclick="toggleMenuColores(event)" style="background: var(--panel-rose, rgba(0,0,0,0.8)); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); outline: none;">
+            🎨
+        </button>
+
+        <div class="sub-menu-colores" id="sub-menu-colores">
+            <div onclick="cambiarTemaRose('dark')" style="width: 22px; height: 22px; background: #000; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Oscuro"></div>
+            <div onclick="cambiarTemaRose('gris')" style="width: 22px; height: 22px; background: #2c2c2c; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Gris"></div>
+            <div onclick="cambiarTemaRose('sepia')" style="width: 22px; height: 22px; background: #f4ecd8; border-radius: 50%; border: 1.5px solid #5f4b32; cursor: pointer;" title="Modo Sepia"></div>
+        </div>
+    </div>
+
+    <script src="funciones-rose.js"></script>
+
     <script>
         // Lógica del Bucle Infinito (Corregida para 4 imágenes)
         const slides = document.querySelectorAll('.bg-slide');
         let currentSlide = 0;
 
         function changeSlide() {
-            // Quitamos la clase active de la imagen actual
             slides[currentSlide].classList.remove('active');
-            
-            // Calculamos la siguiente posición circularmente (0, 1, 2, 3, y vuelve a 0)
             currentSlide = (currentSlide + 1) % slides.length;
-            
-            // Ponemos active a la nueva imagen
             slides[currentSlide].classList.add('active');
         }
 
-        // Cambia de imagen cada 5 segundos
-        // La transición de 2s en CSS hace que se fundan suavemente
         setInterval(changeSlide, 5000);
 
         function mostrarProximamente() {
