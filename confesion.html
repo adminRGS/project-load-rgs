@@ -21,7 +21,6 @@
                 radial-gradient(circle, #fff 1px, transparent 1px),
                 radial-gradient(circle, #fff 1.5px, transparent 1.5px);
             background-size: 80px 80px, 150px 150px;
-            background-position: 0 0, 75px 75px;
             opacity: 0.2;
             animation: moveStars 30s linear infinite;
             pointer-events: none;
@@ -54,6 +53,7 @@
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
+        /* GRID DINÁMICO: Solo botones con contenido se verán brillantes */
         .grid-caps { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
             gap: 15px; width: 92%; max-width: 500px; 
@@ -72,18 +72,53 @@
             cursor: pointer; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
+        .disponible:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); }
 
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
+        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
+        /* BARRA DE NAVEGACIÓN CORREGIDA */
         .nav-lector { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 15px; background: rgba(0, 0, 0, 0.9); 
-            padding: 12px 25px; border-radius: 35px; border: 1px solid #ff66b2; 
-            backdrop-filter: blur(10px); z-index: 102; 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; align-items: center; gap: 12px; 
+            background: rgba(0, 0, 0, 0.96); 
+            padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
+            backdrop-filter: blur(12px); z-index: 102; 
+            box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
         }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        .nav-btn:disabled { background: #333; opacity: 0.4; cursor: not-allowed; }
+
+        .grupo-flechas { display: flex; gap: 8px; }
+        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+        .nav-btn:disabled { background: #333; opacity: 0.4; }
+
+        .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
+
+        /* PULGAR ROSADITO */
+        .btn-votar-pink {
+            position: relative;
+            background: rgba(255, 102, 178, 0.2);
+            border: 1.5px solid #ff66b2;
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .thumb-icon { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
+
+        /* GLOBO DE REACCIONES SUPERIOR */
+        .popover-stats {
+            display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
+            background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2;
+            padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110;
+            box-shadow: 0 0 25px rgba(255, 102, 178, 0.7);
+        }
+        .popover-stats.active { display: flex; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 15px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        .stat-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .stat-item:hover { transform: scale(1.2); }
+        .emoji { font-size: 1.5rem; }
+        .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
+        .count { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
     </style>
 </head>
 <body>
@@ -98,9 +133,30 @@
 
     <div id="lector">
         <div class="nav-lector">
-            <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
-            <button class="nav-btn" style="background:#ff4d4d" onclick="cerrarLector()">✕</button>
-            <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">Sig. →</button>
+            <div class="grupo-flechas">
+                <button id="btn-ant" class="nav-btn">← Ant.</button>
+                <button id="btn-sig" class="nav-btn">Sig. →</button>
+            </div>
+            
+            <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
+
+            <div class="btn-votar-pink" onclick="toggleStats(event)">
+                <span class="thumb-icon">👍</span>
+                <div class="popover-stats" id="stats-menu">
+                    <div class="stat-item" onclick="votar('loves', event)">
+                        <span class="emoji pink-fx">❤️</span>
+                        <span id="txt-loves" class="count">0</span>
+                    </div>
+                    <div class="stat-item" onclick="votar('likes', event)">
+                        <span class="emoji pink-fx">👍</span>
+                        <span id="txt-likes" class="count">0</span>
+                    </div>
+                    <div class="stat-item" onclick="votar('haha', event)">
+                        <span class="emoji">😂</span>
+                        <span id="txt-haha" class="count">0</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
@@ -109,7 +165,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -123,8 +179,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const historiaID = "confesion"; 
-    const grid = document.getElementById('grid');
     let capsOrdenados = [];
+    let idCapActual = "";
 
     function arreglarLink(url) {
         if (url.includes('drive.google.com')) {
@@ -134,81 +190,86 @@
         return url;
     }
 
-    // Generar botones base (Enteros)
+    // Crear 150 botones base
     for (let i = 1; i <= 150; i++) {
         const btn = document.createElement('div');
         btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
-        grid.appendChild(btn);
+        document.getElementById('grid').appendChild(btn);
     }
 
     async function activarCapitulos() {
-        try {
-            const querySnapshot = await getDocs(collection(db, historiaID));
-            let disponibles = [];
+        const querySnapshot = await getDocs(collection(db, historiaID));
+        let disponibles = [];
 
-            querySnapshot.forEach((doc) => {
-                const idOriginal = doc.id.replace("capitulo_", "");
-                const numVal = parseFloat(idOriginal);
-                
-                if (!isNaN(numVal)) {
-                    disponibles.push(idOriginal);
-                    let boton = document.getElementById("btn-" + idOriginal);
+        querySnapshot.forEach((docSnap) => {
+            const idOriginal = docSnap.id.replace("capitulo_", "");
+            disponibles.push(idOriginal);
+            let boton = document.getElementById("btn-" + idOriginal);
 
-                    // LÓGICA DE BOTONES DECIMALES AUTOMÁTICOS
-                    if (!boton) {
-                        boton = document.createElement('div');
-                        boton.className = 'cap-btn disponible';
-                        boton.id = "btn-" + idOriginal;
-                        boton.innerText = idOriginal;
-                        
-                        const anteriorID = Math.floor(numVal);
-                        const btnAnterior = document.getElementById("btn-" + anteriorID);
-                        if (btnAnterior) btnAnterior.after(boton);
-                        else grid.appendChild(boton);
-                    } else {
-                        boton.classList.add('disponible');
-                    }
-                    boton.onclick = () => abrirLector(idOriginal);
-                }
-            });
-
-            // Ordenar lista para la navegación correcta (25, 25.5, 26...)
-            capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
-
-        } catch (e) { console.error("Error:", e); }
+            if (!boton) {
+                boton = document.createElement('div');
+                boton.className = 'cap-btn disponible';
+                boton.id = "btn-" + idOriginal;
+                boton.innerText = idOriginal;
+                const anteriorID = Math.floor(parseFloat(idOriginal));
+                const btnRef = document.getElementById("btn-" + anteriorID);
+                if (btnRef) btnRef.after(boton); else document.getElementById('grid').appendChild(boton);
+            } else {
+                boton.classList.add('disponible');
+            }
+            boton.onclick = () => abrirLector(idOriginal);
+        });
+        capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
     }
     activarCapitulos();
 
     window.abrirLector = async function(idCap) {
+        idCapActual = idCap;
         const lector = document.getElementById('lector');
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando capítulo " + idCap + "... ✨</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px;'>Cargando...</p>";
 
-        // Configurar navegación basada en el orden de Firebase
         const index = capsOrdenados.indexOf(idCap.toString());
         document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[index - 1]);
         document.getElementById('btn-sig').onclick = () => abrirLector(capsOrdenados[index + 1]);
         document.getElementById('btn-ant').disabled = (index <= 0);
         document.getElementById('btn-sig').disabled = (index >= capsOrdenados.length - 1);
 
-        try {
-            const docSnap = await getDoc(doc(db, historiaID, "capitulo_" + idCap));
-            if (docSnap.exists()) {
-                contenedor.innerHTML = "";
-                const data = docSnap.data();
-                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
-                imgs.forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = arreglarLink(url.trim());
-                    contenedor.appendChild(img);
-                });
-            }
-        } catch (e) { console.error(e); }
+        const docRef = doc(db, historiaID, "capitulo_" + idCap);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('txt-loves').innerText = data.loves || 0;
+            document.getElementById('txt-likes').innerText = data.likes || 0;
+            document.getElementById('txt-haha').innerText = data.haha || 0;
+            
+            contenedor.innerHTML = "";
+            let imgs = Array.isArray(data.imagenes) ? data.imagenes : [data.link];
+            imgs.forEach(url => {
+                const img = document.createElement('img');
+                img.src = arreglarLink(url.trim());
+                contenedor.appendChild(img);
+            });
+        }
+    }
+
+    window.votar = async (tipo, e) => {
+        e.stopPropagation();
+        const docRef = doc(db, historiaID, "capitulo_" + idCapActual);
+        await updateDoc(docRef, { [tipo]: increment(1) });
+        const txt = document.getElementById('txt-' + tipo);
+        txt.innerText = parseInt(txt.innerText) + 1;
+    }
+
+    window.toggleStats = (e) => {
+        e.stopPropagation();
+        document.getElementById('stats-menu').classList.toggle('active');
     }
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
+    document.addEventListener('click', () => document.getElementById('stats-menu').classList.remove('active'));
 </script>
 </body>
 </html>
