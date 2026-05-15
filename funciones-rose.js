@@ -1,4 +1,4 @@
-// --- 1. LÓGICA DE TEMAS GLOBALES MEJORADOS ---
+// --- 1. LÓGICA DE TEMAS GLOBALES CON SEPIA ARENA SUAVE (OPCIÓN B) ---
 function aplicarTemaGlobal(tema) {
     const root = document.documentElement;
     
@@ -7,10 +7,10 @@ function aplicarTemaGlobal(tema) {
         root.style.setProperty('--texto-rose', '#ffffff');
         root.style.setProperty('--panel-rose', 'rgba(44, 44, 44, 0.95)');
     } else if (tema === 'sepia') {
-        // Nuevo Sepia Pastel Romántico y Luminoso
-        root.style.setProperty('--fondo-rose', '#fdf6e3');
-        root.style.setProperty('--texto-rose', '#5c4738');
-        root.style.setProperty('--panel-rose', 'rgba(253, 246, 227, 0.96)');
+        // OFICIAL: Sepia Arena Suave (Elegante, neutro y descansa la vista)
+        root.style.setProperty('--fondo-rose', '#fcf8f2');
+        root.style.setProperty('--texto-rose', '#ffffff');
+        root.style.setProperty('--panel-rose', 'rgba(238, 230, 220, 0.9)');
     } else {
         // Modo Oscuro Original
         root.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
