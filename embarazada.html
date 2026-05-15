@@ -14,106 +14,64 @@
         }
         
         body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle, #fff 1px, transparent 1px),
-                radial-gradient(circle, #fff 1.5px, transparent 1.5px);
-            background-size: 80px 80px, 150px 150px;
-            opacity: 0.2;
-            animation: moveStars 30s linear infinite;
-            pointer-events: none;
-            z-index: 1;
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px);
+            background-size: 80px 80px, 150px 150px; opacity: 0.2; animation: moveStars 30s linear infinite; pointer-events: none; z-index: 1;
         }
 
-        @keyframes moveStars {
-            from { transform: translateY(0); }
-            to { transform: translateY(-150px); }
-        }
+        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-150px); } }
 
         .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
         .btn-catalogo { 
-            text-decoration: none; color: #ff66b2; 
-            border: 2px solid #ff66b2; padding: 10px 22px; 
-            border-radius: 30px; font-weight: bold; font-size: 0.95rem; 
-            transition: 0.3s; display: flex; align-items: center; gap: 10px; 
-            background: rgba(255, 102, 178, 0.1);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
+            text-decoration: none; color: #ff66b2; border: 2px solid #ff66b2; padding: 10px 22px; 
+            border-radius: 30px; font-weight: bold; font-size: 0.95rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; 
+            background: rgba(255, 102, 178, 0.1); backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
         }
         .btn-catalogo:hover { background: #ff66b2; color: white; transform: scale(1.05); }
 
         header { padding: 15px; text-align: center; z-index: 10; }
-        h1 { 
-            font-size: 2.2rem; 
-            background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
-            background-size: 200% auto; -webkit-background-clip: text; 
-            color: transparent; animation: shineText 4s linear infinite; margin: 10px 0; 
-        }
+        h1 { font-size: 2.2rem; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shineText 4s linear infinite; margin: 10px 0; }
         @keyframes shineText { to { background-position: 200% center; } }
 
+        /* GRID DINÁMICO AUTOMÁTICO */
         .grid-caps { 
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; width: 92%; max-width: 500px; 
-            padding-bottom: 60px; margin-top: 25px; z-index: 10;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
+            gap: 15px; width: 92%; max-width: 500px; padding-bottom: 60px; margin-top: 25px; z-index: 10;
         }
-        .cap-btn { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            color: #555; text-align: center; padding: 20px 0; 
-            border-radius: 15px; font-weight: bold; transition: 0.4s ease; 
-        }
-        .disponible { 
-            border: 1px solid #ff66b2 !important; 
-            color: white !important; 
-            background: rgba(255, 102, 178, 0.15) !important; 
-            cursor: pointer; 
+        .cap-btn-dinamico { 
+            border: 1px solid #ff66b2; color: white; background: rgba(255, 102, 178, 0.15); 
+            text-align: center; padding: 20px 0; border-radius: 15px; font-weight: bold; transition: 0.4s ease; cursor: pointer; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
+        .cap-btn-dinamico:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); background: rgba(255, 102, 178, 0.3); }
 
         #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        /* BARRA FINAL MEJORADA */
         .nav-lector { 
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            display: flex; align-items: center; gap: 12px; 
-            background: rgba(0, 0, 0, 0.96); 
-            padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
-            backdrop-filter: blur(12px); z-index: 102; 
+            display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.96); 
+            padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; backdrop-filter: blur(12px); z-index: 102; 
             box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
         }
 
         .grupo-navegacion { display: flex; gap: 8px; }
         .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
         .nav-btn:disabled { background: #333; opacity: 0.4; }
-
         .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
 
-        /* PULGAR ROSADO */
-        .btn-votar-pink {
-            position: relative;
-            background: rgba(255, 102, 178, 0.2);
-            border: 1.5px solid #ff66b2;
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s;
-        }
+        .btn-votar-pink { position: relative; background: rgba(255, 102, 178, 0.2); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .thumb-pink { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
 
-        /* POPUP REACCIONES */
         .pop-stats {
             display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
-            background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2;
-            padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110;
+            background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2; padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110;
             box-shadow: 0 0 25px rgba(255, 102, 178, 0.7);
         }
         .pop-stats.active { display: flex; animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes bounceIn { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
 
         .stat-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-        .emoji-res { font-size: 1.5rem; }
         .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
         .num { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
     </style>
@@ -141,15 +99,15 @@
                 <span class="thumb-pink">👍</span>
                 <div class="pop-stats" id="menu-stats">
                     <div class="stat-btn" onclick="votar('loves', event)">
-                        <span class="emoji-res pink-fx">❤️</span>
+                        <span class="pink-fx">❤️</span>
                         <span id="val-loves" class="num">0</span>
                     </div>
                     <div class="stat-btn" onclick="votar('likes', event)">
-                        <span class="emoji-res pink-fx">👍</span>
+                        <span class="pink-fx">👍</span>
                         <span id="val-likes" class="num">0</span>
                     </div>
                     <div class="stat-btn" onclick="votar('haha', event)">
-                        <span class="emoji-res">😂</span>
+                        <span>😂</span>
                         <span id="val-haha" class="num">0</span>
                     </div>
                 </div>
@@ -187,35 +145,33 @@
         return url;
     }
 
-    for (let i = 1; i <= 150; i++) {
-        const btn = document.createElement('div');
-        btn.innerText = i; btn.className = 'cap-btn'; btn.id = "btn-" + i;
-        document.getElementById('grid').appendChild(btn);
-    }
+    // CARGA AUTOMÁTICA DE BOTONES
+    async function cargarBotonesDinamicos() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Buscando capítulos...</p>";
+        
+        try {
+            const querySnapshot = await getDocs(collection(db, historiaID));
+            let disponibles = [];
+            querySnapshot.forEach((docSnap) => {
+                disponibles.push(docSnap.id.replace("capitulo_", ""));
+            });
 
-    async function activarCapitulos() {
-        const querySnapshot = await getDocs(collection(db, historiaID));
-        let disponibles = [];
-        querySnapshot.forEach((docSnap) => {
-            const idReal = docSnap.id.replace("capitulo_", "");
-            disponibles.push(idReal);
-            let boton = document.getElementById("btn-" + idReal);
-            if (!boton) {
-                boton = document.createElement('div');
-                boton.className = 'cap-btn disponible';
-                boton.id = "btn-" + idReal;
-                boton.innerText = idReal;
-                const anteriorID = Math.floor(parseFloat(idReal));
-                const btnRef = document.getElementById("btn-" + anteriorID);
-                if (btnRef) btnRef.after(boton); else document.getElementById('grid').appendChild(boton);
-            } else {
-                boton.classList.add('disponible');
-            }
-            boton.onclick = () => abrirLector(idReal);
-        });
-        capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
+            capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
+            grid.innerHTML = ""; 
+
+            capsOrdenados.forEach(id => {
+                const btn = document.createElement('div');
+                btn.className = 'cap-btn-dinamico';
+                btn.innerText = id;
+                btn.onclick = () => abrirLector(id);
+                grid.appendChild(btn);
+            });
+
+            if (capsOrdenados.length === 0) grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Próximamente...</p>";
+
+        } catch (e) { console.error(e); }
     }
-    activarCapitulos();
 
     window.abrirLector = async function(idCap) {
         idCapActual = idCap;
@@ -223,7 +179,7 @@
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px;'>Abriendo capítulo " + idCap + "...</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px;'>Cargando capítulo " + idCap + "...</p>";
 
         const idx = capsOrdenados.indexOf(idCap.toString());
         document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[idx - 1]);
@@ -263,6 +219,9 @@
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
     document.addEventListener('click', () => document.getElementById('menu-stats').classList.remove('active'));
+    
+    // Iniciar carga
+    cargarBotonesDinamicos();
 </script>
 </body>
 </html>
