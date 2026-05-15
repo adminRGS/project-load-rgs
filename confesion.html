@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confesión - Rose Garden Scan</title>
+    
+    <link rel="stylesheet" href="estilos-rose.css">
+
     <style>
+        /* Mantenemos tu diseño original pero quitamos el fondo fijo del body 
+           para que los temas (Gris/Sepia) operen correctamente */
         body { 
             margin: 0; padding: 0; 
-            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
-            color: white; font-family: 'serif'; 
+            background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
+            color: var(--texto-rose, white); font-family: 'serif'; 
             display: flex; flex-direction: column; align-items: center; 
             overflow-x: hidden; min-height: 100vh; 
+            transition: background 0.3s ease;
         }
         
         body::after {
@@ -53,7 +59,6 @@
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
-        /* GRID DINÁMICO: Solo se verán los botones que existan en Firebase */
         .grid-caps { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
@@ -75,13 +80,19 @@
             background: rgba(255, 102, 178, 0.3);
         }
 
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; }
+        /* EL LECTOR USA EL FONDO ADAPTABLE */
+        #lector { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--fondo-rose, #000); 
+            z-index: 100; overflow-y: scroll; 
+        }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
+        /* BARRA DE NAVEGACIÓN COMPATIBLE CON TEMAS */
         .nav-lector { 
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
             display: flex; align-items: center; gap: 12px; 
-            background: rgba(0, 0, 0, 0.96); 
+            background: var(--panel-rose, rgba(0, 0, 0, 0.96)); 
             padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
             backdrop-filter: blur(12px); z-index: 102; 
             box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
@@ -112,6 +123,10 @@
         .popover-stats.active { display: flex; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 15px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
+        /* CONTENEDOR DE PUNTOS SELECTORES DE COLOR */
+        .dots-container { display: flex; gap: 8px; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px; }
+        .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid white; cursor: pointer; }
+
         .stat-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
         .stat-item:hover { transform: scale(1.2); }
         .emoji { font-size: 1.5rem; }
@@ -120,6 +135,8 @@
     </style>
 </head>
 <body>
+
+    <div id="barra-progreso-rose"></div>
 
     <div class="contenedor-regreso">
         <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
@@ -131,6 +148,12 @@
 
     <div id="lector">
         <div class="nav-lector">
+            <div class="dots-container">
+                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')"></div>
+                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')"></div>
+                <div class="dot" style="background: #f4ecd8;" onclick="cambiarTemaRose('sepia')"></div>
+            </div>
+
             <div class="grupo-flechas">
                 <button id="btn-ant" class="nav-btn">← Ant.</button>
                 <button id="btn-sig" class="nav-btn">Sig. →</button>
@@ -161,6 +184,8 @@
 
     <div class="grid-caps" id="grid"></div>
 
+<script src="funciones-rose.js"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -188,7 +213,6 @@
         return url;
     }
 
-    // CARGA INTELIGENTE: Crea los botones solo si existen en Firebase
     async function cargarBotonesDesdeFirebase() {
         const grid = document.getElementById('grid');
         grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Cargando capítulos...</p>";
@@ -202,10 +226,9 @@
                 disponibles.push(idOriginal);
             });
 
-            // Ordenamos la lista (para que el 1.5 vaya después del 1)
             capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
             
-            grid.innerHTML = ""; // Limpiar mensaje de carga
+            grid.innerHTML = ""; 
 
             capsOrdenados.forEach(idCap => {
                 const btn = document.createElement('div');
@@ -238,22 +261,24 @@
         document.getElementById('btn-ant').disabled = (index <= 0);
         document.getElementById('btn-sig').disabled = (index >= capsOrdenados.length - 1);
 
-        const docRef = doc(db, historiaID, "capitulo_" + idCap);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById('txt-loves').innerText = data.loves || 0;
-            document.getElementById('txt-likes').innerText = data.likes || 0;
-            document.getElementById('txt-haha').innerText = data.haha || 0;
-            
-            contenedor.innerHTML = "";
-            let imgs = Array.isArray(data.imagenes) ? data.imagenes : [data.link];
-            imgs.forEach(url => {
-                const img = document.createElement('img');
-                img.src = arreglarLink(url.trim());
-                contenedor.appendChild(img);
-            });
-        }
+        try {
+            const docRef = doc(db, historiaID, "capitulo_" + idCap);
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById('txt-loves').innerText = data.loves || 0;
+                document.getElementById('txt-likes').innerText = data.likes || 0;
+                document.getElementById('txt-haha').innerText = data.haha || 0;
+                
+                contenedor.innerHTML = "";
+                let imgs = Array.isArray(data.imagenes) ? data.imagenes : [data.link];
+                imgs.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = arreglarLink(url.trim());
+                    contenedor.appendChild(img);
+                });
+            }
+        } catch (e) { console.error(e); }
     }
 
     window.votar = async (tipo, e) => {
