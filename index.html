@@ -111,16 +111,16 @@
         <button class="btn-regresar" onclick="ocultarProximamente()">✦ Regresar ✦</button>
     </div>
 
-    <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 9999;">
+    <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
         
-        <button onclick="toggleMenuColores(event)" style="background: var(--panel-rose, rgba(0,0,0,0.8)); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); outline: none;">
+        <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
             🎨
         </button>
 
         <div class="sub-menu-colores" id="sub-menu-colores">
             <div onclick="cambiarTemaRose('dark')" style="width: 22px; height: 22px; background: #000; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Oscuro"></div>
             <div onclick="cambiarTemaRose('gris')" style="width: 22px; height: 22px; background: #2c2c2c; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Gris"></div>
-            <div onclick="cambiarTemaRose('sepia')" style="width: 22px; height: 22px; background: #f4ecd8; border-radius: 50%; border: 1.5px solid #5f4b32; cursor: pointer;" title="Modo Sepia"></div>
+            <div onclick="cambiarTemaRose('sepia')" style="width: 22px; height: 22px; background: #fdf6e3; border-radius: 50%; border: 1.5px solid #5c4738; cursor: pointer;" title="Modo Sepia"></div>
         </div>
     </div>
 
