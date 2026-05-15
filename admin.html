@@ -11,7 +11,11 @@
         .container { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 500px; border: 2px solid #f06292; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         h2 { color: #d81b60; text-align: center; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
-        select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; }
+        
+        /* Ajustado para que los nombres de los manhwas se lean completos en móviles */
+        select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; font-size: 14px; }
+        select { white-space: normal; word-wrap: break-word; }
+        
         textarea { height: 200px; font-family: monospace; font-size: 11px; }
         button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button:hover { background-color: #d81b60; }
@@ -89,26 +93,36 @@
         if (document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login').style.display = "none";
             document.getElementById('panelControl').style.display = "block";
-            obtenerEstadoActual(); // Carga el estado del primer proyecto al entrar
+            obtenerEstadoActual(); 
         } else { alert("Clave incorrecta"); }
     }
 
-    // NUEVA FUNCIÓN AUTOMÁTICA: LEE EL ESTADO EN TIEMPO REAL AL SELECCIONAR EL MANHWA
-    async function obtenerEstadoActual() {
+    // FUNCIÓN MEJORADA: FUERZA AL NAVEGADOR A COLOCAR EL ESTADO REAL EN TIEMPO REAL
+    function obtenerEstadoActual() {
         const historia = document.getElementById('historia').value;
         const selectorEstado = document.getElementById('estadoProyecto');
         
-        try {
-            const doc = await db.collection("estados_historias").doc(historia).get();
+        db.collection("estados_historias").doc(historia).get().then((doc) => {
             if (doc.exists && doc.data().estado) {
-                selectorEstado.value = doc.data().estado;
+                const estadoBD = doc.data().estado;
+                
+                // Sincroniza el valor interno
+                selectorEstado.value = estadoBD;
+                
+                // Forzar actualización visual en dispositivos móviles
+                for (let i = 0; i < selectorEstado.options.length; i++) {
+                    if (selectorEstado.options[i].value === estadoBD) {
+                        selectorEstado.selectedIndex = i;
+                        break;
+                    }
+                }
             } else {
-                // Si por alguna razón no tiene estado en la BD, por defecto lo pone en emisión
                 selectorEstado.value = "emision";
+                selectorEstado.selectedIndex = 0;
             }
-        } catch (e) {
-            console.log("Error consultando el estado actual: ", e);
-        }
+        }).catch((e) => {
+            console.log("Error al jalar el estado: ", e);
+        });
     }
 
     function forzarLinkDirecto(url) {
