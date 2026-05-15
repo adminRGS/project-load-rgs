@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Los amigos no hacen esto - Rose Garden Scan</title>
+    
+    <link rel="stylesheet" href="estilos-rose.css">
+
     <style>
+        /* Mantenemos tu diseño original pero quitamos el fondo fijo del body 
+           para que los temas (Gris/Sepia) funcionen correctamente */
         body { 
             margin: 0; padding: 0; 
-            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
-            color: white; font-family: 'serif'; 
+            background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
+            color: var(--texto-rose, white); font-family: 'serif'; 
             display: flex; flex-direction: column; align-items: center; 
             overflow-x: hidden; min-height: 100vh; 
+            transition: background 0.3s ease;
         }
         
         body::after {
@@ -68,20 +74,24 @@
         }
         .cap-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 0 30px rgba(255, 102, 178, 0.8); background: rgba(255, 102, 178, 0.4); border-color: #ffd700; }
 
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
+        /* EL LECTOR TIENE QUE USAR EL FONDO DEL TEMA */
+        #lector { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--fondo-rose, #000); 
+            z-index: 100; overflow-y: scroll; scroll-behavior: smooth; 
+        }
         #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
         
-        /* BARRA DE NAVEGACIÓN - ORDEN SOLICITADO */
+        /* BARRA DE NAVEGACIÓN - AJUSTADA PARA LOS TEMAS */
         .nav-lector { 
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
             display: flex; align-items: center; gap: 10px; 
-            background: rgba(0, 0, 0, 0.96); 
+            background: var(--panel-rose, rgba(0, 0, 0, 0.96)); 
             padding: 8px 16px; border-radius: 40px; border: 1px solid #ff66b2; 
             backdrop-filter: blur(12px); z-index: 102; 
             box-shadow: 0 0 30px rgba(255, 102, 178, 0.4); 
         }
 
-        /* Agrupación de botones Ant y Sig */
         .grupo-flechas { display: flex; gap: 5px; }
 
         .nav-btn { 
@@ -94,7 +104,6 @@
 
         .btn-cerrar { background: #ff4d4d; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: none; color: white; cursor: pointer; }
 
-        /* BOTÓN PULGAR ROSADITO INTEGRADO */
         .btn-pulgar-menu {
             position: relative;
             background: rgba(255, 102, 178, 0.2);
@@ -103,12 +112,9 @@
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.3s;
         }
-        .btn-pulgar-menu:hover { background: rgba(255, 102, 178, 0.4); }
         
-        /* Efecto rosado para el emoji del pulgar */
         .thumb-pink { font-size: 1.3rem; filter: sepia(1) saturate(5) hue-rotate(280deg); } 
 
-        /* MENÚ FLOTANTE SUPERIOR CON ESTADÍSTICAS */
         .menu-stats {
             display: none;
             position: absolute;
@@ -120,11 +126,15 @@
             box-shadow: 0 0 25px rgba(255, 102, 178, 0.7);
             white-space: nowrap;
         }
-        .menu-stats::after { /* Flechita del globo */
+        .menu-stats::after {
             content: ""; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
             border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #ff66b2;
         }
         .menu-stats.visible { display: flex; animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* SELECTOR DE COLOR DENTRO DEL LECTOR */
+        .dots-container { display: flex; gap: 8px; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px; }
+        .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid white; cursor: pointer; }
 
         @keyframes bounceIn {
             from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
@@ -135,11 +145,12 @@
         .stat-option:hover { transform: scale(1.3); }
         .emoji-icon { font-size: 1.5rem; }
         .count-val { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
-        /* El corazón rosado dentro del menú */
         .heart-pink { filter: sepia(1) saturate(5) hue-rotate(280deg); }
     </style>
 </head>
 <body>
+
+    <div id="barra-progreso-rose"></div>
 
     <div class="contenedor-regreso">
         <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
@@ -151,6 +162,12 @@
 
     <div id="lector">
         <div class="nav-lector">
+            <div class="dots-container">
+                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')"></div>
+                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')"></div>
+                <div class="dot" style="background: #f4ecd8;" onclick="cambiarTemaRose('sepia')"></div>
+            </div>
+
             <div class="grupo-flechas">
                 <button id="btn-ant" class="nav-btn" onclick="capAnterior()">← Ant.</button>
                 <button id="btn-sig" class="nav-btn" onclick="capSiguiente()">Sig. →</button>
@@ -181,6 +198,8 @@
     </div>
 
     <div class="grid-caps" id="grid"></div>
+
+<script src="funciones-rose.js"></script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -278,8 +297,6 @@
             await updateDoc(docRef, { [tipo]: increment(1) });
             const el = document.getElementById('val-' + tipo);
             el.innerText = parseInt(el.innerText) + 1;
-            // Opcional: cerrar el menú tras votar
-            // document.getElementById('pop-stats').classList.remove('visible');
         } catch (err) { console.log("Error al votar"); }
     };
 
