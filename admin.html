@@ -16,7 +16,6 @@
         button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button:hover { background-color: #d81b60; }
         
-        /* Estilo especial para el botón de solo estado */
         .btn-estado { background-color: #7b1fa2; margin-top: 10px; }
         .btn-estado:hover { background-color: #4a148c; }
         
@@ -37,7 +36,7 @@
         <h2>🌹 Control de Proyectos</h2>
         
         <label>Proyecto:</label>
-        <select id="historia">
+        <select id="historia" onchange="obtenerEstadoActual()">
             <option value="confesion">Confesión</option>
             <option value="lobo">Soy un lobo pero no te lastimaré</option>
             <option value="matrimonio">Matrimonio de conveniencia una obsesión</option>
@@ -90,7 +89,26 @@
         if (document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login').style.display = "none";
             document.getElementById('panelControl').style.display = "block";
+            obtenerEstadoActual(); // Carga el estado del primer proyecto al entrar
         } else { alert("Clave incorrecta"); }
+    }
+
+    // NUEVA FUNCIÓN AUTOMÁTICA: LEE EL ESTADO EN TIEMPO REAL AL SELECCIONAR EL MANHWA
+    async function obtenerEstadoActual() {
+        const historia = document.getElementById('historia').value;
+        const selectorEstado = document.getElementById('estadoProyecto');
+        
+        try {
+            const doc = await db.collection("estados_historias").doc(historia).get();
+            if (doc.exists && doc.data().estado) {
+                selectorEstado.value = doc.data().estado;
+            } else {
+                // Si por alguna razón no tiene estado en la BD, por defecto lo pone en emisión
+                selectorEstado.value = "emision";
+            }
+        } catch (e) {
+            console.log("Error consultando el estado actual: ", e);
+        }
     }
 
     function forzarLinkDirecto(url) {
@@ -103,7 +121,6 @@
         return url;
     }
 
-    // NUEVA FUNCIÓN LIMPIA PARA MODIFICAR EL ESTADO SIN SUBIR NADA MÁS
     async function actualizarSoloEstado() {
         const historia = document.getElementById('historia').value;
         const estado = document.getElementById('estadoProyecto').value;
@@ -113,7 +130,6 @@
         btnEst.disabled = true; btnEst.innerText = "⏳ Cambiando estado...";
 
         try {
-            // Modifica únicamente el estado en la base de datos
             await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e1f5fe"; msg.style.color = "#0288d1";
