@@ -15,6 +15,11 @@
         textarea { height: 200px; font-family: monospace; font-size: 11px; }
         button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button:hover { background-color: #d81b60; }
+        
+        /* Estilo especial para el botón de solo estado */
+        .btn-estado { background-color: #7b1fa2; margin-top: 10px; }
+        .btn-estado:hover { background-color: #4a148c; }
+        
         #panelControl { display: none; }
         #mensaje { display:none; margin-top:15px; text-align:center; font-weight:bold; padding: 10px; border-radius: 8px; }
     </style>
@@ -29,7 +34,7 @@
     </div>
 
     <div id="panelControl">
-        <h2>🌹 Cargar Capítulo</h2>
+        <h2>🌹 Control de Proyectos</h2>
         
         <label>Proyecto:</label>
         <select id="historia">
@@ -51,6 +56,12 @@
             <option value="hiatus">🟡 En Hiatus</option>
             <option value="finalizado">🔴 Terminado (Finalizado)</option>
         </select>
+
+        <button class="btn-estado" id="btnEstado" onclick="actualizarSoloEstado()">🔄 ACTUALIZAR SOLO ESTADO (SIN SUBIR CAPÍTULO)</button>
+
+        <hr style="border: 0; border-top: 1px dashed #f48fb1; margin: 25px 0;">
+
+        <h2>📁 Cargar Nuevo Capítulo</h2>
 
         <label>Número de Capítulo:</label>
         <input type="number" id="capitulo" step="0.1" placeholder="Ej: 5">
@@ -92,9 +103,31 @@
         return url;
     }
 
+    // NUEVA FUNCIÓN LIMPIA PARA MODIFICAR EL ESTADO SIN SUBIR NADA MÁS
+    async function actualizarSoloEstado() {
+        const historia = document.getElementById('historia').value;
+        const estado = document.getElementById('estadoProyecto').value;
+        const btnEst = document.getElementById('btnEstado');
+        const msg = document.getElementById('mensaje');
+
+        btnEst.disabled = true; btnEst.innerText = "⏳ Cambiando estado...";
+
+        try {
+            // Modifica únicamente el estado en la base de datos
+            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
+            
+            msg.style.display = "block"; msg.style.backgroundColor = "#e1f5fe"; msg.style.color = "#0288d1";
+            msg.innerHTML = "🔄 Estado cambiado con éxito en la Biblioteca.";
+            
+            setTimeout(() => { msg.style.display = "none"; }, 4000);
+        } catch (e) { alert("Error al cambiar estado: " + e.message); }
+        
+        btnEst.disabled = false; btnEst.innerText = "🔄 ACTUALIZAR SOLO ESTADO (SIN SUBIR CAPÍTULO)";
+    }
+
     async function guardarCapitulo() {
         const historia = document.getElementById('historia').value;
-        const estado = document.getElementById('estadoProyecto').value; // Captura el estado elegido
+        const estado = document.getElementById('estadoProyecto').value;
         const numCap = document.getElementById('capitulo').value;
         const textoLinks = document.getElementById('links').value;
         const btn = document.getElementById('btnPublicar');
@@ -102,7 +135,7 @@
 
         const listaLinks = textoLinks.split(/[\s,]+/).filter(l => l.trim().length > 10).map(l => forzarLinkDirecto(l.trim()));
 
-        if (!numCap || listaLinks.length === 0) { alert("Llena los campos"); return; }
+        if (!numCap || listaLinks.length === 0) { alert("Llena los campos de capítulo y enlaces"); return; }
         btn.disabled = true; btn.innerText = "⏳ Subiendo...";
 
         try {
@@ -115,15 +148,13 @@
                 fechaCarga: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // Guarda el capítulo
             await db.collection(historia).doc(idDoc).set(datos);
-            
-            // Actualiza también el estado global de la historia en la base de datos
             await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e8f5e9"; msg.style.color = "#2e7d32";
             msg.innerHTML = "✅ Publicado y Estado Actualizado: " + listaLinks.length + " imágenes.";
             document.getElementById('links').value = "";
+            document.getElementById('capitulo').value = "";
         } catch (e) { alert("Error: " + e.message); }
         btn.disabled = false; btn.innerText = "🚀 CARGAR CAPÍTULO COMPLETO";
     }
