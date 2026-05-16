@@ -53,13 +53,13 @@
             overflow: hidden; 
             transition: 0.3s; 
             text-decoration: none; 
-            color: var(--texto-rose, white); 
+            color: inherit; /* Cambia dinámicamente de blanco a oscuro según el fondo */
             text-align: center; 
             display: flex; 
             flex-direction: column; 
             position: relative; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255, 102, 178, 0.2);
+            border: 1px solid var(--borde-tarjeta, rgba(255, 102, 178, 0.2));
         }
         .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); }
         
@@ -70,7 +70,18 @@
 
         .portada { width: 100%; height: 240px; object-fit: cover; background: #222; }
         
-        .info { padding: 15px 8px; font-size: 0.85rem; font-weight: normal; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.3; background: transparent; }
+        .info { 
+            padding: 15px 8px; 
+            font-size: 0.85rem; 
+            font-weight: bold; /* Un extra de grosor para que se lea mucho mejor */
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.3; 
+            background: var(--fondo-info, transparent); 
+            border-top: 1px solid var(--linea-caja, rgba(255, 255, 255, 0.05));
+        }
     </style>
 </head>
 <body>
@@ -149,7 +160,7 @@
     <div class="sub-menu-colores" id="sub-menu-colores">
         <div onclick="cambiarTemaRose('dark')" style="width: 22px; height: 22px; background: #000; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Oscuro"></div>
         <div onclick="cambiarTemaRose('gris')" style="width: 22px; height: 22px; background: #2c2c2c; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Gris"></div>
-        <div onclick="cambiarTemaRose('sepia')" style="width: 22px; height: 22px; background: #fcf8f2; border-radius: 50%; border: 1.5px solid #5c4738; cursor: pointer;" title="Modo Sepia"></div>
+        <div onclick="cambiarTemaRose('malva')" style="width: 22px; height: 22px; background: #dfd3e3; border-radius: 50%; border: 1.5px solid #4a3b4e; cursor: pointer;" title="Modo Malva Suave"></div>
     </div>
 </div>
 
@@ -172,8 +183,8 @@
     // Consultar estados en la base de datos al cargar la página
     dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            const idHistoria = doc.id; // ej: "confesion"
-            const nuevoEstado = doc.data().estado; // "emision", "hiatus" o "finalizado"
+            const idHistoria = doc.id; 
+            const nuevoEstado = doc.data().estado; 
             
             const tarjeta = document.getElementById("card-" + idHistoria);
             if (tarjeta) {
@@ -181,12 +192,10 @@
                 let destinoGrid = document.getElementById("grid-" + nuevoEstado);
                 
                 if (destinoGrid) {
-                    // Mover la tarjeta físicamente de contenedor
                     destinoGrid.appendChild(tarjeta);
                     
-                    // Actualizar estilos y texto de la etiqueta flotante de la portada
                     if (tag) {
-                        tag.className = "estado-tag"; // Reset classes
+                        tag.className = "estado-tag"; 
                         if (nuevoEstado === "emision") {
                             tag.classList.add("tag-emision");
                             tag.innerText = "Emisión";
@@ -204,6 +213,37 @@
     }).catch((error) => {
         console.log("Error sincronizando los estados de las historias: ", error);
     });
+
+    // SISTEMA INTEGRADOR DE TEMAS - INCLUYE EL MODO MALVA SUAVE ANTI-LUZ AZUL
+    function cambiarTemaRose(modo) {
+        const root = document.documentElement;
+        
+        if (modo === 'dark') {
+            document.body.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
+            document.body.style.setProperty('--texto-rose', '#ffffff');
+            root.style.setProperty('--panel-rose', '#161616');
+            root.style.setProperty('--borde-tarjeta', 'rgba(255, 102, 178, 0.2)');
+            root.style.setProperty('--linea-caja', 'rgba(255, 255, 255, 0.05)');
+            root.style.setProperty('--fondo-info', 'transparent');
+            
+        } else if (modo === 'gris') {
+            document.body.style.setProperty('--fondo-rose', '#242426');
+            document.body.style.setProperty('--texto-rose', '#f5f5f5');
+            root.style.setProperty('--panel-rose', '#1c1c1e');
+            root.style.setProperty('--borde-tarjeta', 'rgba(255, 255, 255, 0.1)');
+            root.style.setProperty('--linea-caja', 'rgba(255, 255, 255, 0.1)');
+            root.style.setProperty('--fondo-info', 'transparent');
+            
+        } else if (modo === 'malva') {
+            // Configuración del Modo Malva con letras y líneas oscuras súper legibles
+            document.body.style.setProperty('--fondo-rose', '#dfd3e3');   /* Fondo Malva Suave Relajante */
+            document.body.style.setProperty('--texto-rose', '#351f38');   /* Letras Ciruela Oscuro */
+            root.style.setProperty('--panel-rose', '#f3ebf5');         /* Cuadros sutilmente más claros */
+            root.style.setProperty('--borde-tarjeta', '#bcabbf');       /* Bordes visibles de los cuadros */
+            root.style.setProperty('--linea-caja', '#bcabbf');          /* ¡Línea del nombre del manga perfectamente visible! */
+            root.style.setProperty('--fondo-info', '#e7dee8');          /* Contenedor del título con relieve suave */
+        }
+    }
 </script>
 
 </body>
