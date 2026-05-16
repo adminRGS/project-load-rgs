@@ -11,18 +11,13 @@
         .container { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 500px; border: 2px solid #f06292; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         h2 { color: #d81b60; text-align: center; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #880e4f; }
-        
-        /* Ajustado para que los nombres de los manhwas se lean completos en móviles */
         select, input, textarea, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #f48fb1; box-sizing: border-box; font-size: 14px; }
         select { white-space: normal; word-wrap: break-word; }
-        
         textarea { height: 200px; font-family: monospace; font-size: 11px; }
         button { background-color: #f06292; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button:hover { background-color: #d81b60; }
-        
         .btn-estado { background-color: #7b1fa2; margin-top: 10px; }
         .btn-estado:hover { background-color: #4a148c; }
-        
         #panelControl { display: none; }
         #mensaje { display:none; margin-top:15px; text-align:center; font-weight:bold; padding: 10px; border-radius: 8px; }
     </style>
@@ -97,31 +92,27 @@
         } else { alert("Clave incorrecta"); }
     }
 
-    // FUNCIÓN MEJORADA: FUERZA AL NAVEGADOR A COLOCAR EL ESTADO REAL EN TIEMPO REAL
+    // CORRECCIÓN: Busca el ID en minúsculas sin alterar el flujo del selector
     function obtenerEstadoActual() {
         const historia = document.getElementById('historia').value;
         const selectorEstado = document.getElementById('estadoProyecto');
         
+        // Buscamos directamente el documento en la colección de estados
         db.collection("estados_historias").doc(historia).get().then((doc) => {
             if (doc.exists && doc.data().estado) {
-                const estadoBD = doc.data().estado;
+                const estadoBD = doc.data().estado.toLowerCase().trim();
                 
-                // Sincroniza el valor interno
-                selectorEstado.value = estadoBD;
+                // Mapeo por si en la base de datos está guardado como "finalizado" o "terminado"
+                let valorFiltrado = "emision";
+                if (estadoBD.includes("hiatus")) valorFiltrado = "hiatus";
+                if (estadoBD.includes("finalizado") || estadoBD.includes("terminado") || estadoBD.includes("finalizad")) valorFiltrado = "finalizado";
                 
-                // Forzar actualización visual en dispositivos móviles
-                for (let i = 0; i < selectorEstado.options.length; i++) {
-                    if (selectorEstado.options[i].value === estadoBD) {
-                        selectorEstado.selectedIndex = i;
-                        break;
-                    }
-                }
+                selectorEstado.value = valorFiltrado;
             } else {
                 selectorEstado.value = "emision";
-                selectorEstado.selectedIndex = 0;
             }
         }).catch((e) => {
-            console.log("Error al jalar el estado: ", e);
+            console.log("Error al conectar con Firebase: ", e);
         });
     }
 
@@ -144,6 +135,7 @@
         btnEst.disabled = true; btnEst.innerText = "⏳ Cambiando estado...";
 
         try {
+            // Guardamos el estado limpio en minúsculas para mantener el orden
             await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e1f5fe"; msg.style.color = "#0288d1";
