@@ -92,27 +92,37 @@
         } else { alert("Clave incorrecta"); }
     }
 
-    // CORRECCIÓN: Busca el ID en minúsculas sin alterar el flujo del selector
+    // CORRECCIÓN CLAVE: Lee el estado directo desde el documento de configuración de la propia historia
     function obtenerEstadoActual() {
         const historia = document.getElementById('historia').value;
         const selectorEstado = document.getElementById('estadoProyecto');
         
-        // Buscamos directamente el documento en la colección de estados
-        db.collection("estados_historias").doc(historia).get().then((doc) => {
+        // Buscamos el documento "config" dentro de la colección del propio manhwa
+        db.collection(historia).doc("config").get().then((doc) => {
             if (doc.exists && doc.data().estado) {
                 const estadoBD = doc.data().estado.toLowerCase().trim();
                 
-                // Mapeo por si en la base de datos está guardado como "finalizado" o "terminado"
                 let valorFiltrado = "emision";
                 if (estadoBD.includes("hiatus")) valorFiltrado = "hiatus";
-                if (estadoBD.includes("finalizado") || estadoBD.includes("terminado") || estadoBD.includes("finalizad")) valorFiltrado = "finalizado";
+                if (estadoBD.includes("finalizado") || estadoBD.includes("terminado")) valorFiltrado = "finalizado";
                 
                 selectorEstado.value = valorFiltrado;
             } else {
-                selectorEstado.value = "emision";
+                // Si no existe el documento config, intentamos buscar en un documento llamado "estado"
+                db.collection(historia).doc("estado").get().then((doc2) => {
+                    if (doc2.exists && doc2.data().estado) {
+                        const estadoBD2 = doc2.data().estado.toLowerCase().trim();
+                        let valorFiltrado2 = "emision";
+                        if (estadoBD2.includes("hiatus")) valorFiltrado2 = "hiatus";
+                        if (estadoBD2.includes("finalizado") || estadoBD2.includes("terminado")) valorFiltrado2 = "finalizado";
+                        selectorEstado.value = valorFiltrado2;
+                    } else {
+                        selectorEstado.value = "emision";
+                    }
+                }).catch(() => { selectorEstado.value = "emision"; });
             }
         }).catch((e) => {
-            console.log("Error al conectar con Firebase: ", e);
+            console.log("Error al conectar con la colección: ", e);
         });
     }
 
@@ -135,8 +145,9 @@
         btnEst.disabled = true; btnEst.innerText = "⏳ Cambiando estado...";
 
         try {
-            // Guardamos el estado limpio en minúsculas para mantener el orden
-            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
+            // Guarda el estado en los dos posibles documentos de la colección para asegurar compatibilidad con tu web
+            await db.collection(historia).doc("config").set({ estado: estado }, { merge: true });
+            await db.collection(historia).doc("estado").set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e1f5fe"; msg.style.color = "#0288d1";
             msg.innerHTML = "🔄 Estado cambiado con éxito en la Biblioteca.";
@@ -171,7 +182,9 @@
             };
             
             await db.collection(historia).doc(idDoc).set(datos);
-            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
+            // Al subir capítulo también guardamos el estado en su respectivo documento config
+            await db.collection(historia).doc("config").set({ estado: estado }, { merge: true });
+            await db.collection(historia).doc("estado").set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e8f5e9"; msg.style.color = "#2e7d32";
             msg.innerHTML = "✅ Publicado y Estado Actualizado: " + listaLinks.length + " imágenes.";
