@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Rose Garden - CARGA TOTAL</title>
+    <title>Panel Rose Garden - CONTROL TOTAL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -35,7 +35,7 @@
         <h2>🌹 Control de Proyectos</h2>
         
         <label>Proyecto:</label>
-        <select id="historia" onchange="limpiarSelectorEstado()">
+        <select id="historia" onchange="obtenerEstadoActual()">
             <option value="confesion">Confesión</option>
             <option value="lobo">Soy un lobo pero no te lastimaré</option>
             <option value="matrimonio">Matrimonio de conveniencia una obsesión</option>
@@ -88,13 +88,25 @@
         if (document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login').style.display = "none";
             document.getElementById('panelControl').style.display = "block";
-            limpiarSelectorEstado();
+            obtenerEstadoActual(); 
         } else { alert("Clave incorrecta"); }
     }
 
-    // Al cambiar de manga, vuelve a colocarlo en emisión por defecto para que tú elijas el cambio de forma segura
-    function limpiarSelectorEstado() {
-        document.getElementById('estadoProyecto').value = "emision";
+    // MEMORIA AUTOMÁTICA: Lee de la colección "estados_historias" que usa tu biblioteca
+    function obtenerEstadoActual() {
+        const historia = document.getElementById('historia').value;
+        const selectorEstado = document.getElementById('estadoProyecto');
+        
+        db.collection("estados_historias").doc(historia).get().then((doc) => {
+            if (doc.exists && doc.data().estado) {
+                selectorEstado.value = doc.data().estado;
+            } else {
+                selectorEstado.value = "emision"; // Si no se ha guardado nunca, muestra Emisión
+            }
+        }).catch((e) => {
+            console.log("Error leyendo estados: ", e);
+            selectorEstado.value = "emision";
+        });
     }
 
     function forzarLinkDirecto(url) {
@@ -113,17 +125,14 @@
         const btnEst = document.getElementById('btnEstado');
         const msg = document.getElementById('mensaje');
 
-        btnEst.disabled = true; btnEst.innerText = "⏳ Guardando estado...";
+        btnEst.disabled = true; btnEst.innerText = "⏳ Sincronizando biblioteca...";
 
         try {
-            // Guarda el estado de forma limpia en un documento maestro único por colección
-            await db.collection(historia).doc("informacion_manga").set({ 
-                estado: estado,
-                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            // Guarda en la colección exacta que tu biblioteca lee para mover las tarjetas
+            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e1f5fe"; msg.style.color = "#0288d1";
-            msg.innerHTML = "🔄 Estado guardado en Firebase correctamente.";
+            msg.innerHTML = "🔄 Estado sincronizado con la Biblioteca.";
             
             setTimeout(() => { msg.style.display = "none"; }, 3000);
         } catch (e) { alert("Error al guardar: " + e.message); }
@@ -154,12 +163,13 @@
                 fechaCarga: firebase.firestore.FieldValue.serverTimestamp()
             };
             
+            // Sube el capítulo a su colección correspondiente
             await db.collection(historia).doc(idDoc).set(datos);
-            // También asegura el estado actual al subir capítulo nuevo
-            await db.collection(historia).doc("informacion_manga").set({ estado: estado }, { merge: true });
+            // Sincroniza el estado en la colección global de la biblioteca
+            await db.collection("estados_historias").doc(historia).set({ estado: estado }, { merge: true });
             
             msg.style.display = "block"; msg.style.backgroundColor = "#e8f5e9"; msg.style.color = "#2e7d32";
-            msg.innerHTML = "✅ ¡Capítulo publicado con éxito!";
+            msg.innerHTML = "✅ ¡Capítulo publicado y biblioteca actualizada!";
             document.getElementById('links').value = "";
             document.getElementById('capitulo').value = "";
         } catch (e) { alert("Error: " + e.message); }
