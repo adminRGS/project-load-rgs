@@ -10,20 +10,19 @@
 
     <style>
         :root {
-            --fondo-oscuro: #16151a;
-            --fondo-tarjeta: #1c1b22;
-            --rosa-principal: #ff4fa8;
-            --rosa-borde: #ff4fa8;
-            --texto-claro: #ffffff;
-            --gris-input: #25242a;
+            --rosa-fondo: #fff0f6;
+            --rosa-principal: #ff66b2;
+            --rosa-claro: #ffe3ec;
+            --rosa-oscuro: #4a1525;
+            --texto-formulario: #333333;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--fondo-oscuro);
-            color: var(--texto-claro);
+            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--rosa-fondo) 100%);
+            color: var(--rosa-oscuro);
             margin: 0;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -31,86 +30,77 @@
         }
 
         h1 { 
-            color: #ffa1d4; 
+            color: var(--rosa-oscuro); 
+            text-shadow: 0 2px 5px rgba(255, 102, 178, 0.2); 
             text-align: center;
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: bold;
+            font-family: 'Georgia', serif;
             margin-bottom: 25px;
-            font-size: 1.6rem;
         }
 
-        /* BLOQUE DE ACCESO CON PUNTITOS */
+        /* COMPONENTE DE LOGIN INTEGRADO */
         #bloque-login {
-            background: var(--fondo-tarjeta);
+            background: white;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--rosa-borde);
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.2);
+            border: 2px solid var(--rosa-principal);
             text-align: center;
-            max-width: 340px;
+            max-width: 320px;
             width: 100%;
             box-sizing: border-box;
-            margin-top: 60px;
+            margin-top: 40px;
         }
 
-        #bloque-login h2 {
-            color: var(--rosa-principal);
-            margin-top: 0;
-            font-size: 1.3rem;
-        }
-
+        /* EL PANEL ADMINISTRATIVO SE OCULTA HASTA PONER LA CLAVE */
         #contenido-panel {
             display: none;
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             flex-direction: column;
+            align-items: center;
         }
 
-        /* REPRODUCCIÓN DEL MENÚ ORIGINAL DE TUS CAPTURAS */
+        /* MENÚ PRINCIPAL */
         .menu-administracion {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             width: 100%;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .btn-menu {
             width: 100%;
-            padding: 14px;
-            background: var(--fondo-tarjeta);
-            border: 2px solid var(--rosa-borde);
-            color: var(--texto-claro);
-            border-radius: 14px;
-            font-size: 1.05rem;
-            font-weight: 600;
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--rosa-principal);
+            color: var(--rosa-oscuro);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 102, 178, 0.1);
             text-align: center;
             box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
-        /* ESTADO ACTIVO: FONDO ROSA ENCIENDE COMO EN TU CAPTURA */
-        .btn-menu.activo {
-            background: #ff55b0;
-            color: #ffffff;
-            border-color: #ff55b0;
-            box-shadow: 0 0 15px rgba(255, 85, 176, 0.5);
+        .btn-menu:hover, .btn-menu.activo {
+            background: var(--rosa-principal);
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 102, 178, 0.4);
+            transform: translateY(-2px);
         }
 
-        /* SECCIONES CONTENEDORAS OSCURAS CON BORDE ROSA */
+        /* CONTENEDORES DE SECCIONES TOTALMENTE ROSAS */
         .seccion-admin {
             display: none; 
             width: 100%;
-            background: var(--fondo-tarjeta);
-            padding: 22px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid var(--rosa-borde);
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(255, 102, 178, 0.15);
+            border: 2px solid var(--rosa-principal);
             box-sizing: border-box;
         }
 
@@ -119,15 +109,14 @@
         }
 
         .seccion-admin h2 {
-            color: #ffffff;
+            color: var(--rosa-oscuro);
             margin-top: 0;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--rosa-claro);
+            padding-bottom: 10px;
         }
 
+        /* FORMULARIOS ESTILO ROSA CLARO */
         .grupo-control {
             margin-bottom: 18px;
             display: flex;
@@ -137,18 +126,18 @@
 
         label { 
             font-weight: bold; 
-            color: #ff99cc; 
-            font-size: 0.8rem; 
+            color: var(--rosa-oscuro); 
+            font-size: 0.85rem; 
             text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+            letter-spacing: 1px; 
         }
         
         input, select, textarea {
             padding: 12px;
-            background: var(--gris-input);
-            border: 1px solid #3a3842;
-            color: var(--texto-claro);
-            border-radius: 10px;
+            background: #fff9fb;
+            border: 1px solid var(--rosa-principal);
+            color: var(--texto-formulario);
+            border-radius: 8px;
             font-size: 1rem;
             outline: none;
             width: 100%;
@@ -156,33 +145,33 @@
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--rosa-principal);
-            box-shadow: 0 0 8px rgba(255, 79, 168, 0.3);
+            background: white;
+            border-color: var(--rosa-oscuro);
+            box-shadow: 0 0 8px rgba(255, 102, 178, 0.3);
         }
 
         .btn-guardar {
-            background: #ff55b0;
+            background: var(--rosa-principal);
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1rem;
             width: 100%;
-            transition: 0.2s;
+            transition: 0.3s;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
-
         .btn-guardar:hover { 
-            background: #e63994; 
-            box-shadow: 0 0 15px rgba(255, 85, 176, 0.4); 
+            background: #ff3399; 
+            box-shadow: 0 0 15px rgba(255,51,153,0.3); 
         }
 
         .divisor {
-            height: 1px;
-            background: rgba(255, 102, 178, 0.15);
+            height: 2px;
+            background: var(--rosa-claro);
             margin: 25px 0;
         }
     </style>
@@ -192,7 +181,7 @@
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
     <div id="bloque-login">
-        <h2>🌸 Acceso Administrativo </h2>
+        <h2 style="color: var(--rosa-oscuro); margin-top: 0;">🌸 Acceso </h2>
         <div class="grupo-control">
             <label>Contraseña</label>
             <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
@@ -203,17 +192,17 @@
     <div id="contenido-panel">
         
         <div class="menu-administracion">
-            <button class="btn-menu activo" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
             <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
             <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
 
-        <div id="opcion-cargar" class="seccion-admin activa">
+        <div id="opcion-cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
                 <label>Seleccionar el Proyecto</label>
                 <select id="select-proyecto-capitulo">
-                    <option value="">Buscando historias en Firebase...</option>
+                    <option value="">Cargando historias...</option>
                 </select>
             </div>
             <div class="grupo-control">
@@ -232,12 +221,12 @@
             <div class="grupo-control">
                 <label>Seleccionar Proyecto</label>
                 <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
-                    <option value="">Buscando historias en Firebase...</option>
+                    <option value="">Cargando historias...</option>
                 </select>
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual del Proyecto</label>
-                <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--gris-input); border-color: var(--rosa-principal); color: var(--rosa-principal); font-weight: bold;">
+                <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--rosa-claro); border-color: var(--rosa-principal); color: var(--rosa-oscuro); font-weight: bold;">
             </div>
             <div class="grupo-control">
                 <label>Cambiar a Nuevo Estatus</label>
@@ -253,9 +242,9 @@
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
             
-            <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 0.9rem;">➕ CREAR NUEVO PROYECTO</h3>
+            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
             <div class="grupo-control">
-                <label>ID del Proyecto (Firebase - Sin espacios)</label>
+                <label>ID del Proyecto (Firebase - Sin espacios ni mayúsculas)</label>
                 <input type="text" id="nuevo-id" placeholder="ej: de-fans-para-fans">
             </div>
             <div class="grupo-control">
@@ -274,11 +263,11 @@
 
             <div class="divisor"></div>
 
-            <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 0.9rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
             <div class="grupo-control">
                 <label>Seleccionar Proyecto a Editar</label>
                 <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
-                    <option value="">Buscando historias en Firebase...</option>
+                    <option value="">Cargando historias...</option>
                 </select>
             </div>
             <div class="grupo-control">
@@ -289,13 +278,13 @@
                 <label>Cambiar Sinopsis</label>
                 <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
             </div>
-            <button class="btn-guardar" style="background: #2ea44f;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
+            <button class="btn-guardar" style="background: #3399ff;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
         </div>
 
     </div>
 
     <script>
-        // CONFIGURACIÓN DE TU FIREBASE
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -309,17 +298,19 @@
 
         let listaProyectosGlobal = {};
 
+        // VALIDACIÓN DE LA CLAVE ORIGINAL
         function verificarClave() {
             const entrada = document.getElementById("clave-input").value;
             if (entrada === "Rose2026") {
                 document.getElementById("bloque-login").style.display = "none";
                 document.getElementById("contenido-panel").style.display = "flex";
-                cargarProyectosEnSelects();
+                cargarProyectosEnSelects(); 
             } else {
                 alert("Contraseña incorrecta.");
             }
         }
 
+        // CONTROLADOR DE PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -328,13 +319,12 @@
             evento.target.classList.add('activo');
         }
 
-        // SOLUCIÓN DOBLE: Lee simultáneamente ambas opciones por si guardas los títulos largos en colecciones cruzadas
+        // CORRECCIÓN DEFINITIVA DE NOMBRES LARGOS
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
-            // Buscamos primero en estados_historias
             db.collection("estados_historias").onSnapshot((querySnapshot) => {
                 selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
@@ -345,21 +335,22 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // FORZADO EXTREMO: Si tiene campo "titulo" o "nombre" se usa, si no, se busca mayúscula
-                    let nombreLargoCompleto = data.titulo || data.nombre || data.name || doc.id;
+                    // Condición estricta: Si el campo "titulo" no existe o se guardó roto, el código lo limpia y usa una versión legible en vez del ID en minúsculas
+                    let nombreMostrar = data.titulo || data.nombre;
                     
-                    // Si el nombre largo coincide con el ID corto, intentamos transformarlo visualmente por estética mientras se actualiza
-                    if (nombreLargoCompleto === doc.id) {
-                        nombreLargoCompleto = doc.id.charAt(0).toUpperCase() + doc.id.slice(1);
+                    if (!nombreMostrar || nombreMostrar === doc.id) {
+                        // Si está vacío o es igual al ID corto, lo convierte automáticamente a un formato limpio y elegante de respaldo
+                        nombreMostrar = doc.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     }
                     
-                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreLargoCompleto; selectCap.appendChild(opc1);
-                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreLargoCompleto; selectEst.appendChild(opc2);
-                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = nombreLargoCompleto; selectEdi.appendChild(opc3);
+                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreMostrar; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreMostrar; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = nombreMostrar; selectEdi.appendChild(opc3);
                 });
             });
         }
 
+        // Mostrar estatus actual
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
@@ -371,6 +362,7 @@
             }
         }
 
+        // Cargar datos para editar
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if(id && listaProyectosGlobal[id]) {
@@ -382,6 +374,7 @@
             }
         }
 
+        // ACCIÓN: CARGAR CAPÍTULO
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -402,6 +395,7 @@
             .catch(error => alert("Error: " + error));
         }
 
+        // ACCIÓN: ACTUALIZAR ESTATUS
         function actualizarEstadoFirebase() {
             const idSubido = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -415,6 +409,7 @@
             .catch(error => alert("Error: " + error));
         }
 
+        // ACCIÓN: CREAR NUEVO PROYECTO
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
@@ -439,6 +434,7 @@
             .catch(error => alert("Error: " + error));
         }
 
+        // ACCIÓN: EDITAR PROYECTO EXISTENTE
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             const nuevaPortada = document.getElementById("editar-portada").value.trim();
