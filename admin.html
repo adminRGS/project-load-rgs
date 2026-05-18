@@ -10,17 +10,19 @@
 
     <style>
         :root {
-            --rosa-fondo: #fff0f6;
+            --fondo-oscuro: #121214;
+            --tarjeta-oscura: #1a1a1e;
             --rosa-principal: #ff66b2;
+            --rosa-brillante: #ff3399;
             --rosa-claro: #ffe3ec;
-            --rosa-oscuro: #4a1525;
-            --texto-formulario: #333333;
+            --texto-blanco: #ffffff;
+            --texto-mutado: #a0a0a5;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--rosa-fondo) 100%);
-            color: var(--rosa-oscuro);
+            background-color: var(--fondo-oscuro);
+            color: var(--texto-blanco);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -30,21 +32,22 @@
         }
 
         h1 { 
-            color: var(--rosa-oscuro); 
-            text-shadow: 0 2px 5px rgba(255, 102, 178, 0.2); 
+            color: var(--texto-blanco); 
+            text-shadow: 0 0 10px rgba(255, 102, 178, 0.4); 
             text-align: center;
             font-family: 'Georgia', serif;
             margin-bottom: 25px;
+            font-size: 1.8rem;
         }
 
         #bloque-login {
-            background: white;
+            background: var(--tarjeta-oscura);
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             border: 2px solid var(--rosa-principal);
             text-align: center;
-            max-width: 320px;
+            max-width: 340px;
             width: 100%;
             box-sizing: border-box;
             margin-top: 40px;
@@ -69,35 +72,35 @@
         .btn-menu {
             width: 100%;
             padding: 16px;
-            background: white;
+            background: var(--tarjeta-oscura);
             border: 2px solid var(--rosa-principal);
-            color: var(--rosa-oscuro);
+            color: var(--texto-blanco);
             border-radius: 12px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255, 102, 178, 0.1);
             text-align: center;
             box-sizing: border-box;
         }
 
         .btn-menu:hover, .btn-menu.activo {
             background: var(--rosa-principal);
-            color: white;
-            box-shadow: 0 6px 15px rgba(255, 102, 178, 0.4);
+            color: var(--texto-blanco);
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
             transform: translateY(-2px);
         }
 
         .seccion-admin {
             display: none; 
             width: 100%;
-            background: white;
+            background: var(--tarjeta-oscura);
             padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(255, 102, 178, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             border: 2px solid var(--rosa-principal);
             box-sizing: border-box;
+            margin-bottom: 30px;
         }
 
         .seccion-admin.activa {
@@ -105,10 +108,10 @@
         }
 
         .seccion-admin h2 {
-            color: var(--rosa-oscuro);
+            color: var(--rosa-principal);
             margin-top: 0;
             font-size: 1.4rem;
-            border-bottom: 2px solid var(--rosa-claro);
+            border-bottom: 1px solid #333;
             padding-bottom: 10px;
         }
 
@@ -121,18 +124,18 @@
 
         label { 
             font-weight: bold; 
-            color: var(--rosa-oscuro); 
+            color: var(--rosa-principal); 
             font-size: 0.85rem; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
         }
         
         input, select, textarea {
-            padding: 12px;
-            background: #fff9fb;
-            border: 1px solid var(--rosa-principal);
-            color: var(--texto-formulario);
-            border-radius: 8px;
+            padding: 14px;
+            background: #252529;
+            border: 1px solid #444;
+            color: var(--texto-blanco);
+            border-radius: 10px;
             font-size: 1rem;
             outline: none;
             width: 100%;
@@ -140,17 +143,16 @@
         }
 
         input:focus, select:focus, textarea:focus {
-            background: white;
-            border-color: var(--rosa-oscuro);
-            box-shadow: 0 0 8px rgba(255, 102, 178, 0.3);
+            border-color: var(--rosa-principal);
+            box-shadow: 0 0 8px rgba(255, 102, 178, 0.4);
         }
 
         .btn-guardar {
             background: var(--rosa-principal);
-            color: white;
+            color: var(--texto-blanco);
             border: none;
-            padding: 14px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             font-size: 1rem;
@@ -160,13 +162,13 @@
             letter-spacing: 1px;
         }
         .btn-guardar:hover { 
-            background: #ff3399; 
-            box-shadow: 0 0 15px rgba(255,51,153,0.3); 
+            background: var(--rosa-brillante); 
+            box-shadow: 0 0 15px rgba(255,51,153,0.4); 
         }
 
         .divisor {
-            height: 2px;
-            background: var(--rosa-claro);
+            height: 1px;
+            background: #333;
             margin: 25px 0;
         }
     </style>
@@ -176,7 +178,7 @@
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
     <div id="bloque-login">
-        <h2 style="color: var(--rosa-oscuro); margin-top: 0;">🌸 Acceso </h2>
+        <h2 style="color: var(--rosa-principal); margin-top: 0;">🌸 Acceso Administrativo</h2>
         <div class="grupo-control">
             <label>Contraseña</label>
             <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
@@ -221,7 +223,7 @@
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual del Proyecto</label>
-                <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--rosa-claro); border-color: var(--rosa-principal); color: var(--rosa-oscuro); font-weight: bold;">
+                <input type="text" id="estatus-actual-pantalla" readonly style="background: #202024; border-color: #444; color: var(--rosa-principal); font-weight: bold;">
             </div>
             <div class="grupo-control">
                 <label>Cambiar a Nuevo Estatus</label>
@@ -273,7 +275,7 @@
                 <label>Cambiar Sinopsis</label>
                 <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
             </div>
-            <button class="btn-guardar" style="background: #3399ff;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
+            <button class="btn-guardar" style="background: #2575fc;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
         </div>
 
     </div>
@@ -311,12 +313,12 @@
             evento.target.classList.add('activo');
         }
 
-        // APUNTADO DIRECTO A LA COLECCIÓN ORIGINAL DE HISTORIAS Y AL CAMPO NOMBRE
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
+            // Conexión directa a la colección "historias" para traer los campos reales
             db.collection("historias").onSnapshot((querySnapshot) => {
                 selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
@@ -327,10 +329,9 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Extrae el nombre largo desde la propiedad original
-                    let nombreFinal = data.nombre || data.titulo || data.title;
+                    // Extrae el título real guardado en el campo "nombre"
+                    let nombreFinal = data.nombre;
                     
-                    // Si el documento carece del campo, limpia el ID plano quitando guiones como protección
                     if (!nombreFinal) {
                         nombreFinal = doc.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     }
@@ -346,14 +347,13 @@
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
             
-            // Buscamos el estado cruzando la info con estados_historias por debajo
             if(id) {
                 db.collection("estados_historias").doc(id).get().then((doc) => {
                     if (doc.exists) {
                         const est = doc.data().estado;
                         campo.value = est === "emision" ? "🔴 En Emisión" : est === "hiatus" ? "🟡 En Hiatus" : "💖 Finalizado";
                     } else {
-                        campo.value = "🔴 En Emisión"; // Por defecto si es nuevo
+                        campo.value = "🔴 En Emisión";
                     }
                 });
             } else {
@@ -413,7 +413,6 @@
 
             if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
 
-            // Se guarda tanto en historias como en estados para mantener la sincronía perfecta
             db.collection("historias").doc(id).set({
                 nombre: titulo,
                 portadaUrl: portada,
