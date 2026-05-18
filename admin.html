@@ -312,7 +312,6 @@
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
-            // Lista con tus 10 Colecciones Reales en la raíz de tu base de datos
             const misIds = ["amigos", "confesion", "embarazada", "guarderia", "hermana", "leopardo", "lobo", "matrimonio", "princesa", "salvada"];
             
             selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
@@ -321,44 +320,32 @@
             listaProyectosGlobal = {}; 
             
             misIds.forEach((id) => {
-                listaProyectosGlobal[id] = { nombre: id };
-                
                 let nombreFinal = "";
                 
                 switch(id) {
-                    case "amigos":
-                        nombreFinal = "Los amigos no hacen esto";
-                        break;
-                    case "confesion":
-                        nombreFinal = "Confesión";
-                        break;
-                    case "embarazada":
-                        nombreFinal = "Finge estar embarazada pero mi esposo regresó";
-                        break;
-                    case "guarderia":
-                        nombreFinal = "La guardería de la villana";
-                        break;
-                    case "hermana":
-                        nombreFinal = "Mi hermana que era mi enemiga ahora me ama";
-                        break;
-                    case "leopardo":
-                        nombreFinal = "La pequeña bebé leopardo de las nieves de la familia de panteras negras";
-                        break;
-                    case "lobo":
-                        nombreFinal = "Soy un lobo pero no te lastimaré";
-                        break;
-                    case "matrimonio":
-                        nombreFinal = "Matrimonio conveniencia a una obsesión";
-                        break;
-                    case "princesa":
-                        nombreFinal = "No solo encante a la princesa";
-                        break;
-                    case "salvada":
-                        nombreFinal = "Salvada por la pequeña dama sin poderes";
-                        break;
-                    default:
-                        nombreFinal = id;
+                    case "amigos": nombreFinal = "Los amigos no hacen esto"; break;
+                    case "confesion": nombreFinal = "Confesión"; break;
+                    case "embarazada": nombreFinal = "Finge estar embarazada pero mi esposo regresó"; break;
+                    case "guarderia": nombreFinal = "La guardería de la villana"; break;
+                    case "hermana": nombreFinal = "Mi hermana que era mi enemiga ahora me ama"; break;
+                    case "leopardo": nombreFinal = "La pequeña bebé leopardo de las nieves de la familia de panteras negras"; break;
+                    case "lobo": nombreFinal = "Soy un lobo pero no te lastimaré"; break;
+                    case "matrimonio": nombreFinal = "Matrimonio conveniencia a una obsesión"; break;
+                    case "princesa": nombreFinal = "No solo encante a la princesa"; break;
+                    case "salvada": nombreFinal = "Salvada por la pequeña dama sin poderes"; break;
+                    default: nombreFinal = id;
                 }
+
+                // Carga la información de portada/sinopsis desde tu documento datos_proyecto
+                db.collection(id).doc("datos_proyecto").get().then((docSnapshot) => {
+                    if(docSnapshot.exists) {
+                        listaProyectosGlobal[id] = docSnapshot.data();
+                    } else {
+                        listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
+                    }
+                }).catch(() => {
+                    listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
+                });
                 
                 let opc1 = document.createElement("option"); opc1.value = id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
                 let opc2 = document.createElement("option"); opc2.value = id; opc2.text = nombreFinal; selectEst.appendChild(opc2);
@@ -404,8 +391,8 @@
             if(!idProyecto) { alert("Por favor, selecciona un proyecto."); return; }
             if(!numCap || arrayImagenes.length === 0) { alert("Completa el número de capítulo y agrega imágenes."); return; }
 
-            // Entra directo a tu colección correspondiente y le mete la subcolección capitulos
-            db.collection(idProyecto).document("capitulos").collection("lista").document("cap-" + numCap).set({
+            // Sube el capítulo directo a la subcolección correspondiente a tu estructura
+            db.collection(idProyecto).doc("capitulos").collection("lista").doc("cap-" + numCap).set({
                 imagenes: arrayImagenes
             })
             .then(() => {
@@ -441,7 +428,7 @@
                 nombre: titulo,
                 portadaUrl: portada,
                 sinopsis: sinopsis
-            })
+            }, { merge: true })
             .then(() => {
                 return db.collection("estados_historias").doc(id).set({
                     estado: "emision"
@@ -453,6 +440,7 @@
                 document.getElementById("nuevo-titulo").value = "";
                 document.getElementById("nuevo-portada").value = "";
                 document.getElementById("nuevo-sinopsis").value = "";
+                cargarProyectosEnSelects();
             })
             .catch(error => alert("Error: " + error));
         }
@@ -464,12 +452,17 @@
 
             if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
 
-            db.collection(id).doc("datos_proyecto").update({
+            // Usa .set con merge para crear el documento si no existía previamente
+            db.collection(id).doc("datos_proyecto").set({
                 portadaUrl: nuevaPortada,
                 sinopsis: nuevaSinopsis
-            })
+            }, { merge: true })
             .then(() => {
                 alert("¡Proyecto editado correctamente!");
+                if(!listaProyectosGlobal[id]) listaProyectosGlobal[id] = {};
+                listaProyectosGlobal[id].portadaUrl = nuevaPortada;
+                listaProyectosGlobal[id].sinopsis = nuevaSinopsis;
+                
                 document.getElementById("editar-portada").value = "";
                 document.getElementById("editar-sinopsis").value = "";
             })
