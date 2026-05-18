@@ -10,109 +10,155 @@
 
     <style>
         :root {
+            --rosa-fondo: #fff0f6;
             --rosa-principal: #ff66b2;
-            --fondo-oscuro: #121214;
-            --tarjeta-oscuro: #1a1a1e;
-            --texto-claro: #f5f5f7;
+            --rosa-oscuro: #4a1525;
+            --panel-oscuro: #1e1e24;
+            --texto-claro: #ffffff;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--fondo-oscuro);
-            color: var(--texto-claro);
+            background: linear-gradient(135deg, #ffe3ec 0%, #fff0f6 100%);
+            color: var(--rosa-oscuro);
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
-        h1 { color: var(--rosa-principal); text-shadow: 0 0 10px rgba(255,102,178,0.3); }
+        h1 { 
+            color: var(--rosa-oscuro); 
+            text-shadow: 0 2px 5px rgba(255, 102, 178, 0.2); 
+            text-align: center;
+            font-family: 'Georgia', serif;
+            margin-bottom: 25px;
+        }
 
-        /* MENÚ DE TRES OPCIONES PRINCIPALES */
+        /* LAS TRES OPCIONES PRINCIPALES AL ENTRAR */
         .menu-administracion {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            flex-direction: column;
+            gap: 12px;
             width: 100%;
-            max-width: 800px;
+            max-width: 500px;
+            margin-bottom: 30px;
         }
 
         .btn-menu {
-            flex: 1;
-            padding: 15px;
-            background: var(--tarjeta-oscuro);
-            border: 2px solid rgba(255,102,178,0.2);
-            color: var(--texto-claro);
-            border-radius: 10px;
-            font-size: 1rem;
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--rosa-principal);
+            color: var(--rosa-oscuro);
+            border-radius: 12px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 102, 178, 0.1);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .btn-menu:hover, .btn-menu.activo {
             background: var(--rosa-principal);
             color: white;
-            box-shadow: 0 0 15px var(--rosa-principal);
-            border-color: var(--rosa-principal);
+            box-shadow: 0 6px 15px rgba(255, 102, 178, 0.4);
+            transform: translateY(-2px);
         }
 
         /* CONTENEDORES DE LAS SECCIONES */
         .seccion-admin {
-            display: none; /* Ocultas por defecto */
+            display: none; /* Se ocultan para que solo veas las opciones al entrar */
             width: 100%;
-            max-width: 800px;
-            background: var(--tarjeta-oscuro);
+            max-width: 500px;
+            background: var(--panel-oscuro);
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,153,204,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 2px solid var(--rosa-principal);
+            box-sizing: border-box;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .seccion-admin.activa {
-            display: block; /* Solo se muestra la pestaña seleccionada */
+            display: block;
         }
 
-        /* FORMULARIOS */
+        .seccion-admin h2 {
+            color: var(--rosa-principal);
+            margin-top: 0;
+            font-size: 1.4rem;
+            border-bottom: 1px solid rgba(255, 102, 178, 0.3);
+            padding-bottom: 10px;
+        }
+
+        /* FORMULARIOS INTERNOS */
         .grupo-control {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        label { font-weight: 600; color: #ff99cc; font-size: 0.9rem; text-transform: uppercase; }
+        label { 
+            font-weight: bold; 
+            color: #ff99cc; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
         
         input, select, textarea {
             padding: 12px;
-            background: #222226;
+            background: #2d2d35;
             border: 1px solid #444;
-            color: white;
-            border-radius: 6px;
+            color: var(--texto-claro);
+            border-radius: 8px;
             font-size: 1rem;
             outline: none;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--rosa-principal);
-            box-shadow: 0 0 8px rgba(255,102,178,0.4);
+            box-shadow: 0 0 8px rgba(255, 102, 178, 0.5);
         }
 
         .btn-guardar {
-            background: #2e7d32;
+            background: var(--rosa-principal);
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             font-size: 1rem;
             width: 100%;
             transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-guardar:hover { background: #388e3c; box-shadow: 0 0 12px rgba(76,175,80,0.4); }
+        .btn-guardar:hover { 
+            background: #ff3399; 
+            box-shadow: 0 0 15px rgba(255,51,153,0.5); 
+        }
+
+        /* Divisor simple para separar Crear de Editar */
+        .divisor {
+            height: 1px;
+            background: rgba(255, 102, 178, 0.3);
+            margin: 25px 0;
+        }
     </style>
 </head>
 <body>
@@ -120,17 +166,18 @@
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
     <div class="menu-administracion">
-        <button class="btn-menu activo" onclick="cambiarPestaña('opcion-cargar')">📂 Cargar Capítulos</button>
-        <button class="btn-menu" onclick="cambiarPestaña('opcion-estatus')">🔄 Actualizar Estatus</button>
-        <button class="btn-menu" onclick="cambiarPestaña('opcion-nuevo')">✨ Crear / Editar Proyecto</button>
+        <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
+        <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
+        <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
     </div>
 
-    <div id="opcion-cargar" class="seccion-admin activa">
-        <h2>📂 Cargar Nuevos Capítulos</h2>
+    <div id="opcion-cargar" class="seccion-admin">
+        <h2>📂 Cargar Capítulo</h2>
         <div class="grupo-control">
-            <label>Seleccionar Proyecto</label>
+            <label>Seleccionar el Proyecto</label>
             <select id="select-proyecto-capitulo">
-                </select>
+                <option value="">Cargando historias...</option>
+            </select>
         </div>
         <div class="grupo-control">
             <label>Número del Capítulo</label>
@@ -138,20 +185,25 @@
         </div>
         <div class="grupo-control">
             <label>Enlaces de las Imágenes (Uno por línea)</label>
-            <textarea id="enlaces-imagenes" rows="8" placeholder="https://enlace1.com/img.jpg&#10;https://enlace2.com/img.jpg"></textarea>
+            <textarea id="enlaces-imagenes" rows="8" placeholder="https://enlace1.com/imagen.jpg&#10;https://enlace2.com/imagen.jpg"></textarea>
         </div>
         <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
     </div>
 
     <div id="opcion-estatus" class="seccion-admin">
-        <h2>🔄 Actualizar Estatus del Proyecto</h2>
+        <h2>🔄 Actualizar Estatus</h2>
         <div class="grupo-control">
             <label>Seleccionar Proyecto</label>
-            <select id="select-proyecto-estatus">
-                </select>
+            <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
+                <option value="">Cargando historias...</option>
+            </select>
         </div>
         <div class="grupo-control">
-            <label>Nuevo Estado</label>
+            <label>Estatus Actual del Proyecto</label>
+            <input type="text" id="estatus-actual-pantalla" readonly style="background: #1e1e24; border-color: #ff66b2; color: #ff99cc; font-weight: bold;">
+        </div>
+        <div class="grupo-control">
+            <label>Cambiar a Nuevo Estatus</label>
             <select id="nuevo-estado-valor">
                 <option value="emision">🔴 En Emisión</option>
                 <option value="hiatus">🟡 En Hiatus</option>
@@ -162,24 +214,45 @@
     </div>
 
     <div id="opcion-nuevo" class="seccion-admin">
-        <h2>✨ Crear / Editar Proyecto (Lienzo en Blanco)</h2>
+        <h2>✨ Crear / Editar Proyecto</h2>
+        
+        <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
         <div class="grupo-control">
             <label>ID del Proyecto (Sin espacios ni mayúsculas)</label>
-            <input type="text" id="nuevo-id" placeholder="ej: diciembre o nombre-del-manga">
+            <input type="text" id="nuevo-id" placeholder="ej: diciembre">
         </div>
         <div class="grupo-control">
-            <label>Nombre Visible del Proyecto</label>
+            <label>Nombre del Proyecto</label>
             <input type="text" id="nuevo-titulo" placeholder="Ej: Diciembre">
         </div>
         <div class="grupo-control">
-            <label>URL de la Portada</label>
+            <label>Link de la Portada</label>
             <input type="text" id="nuevo-portada" placeholder="https://enlace.com/portada.jpg">
         </div>
         <div class="grupo-control">
             <label>Sinopsis / Descripción</label>
-            <textarea id="nuevo-sinopsis" rows="5" placeholder="Escribe la sinopsis del nuevo proyecto aquí..."></textarea>
+            <textarea id="nuevo-sinopsis" rows="3" placeholder="Escribe la sinopsis aquí..."></textarea>
         </div>
         <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo Proyecto</button>
+
+        <div class="divisor"></div>
+
+        <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+        <div class="grupo-control">
+            <label>Seleccionar Proyecto a Editar</label>
+            <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
+                <option value="">Cargando historias...</option>
+            </select>
+        </div>
+        <div class="grupo-control">
+            <label>Cambiar Link de la Portada</label>
+            <input type="text" id="editar-portada" placeholder="https://enlace.com/nueva-portada.jpg">
+        </div>
+        <div class="grupo-control">
+            <label>Cambiar Sinopsis</label>
+            <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
+        </div>
+        <button class="btn-guardar" style="background: #3399ff;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
     </div>
 
     <script>
@@ -195,101 +268,143 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 1. FUNCIÓN PARA NAVEGAR ENTRE LAS TRES OPCIONES
-        function cambiarPestaña(idPestaña) {
+        // Almacén local de datos de Firebase para no saturar lecturas
+        let listaProyectosGlobal = {};
+
+        // 1. MANEJAR LAS PESTAÑAS DENTRO DEL PANEL ROSA
+        function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
             
-            document.getElementById(idPestaña).classList.add('activa');
-            event.target.classList.add('activo');
+            document.getElementById(idSeccion).classList.add('activa');
+            evento.target.classList.add('activo');
         }
 
-        // 2. CARGAR TODOS LOS PROYECTOS EN LOS SELECTS AUTOMÁTICAMENTE
-        function cargarProyectos EnSelects() {
+        // 2. CARGAR TODOS LOS MANGAS EN TODOS LOS SELECTS AUTOMÁTICAMENTE
+        function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
+            const selectEdi = document.getElementById("select-proyecto-editar");
             
             db.collection("estados_historias").onSnapshot((querySnapshot) => {
-                selectCap.innerHTML = "";
-                selectEst.innerHTML = "";
+                selectCap.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+                selectEst.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+                selectEdi.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+                listaProyectosGlobal = {}; // Limpiar caché local
                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
+                    listaProyectosGlobal[doc.id] = data; // Guardar datos
                     const tituloVisible = data.titulo || doc.id;
                     
-                    let opc1 = document.createElement("option");
-                    opc1.value = doc.id;
-                    opc1.text = tituloVisible;
-                    selectCap.appendChild(opc1);
-
-                    let opc2 = document.createElement("option");
-                    opc2.value = doc.id;
-                    opc2.text = tituloVisible;
-                    selectEst.appendChild(opc2);
+                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = tituloVisible; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = tituloVisible; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = tituloVisible; selectEdi.appendChild(opc3);
                 });
             });
         }
         window.onload = cargarProyectosEnSelects;
 
-        // 3. ACCIÓN: CREAR EL LIENZO EN BLANCO (TERCERA OPCIÓN)
-        function crearNuevoProyecto() {
-            const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
-            const titulo = document.getElementById("nuevo-titulo").value.trim();
-            const portada = document.getElementById("nuevo-portada").value.trim();
-            const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
-
-            if(!id || !titulo) {
-                alert("Por favor rellena el ID y el Título del proyecto.");
-                return;
+        // Mostrar estatus actual en la sección 2
+        function mostrarEstatusActual() {
+            const id = document.getElementById("select-proyecto-estatus").value;
+            const campo = document.getElementById("estatus-actual-pantalla");
+            if(id && listaProyectosGlobal[id]) {
+                const est = listaProyectosGlobal[id].estado;
+                campo.value = est === "emision" ? "🔴 En Emisión" : est === "hiatus" ? "🟡 En Hiatus" : "💖 Finalizado";
+            } else {
+                campo.value = "";
             }
-
-            db.collection("estados_historias").doc(id).set({
-                titulo: titulo,
-                estado: "emision", // Se crea por defecto en emisión
-                portadaUrl: portada,
-                sinopsis: sinopsis
-            })
-            .then(() => {
-                alert(`¡Proyecto "${titulo}" creado con éxito en blanco! Ya aparece en tus listas.`);
-                document.getElementById("nuevo-id").value = "";
-                document.getElementById("nuevo-titulo").value = "";
-                document.getElementById("nuevo-portada").value = "";
-                document.getElementById("nuevo-sinopsis").value = "";
-            })
-            .catch(error => alert("Error al crear proyecto: " + error));
         }
 
-        // 4. ACCIÓN: ACTUALIZAR EL ESTATUS (SEGUNDA OPCIÓN)
-        function actualizarEstadoFirebase() {
-            const idSubido = document.getElementById("select-proyecto-estatus").value;
-            const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
-
-            db.collection("estados_historias").doc(idSubido).update({
-                estado: nuevoEstado
-            })
-            .then(() => alert("Estatus actualizado correctamente."))
-            .catch(error => alert("Error: " + error));
+        // Auto-llenar campos al seleccionar un manga en la sección de Editar
+        function cargarDatosParaEditar() {
+            const id = document.getElementById("select-proyecto-editar").value;
+            if(id && listaProyectosGlobal[id]) {
+                document.getElementById("editar-portada").value = listaProyectosGlobal[id].portadaUrl || "";
+                document.getElementById("editar-sinopsis").value = listaProyectosGlobal[id].sinopsis || "";
+            } else {
+                document.getElementById("editar-portada").value = "";
+                document.getElementById("editar-sinopsis").value = "";
+            }
         }
 
-        // 5. ACCIÓN: SUBIR UN CAPÍTULO (PRIMERA OPCIÓN)
+        // 3. ACCIÓN: CARGAR CAPÍTULO (Sección 1)
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
             const textoEnlaces = document.getElementById("enlaces-imagenes").value;
             const arrayImagenes = textoEnlaces.split("\n").filter(linea => linea.trim() !== "");
 
-            if(!numCap || arrayImagenes.length === 0) {
-                alert("Completa el número de capítulo y añade imágenes.");
-                return;
-            }
+            if(!idProyecto) { alert("Por favor, selecciona un proyecto."); return; }
+            if(!numCap || arrayImagenes.length === 0) { alert("Completa el número de capítulo y agrega imágenes."); return; }
 
             db.collection("historias").doc(idProyecto).collection("capitulos").doc("cap-" + numCap).set({
                 imagenes: arrayImagenes
             })
             .then(() => {
-                alert(`¡Capítulo ${numCap} subido exitosamente!`);
+                alert(`¡Capítulo ${numCap} publicado con éxito!`);
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
+            })
+            .catch(error => alert("Error: " + error));
+        }
+
+        // 4. ACCIÓN: ACTUALIZAR ESTATUS (Sección 2)
+        function actualizarEstadoFirebase() {
+            const idSubido = document.getElementById("select-proyecto-estatus").value;
+            const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
+
+            if(!idSubido) { alert("Selecciona un proyecto primero."); return; }
+
+            db.collection("estados_historias").doc(idSubido).update({
+                estado: nuevoEstado
+            })
+            .then(() => alert("¡Estatus actualizado correctamente!"))
+            .catch(error => alert("Error: " + error));
+        }
+
+        // 5. ACCIÓN: CREAR NUEVO PROYECTO (Sección 3 - Parte A)
+        function crearNuevoProyecto() {
+            const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
+            const titulo = document.getElementById("nuevo-titulo").value.trim();
+            const portada = document.getElementById("nuevo-portada").value.trim();
+            const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
+
+            if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
+
+            db.collection("estados_historias").doc(id).set({
+                titulo: titulo,
+                estado: "emision",
+                portadaUrl: portada,
+                sinopsis: sinopsis
+            })
+            .then(() => {
+                alert(`¡Proyecto "${titulo}" creado con éxito en blanco!`);
+                document.getElementById("nuevo-id").value = "";
+                document.getElementById("nuevo-titulo").value = "";
+                document.getElementById("nuevo-portada").value = "";
+                document.getElementById("nuevo-sinopsis").value = "";
+            })
+            .catch(error => alert("Error: " + error));
+        }
+
+        // 6. ACCIÓN: EDITAR PROYECTO EXISTENTE (Sección 3 - Parte B)
+        function guardarEdicionProyecto() {
+            const id = document.getElementById("select-proyecto-editar").value;
+            const nuevaPortada = document.getElementById("editar-portada").value.trim();
+            const nuevaSinopsis = document.getElementById("editar-sinopsis").value.trim();
+
+            if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
+
+            db.collection("estados_historias").doc(id).update({
+                portadaUrl: nuevaPortada,
+                sinopsis: nuevaSinopsis
+            })
+            .then(() => {
+                alert("¡Proyecto editado correctamente!");
+                document.getElementById("editar-portada").value = "";
+                document.getElementById("editar-sinopsis").value = "";
             })
             .catch(error => alert("Error: " + error));
         }
