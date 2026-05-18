@@ -51,7 +51,6 @@
             margin-top: 40px;
         }
 
-        /* EL PANEL ADMINISTRATIVO SE OCULTA HASTA PONER LA CLAVE */
         #contenido-panel {
             display: none;
             width: 100%;
@@ -92,7 +91,7 @@
             transform: translateY(-2px);
         }
 
-        /* CONTENEDORES DE SECCIONES TOTALMENTE ROSAS */
+        /* CONTENEDORES DE SECCIONES */
         .seccion-admin {
             display: none; 
             width: 100%;
@@ -116,7 +115,6 @@
             padding-bottom: 10px;
         }
 
-        /* FORMULARIOS ESTILO ROSA CLARO */
         .grupo-control {
             margin-bottom: 18px;
             display: flex;
@@ -284,7 +282,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -298,7 +295,6 @@
 
         let listaProyectosGlobal = {};
 
-        // VALIDACIÓN DE LA CLAVE ORIGINAL
         function verificarClave() {
             const entrada = document.getElementById("clave-input").value;
             if (entrada === "Rose2026") {
@@ -310,7 +306,6 @@
             }
         }
 
-        // CONTROLADOR DE PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -319,7 +314,7 @@
             evento.target.classList.add('activo');
         }
 
-        // CORRECCIÓN DEFINITIVA DE NOMBRES LARGOS
+        // CONTROL EXTRA EXCLUSIVO PARA OBTENER EL TÍTULO REAL DESDE FIRESTORE
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
@@ -335,22 +330,22 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Condición estricta: Si el campo "titulo" no existe o se guardó roto, el código lo limpia y usa una versión legible en vez del ID en minúsculas
-                    let nombreMostrar = data.titulo || data.nombre;
+                    // Extrae prioritariamente el título largo explícito guardado
+                    let nombreFinal = data.titulo || data.nombre || data.name;
                     
-                    if (!nombreMostrar || nombreMostrar === doc.id) {
-                        // Si está vacío o es igual al ID corto, lo convierte automáticamente a un formato limpio y elegante de respaldo
-                        nombreMostrar = doc.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    // Si no está definido el campo o coincide exactamente con el ID plano en minúsculas,
+                    // lo procesa de respaldo convirtiendo guiones en espacios y añadiendo capitales limpias.
+                    if (!nombreFinal || nombreFinal === doc.id) {
+                        nombreFinal = doc.id.replace(/-/g, ' ').replace(/\b\w/g, letra => letra.toUpperCase());
                     }
                     
-                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreMostrar; selectCap.appendChild(opc1);
-                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreMostrar; selectEst.appendChild(opc2);
-                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = nombreMostrar; selectEdi.appendChild(opc3);
+                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreFinal; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = nombreFinal; selectEdi.appendChild(opc3);
                 });
             });
         }
 
-        // Mostrar estatus actual
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
@@ -362,7 +357,6 @@
             }
         }
 
-        // Cargar datos para editar
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if(id && listaProyectosGlobal[id]) {
@@ -374,7 +368,6 @@
             }
         }
 
-        // ACCIÓN: CARGAR CAPÍTULO
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -395,7 +388,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: ACTUALIZAR ESTATUS
         function actualizarEstadoFirebase() {
             const idSubido = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -409,7 +401,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: CREAR NUEVO PROYECTO
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
@@ -434,7 +425,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: EDITAR PROYECTO EXISTENTE
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             const nuevaPortada = document.getElementById("editar-portada").value.trim();
