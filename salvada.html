@@ -19,84 +19,85 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
         
-        /* 🔥 HEADER ADAPTADO PARA PORTADA Y SINOPSIS AL LADO */
-        header { 
-            padding: 40px 20px 20px 20px; 
-            width: 100%; max-width: 900px; 
-            display: flex; flex-direction: row; gap: 30px; 
-            align-items: flex-start; justify-content: center;
+        .contenedor-manga {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 60px 10px 20px 10px;
         }
-        
+
         .btn-volver { 
             position: absolute; top: 20px; left: 20px; text-decoration: none; color: #ff66b2; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border: 1px solid #ff66b2; padding: 8px 15px; border-radius: 20px; transition: 0.3s; background: transparent; z-index: 10;
         }
         .btn-volver:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
 
-        /* 🔥 PORTADA DE DRIVE (Acepta el blindaje automáticamente) */
-        .portada-grande { 
-            width: 200px; min-width: 200px; height: 300px; object-fit: cover; 
-            border-radius: 12px; border: 2px solid #ff66b2; 
+        .portada-centrada { 
+            width: 85%;
+            max-width: 240px;
+            height: auto;
+            aspect-ratio: 2 / 3;
+            object-fit: cover; 
+            border-radius: 12px; 
+            border: 2px solid #ff66b2; 
             box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); 
             background: #222;
+            margin-bottom: 25px;
         }
-
-        /* 🔥 CONTENEDOR DE TEXTO (TITULO + SINOPSIS) */
-        .info-header { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; margin-top: 20px; }
 
         .titulo-manga { 
-            font-size: 2rem; color: #ff66b2; margin: 0; 
-            font-family: 'Georgia', serif; font-weight: bold; line-height: 1.2;
+            font-size: 1.8rem; color: #ff66b2; margin: 0 0 15px 0; 
+            font-family: 'Georgia', serif; font-weight: bold; line-height: 1.3;
         }
 
-        /* 🔥 ESPACIO VISUAL PARA LA SINOPSIS (Viniendo de Firebase) */
         .sinopsis-texto { 
-            font-size: 0.95rem; line-height: 1.5; color: rgba(255, 255, 255, 0.85); 
-            margin: 0; font-family: sans-serif;
+            font-size: 0.95rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85); 
+            margin: 0 0 30px 0; font-family: sans-serif;
+            text-align: justify;
+            text-align-last: center;
         }
 
-        .seccion-titulo { width: 90%; max-width: 900px; margin: 40px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .seccion-titulo { 
+            width: 100%; max-width: 500px; margin: 20px 0 20px 0; font-size: 1.1rem; 
+            border-bottom: 2px solid #ff66b2; padding-bottom: 8px; color: #ff66b2; 
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
+        }
 
-        /* 🔥 CAMBIO A DISEÑO DE LISTA VERTICAL PARA CAPÍTULOS (Símil reference image 7 but list) */
         .lista-capitulos { 
-            display: flex; flex-direction: column; gap: 15px; 
-            width: 95%; max-width: 900px; padding: 10px 10px 60px 10px; 
+            display: flex; flex-direction: column; gap: 12px; 
+            width: 100%; max-width: 500px; padding-bottom: 60px;
         }
 
-        /* 🔥 BOTONES DE CAPÍTULOS EN FORMATO FILA COMODA */
         .btn-capitulo { 
-            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
-            padding: 18px 25px; background: #3d142b; /* Fondo oscuro rosa sutil reference */
-            border: 1px solid #ff66b2; border-radius: 12px; 
-            text-decoration: none; color: #ffccff; /* Texto rosa claro reference */
-            font-size: 1.1rem; font-weight: bold; transition: 0.3s; 
+            display: block;
+            padding: 14px 20px; background: #3d142b; 
+            border: 1px solid #ff66b2; border-radius: 10px; 
+            text-decoration: none; color: #ffccff; 
+            font-size: 1rem; font-weight: bold; transition: 0.3s; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center;
         }
-        .btn-capitulo:hover { background: #ff66b2; color: white; transform: translateY(-3px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.5); }
-        
-        .numero-cap { font-size: 1.3rem; margin-right: 15px; color: #ff66b2; } /* Número grande reference */
-        .btn-capitulo:hover .numero-cap { color: white; }
+        .btn-capitulo:hover { background: #ff66b2; color: white; transform: translateY(-2px); box-shadow: 0 0 15px rgba(255, 102, 178, 0.5); }
     </style>
 </head>
 <body>
 
 <a href="historias.html" class="btn-volver">🏠 Volver</a>
 
-<header>
-    <img src="salvada.jpg" class="portada-grande" id="portada-grande-salvada">
-    <div class="info-header">
-        <h1 class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
-        <p class="sinopsis-texto" id="sinopsis-completa-salvada">Cargando descripción oficial guardada en Firebase...</p>
+<div class="contenedor-manga">
+    <img src="salvada.jpg" class="portada-centrada" id="portada-grande-salvada">
+    
+    <h1 class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
+    
+    <p class="sinopsis-texto" id="sinopsis-completa-salvada">Cargando descripción...</p>
+
+    <div class="seccion-titulo">Capítulos Disponibles</div>
+
+    <div class="lista-capitulos" id="contenedor-lista-caps">
+        <p style="text-align: center; opacity: 0.6;">Buscando capítulos...</p>
     </div>
-</header>
-
-<div class="seccion-titulo">Capítulos Disponibles</div>
-
-<div class="lista-capitulos">
-    <a href="capitulos/salvada/1.html" class="btn-capitulo"><span><span class="numero-cap">1</span> Capítulo 1</span> <span>➡️</span></a>
-    <a href="capitulos/salvada/2.html" class="btn-capitulo"><span><span class="numero-cap">2</span> Capítulo 2</span> <span>➡️</span></a>
-    <a href="capitulos/salvada/3.html" class="btn-capitulo"><span><span class="numero-cap">3</span> Capítulo 3</span> <span>➡️</span></a>
-    <a href="capitulos/salvada/4.html" class="btn-capitulo"><span><span class="numero-cap">4</span> Capítulo 4</span> <span>➡️</span></a>
-    <a href="capitulos/salvada/5.html" class="btn-capitulo"><span><span class="numero-cap">5</span> Capítulo 5</span> <span>➡️</span></a>
 </div>
 
 <script>
@@ -113,24 +114,73 @@
     }
     const dbInstancia = firebase.firestore();
 
-    // 🔥 BLINDAJE ESPECIFICO: Sincroniza portada y sinopsis SÓLO de 'salvada'
+    function formatearLinkDrive(url) {
+        if (!url) return "";
+        if (url.includes("drive.google.com")) {
+            let id = "";
+            if (url.includes("id=")) { id = url.split("id=")[1].split("&")[0]; }
+            else if (url.includes("/d/")) { id = url.split("/d/")[1].split("/")[0]; }
+            if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
+        }
+        return url;
+    }
+
+    // 1. CARGAR DATOS PRINCIPALES (PORTADA Y SINOPSIS)
     dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
         if (docSnapshot.exists) {
             const datos = docSnapshot.data();
-            
-            // Actualiza la portada grande si hay link guardado
             const imgElemento = document.getElementById("portada-grande-salvada");
             if (imgElemento && datos.portadaUrl) {
-                imgElemento.src = datos.portadaUrl;
+                imgElemento.src = formatearLinkDrive(datos.portadaUrl);
             }
-            
-            // Actualiza la sinopsis completa
             const sinopsisElemento = document.getElementById("sinopsis-completa-salvada");
             if (sinopsisElemento) {
-                sinopsisElemento.innerText = datos.sinopsis || "La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al...";
+                sinopsisElemento.innerText = datos.sinopsis || "Sin descripción disponible.";
             }
         }
-    }).catch((err) => console.log("Error trayendo detalles del proyecto 'salvada': ", err));
+    }).catch((err) => console.log("Error en datos base: ", err));
+
+    // 2. 🔥 RECOLECTAR Y CREAR BOTONES DE CAPÍTULOS EN ORDEN AUTOMÁTICO
+    dbInstancia.collection("salvada").get().then((querySnapshot) => {
+        let capitulosLista = [];
+
+        querySnapshot.forEach((doc) => {
+            // Saltamos el documento de configuración para agarrar solo los capítulos
+            if (doc.id !== "datos_proyecto") {
+                // Convertimos el ID a número para poder ordenarlos bien (ej: "1.5" pasa a ser el número 1.5)
+                const numCap = parseFloat(doc.id);
+                if (!isNaN(numCap)) {
+                    capitulosLista.push({
+                        idTexto: doc.id, // Guardamos el texto original "1", "1.5" para la URL
+                        valorNum: numCap
+                    });
+                }
+            }
+        });
+
+        // Los ordenamos de menor a mayor matemáticamente para que el 1.5 quede entre el 1 y el 2
+        capitulosLista.sort((a, b) => a.valorNum - b.valorNum);
+
+        const contenedor = document.getElementById("contenedor-lista-caps");
+        contenedor.innerHTML = ""; // Limpiamos el mensaje de "Buscando..."
+
+        if (capitulosLista.length === 0) {
+            contenedor.innerHTML = '<p style="text-align: center; opacity: 0.5;">No hay capítulos publicados aún.</p>';
+            return;
+        }
+
+        // Creamos cada botón dinámicamente en el HTML
+        capitulosLista.forEach((cap) => {
+            const boton = document.createElement("a");
+            boton.href = `capitulos/salvada/${cap.idTexto}.html`;
+            boton.className = "btn-capitulo";
+            boton.innerText = `Capítulo ${cap.idTexto}`;
+            contenedor.appendChild(boton);
+        });
+
+    }).catch((err) => {
+        console.log("Error cargando la lista automática de capítulos: ", err);
+    });
 </script>
 
 </body>
