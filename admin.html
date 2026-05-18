@@ -72,7 +72,7 @@
 
         /* CONTENEDORES DE LAS SECCIONES */
         .seccion-admin {
-            display: none; /* Se ocultan para que solo veas las opciones al entrar */
+            display: none;
             width: 100%;
             max-width: 500px;
             background: var(--panel-oscuro);
@@ -153,7 +153,6 @@
             box-shadow: 0 0 15px rgba(255,51,153,0.5); 
         }
 
-        /* Divisor simple para separar Crear de Editar */
         .divisor {
             height: 1px;
             background: rgba(255, 102, 178, 0.3);
@@ -218,12 +217,12 @@
         
         <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
         <div class="grupo-control">
-            <label>ID del Proyecto (Sin espacios ni mayúsculas)</label>
+            <label>ID del Proyecto (Firebase - Sin espacios ni mayúsculas)</label>
             <input type="text" id="nuevo-id" placeholder="ej: diciembre">
         </div>
         <div class="grupo-control">
-            <label>Nombre del Proyecto</label>
-            <input type="text" id="nuevo-titulo" placeholder="Ej: Diciembre">
+            <label>Nombre Completo del Proyecto (Visible)</label>
+            <input type="text" id="nuevo-titulo" placeholder="Ej: Fingí estar embarazada...">
         </div>
         <div class="grupo-control">
             <label>Link de la Portada</label>
@@ -256,6 +255,14 @@
     </div>
 
     <script>
+        // === TU CONTRASEÑA MANTENIDA RESPONSABLEMENTE ===
+        const passwordAdmin = prompt("Introduce la contraseña de administradora:");
+        if (passwordAdmin !== "Rose2026") { 
+            alert("Acceso denegado.");
+            document.body.innerHTML = "<h1 style='color:red; margin-top:100px;'>🔒 No tienes autorización para ver este panel.</h1>";
+            window.stop();
+        }
+
         // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -268,10 +275,9 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Almacén local de datos de Firebase para no saturar lecturas
         let listaProyectosGlobal = {};
 
-        // 1. MANEJAR LAS PESTAÑAS DENTRO DEL PANEL ROSA
+        // 1. MANEJAR LAS PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -280,7 +286,7 @@
             evento.target.classList.add('activo');
         }
 
-        // 2. CARGAR TODOS LOS MANGAS EN TODOS LOS SELECTS AUTOMÁTICAMENTE
+        // 2. CORRECCIÓN PRINCIPAL: MOSTRAR LOS NOMBRES REALES COMPLETOS EN LOS DESPLEGABLES
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
@@ -290,22 +296,24 @@
                 selectCap.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
                 selectEst.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
                 selectEdi.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
-                listaProyectosGlobal = {}; // Limpiar caché local
+                listaProyectosGlobal = {}; 
                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    listaProyectosGlobal[doc.id] = data; // Guardar datos
-                    const tituloVisible = data.titulo || doc.id;
+                    listaProyectosGlobal[doc.id] = data; 
                     
-                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = tituloVisible; selectCap.appendChild(opc1);
-                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = tituloVisible; selectEst.appendChild(opc2);
-                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = tituloVisible; selectEdi.appendChild(opc3);
+                    // Aquí forzamos que use el título completo del Manhwa
+                    const tituloCompleto = data.titulo || doc.id;
+                    
+                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = tituloCompleto; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = tituloCompleto; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = tituloCompleto; selectEdi.appendChild(opc3);
                 });
             });
         }
         window.onload = cargarProyectosEnSelects;
 
-        // Mostrar estatus actual en la sección 2
+        // Mostrar estatus actual
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
@@ -317,7 +325,7 @@
             }
         }
 
-        // Auto-llenar campos al seleccionar un manga en la sección de Editar
+        // Auto-llenar campos para editar
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if(id && listaProyectosGlobal[id]) {
@@ -329,7 +337,7 @@
             }
         }
 
-        // 3. ACCIÓN: CARGAR CAPÍTULO (Sección 1)
+        // 3. ACCIÓN: CARGAR CAPÍTULO
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -350,7 +358,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 4. ACCIÓN: ACTUALIZAR ESTATUS (Sección 2)
+        // 4. ACCIÓN: ACTUALIZAR ESTATUS
         function actualizarEstadoFirebase() {
             const idSubido = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -364,7 +372,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 5. ACCIÓN: CREAR NUEVO PROYECTO (Sección 3 - Parte A)
+        // 5. ACCIÓN: CREAR NUEVO PROYECTO
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
@@ -380,7 +388,7 @@
                 sinopsis: sinopsis
             })
             .then(() => {
-                alert(`¡Proyecto "${titulo}" creado con éxito en blanco!`);
+                alert(`¡Proyecto "${titulo}" creado con éxito!`);
                 document.getElementById("nuevo-id").value = "";
                 document.getElementById("nuevo-titulo").value = "";
                 document.getElementById("nuevo-portada").value = "";
@@ -389,7 +397,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 6. ACCIÓN: EDITAR PROYECTO EXISTENTE (Sección 3 - Parte B)
+        // 6. ACCIÓN: EDITAR PROYECTO EXISTENTE
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             const nuevaPortada = document.getElementById("editar-portada").value.trim();
