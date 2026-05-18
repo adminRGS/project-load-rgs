@@ -3,130 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salvada por la dama - Rose Garden Scan</title>
+    <title>Salvada por la pequeña dama sin poderes - Rose Garden Scan</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <link rel="stylesheet" href="estilos-rose.css">
+    
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
-            color: white; font-family: 'serif'; 
-            display: flex; flex-direction: column; align-items: center; 
-            overflow-x: hidden; min-height: 100vh; 
+            background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
+            color: var(--texto-rose, white); 
+            font-family: 'serif'; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
+        
+        /* 🔥 HEADER ADAPTADO PARA PORTADA Y SINOPSIS AL LADO */
+        header { 
+            padding: 40px 20px 20px 20px; 
+            width: 100%; max-width: 900px; 
+            display: flex; flex-direction: row; gap: 30px; 
+            align-items: flex-start; justify-content: center;
         }
         
-        body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px);
-            background-size: 80px 80px, 150px 150px; opacity: 0.15; animation: moveStars 30s linear infinite; pointer-events: none; z-index: 1;
+        .btn-volver { 
+            position: absolute; top: 20px; left: 20px; text-decoration: none; color: #ff66b2; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border: 1px solid #ff66b2; padding: 8px 15px; border-radius: 20px; transition: 0.3s; background: transparent; z-index: 10;
+        }
+        .btn-volver:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
+
+        /* 🔥 PORTADA DE DRIVE (Acepta el blindaje automáticamente) */
+        .portada-grande { 
+            width: 200px; min-width: 200px; height: 300px; object-fit: cover; 
+            border-radius: 12px; border: 2px solid #ff66b2; 
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); 
+            background: #222;
         }
 
-        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-150px); } }
+        /* 🔥 CONTENEDOR DE TEXTO (TITULO + SINOPSIS) */
+        .info-header { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; margin-top: 20px; }
 
-        .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
-        .btn-catalogo { 
-            text-decoration: none; color: #ff66b2; border: 2px solid #ff66b2; padding: 10px 22px; 
-            border-radius: 30px; font-weight: bold; font-size: 0.95rem; transition: 0.3s; 
-            background: rgba(255, 102, 178, 0.1); backdrop-filter: blur(8px);
+        .titulo-manga { 
+            font-size: 2rem; color: #ff66b2; margin: 0; 
+            font-family: 'Georgia', serif; font-weight: bold; line-height: 1.2;
         }
-        .btn-catalogo:hover { background: #ff66b2; color: white; box-shadow: 0 0 20px #ff66b2; transform: scale(1.05); }
 
-        header { padding: 15px; text-align: center; z-index: 10; }
-        h1 { 
-            font-size: 1.8rem; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); 
-            background-size: 200% auto; -webkit-background-clip: text; color: transparent; 
-            animation: shineText 4s linear infinite; margin: 10px 0; padding: 0 15px;
+        /* 🔥 ESPACIO VISUAL PARA LA SINOPSIS (Viniendo de Firebase) */
+        .sinopsis-texto { 
+            font-size: 0.95rem; line-height: 1.5; color: rgba(255, 255, 255, 0.85); 
+            margin: 0; font-family: sans-serif;
         }
-        @keyframes shineText { to { background-position: 200% center; } }
 
-        /* GRID DINÁMICO */
-        .grid-caps { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
-            gap: 15px; width: 92%; max-width: 500px; padding-bottom: 60px; margin-top: 25px; z-index: 10;
-        }
-        .cap-btn-dinamico { 
-            border: 1px solid #ff66b2; color: white; background: rgba(255, 102, 178, 0.15); 
-            text-align: center; padding: 20px 0; border-radius: 15px; font-weight: bold; transition: 0.4s ease; cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-        .cap-btn-dinamico:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); background: rgba(255, 102, 178, 0.3); }
+        .seccion-titulo { width: 90%; max-width: 900px; margin: 40px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; overflow-y: scroll; scroll-behavior: smooth; }
-        #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
+        /* 🔥 CAMBIO A DISEÑO DE LISTA VERTICAL PARA CAPÍTULOS (Símil reference image 7 but list) */
+        .lista-capitulos { 
+            display: flex; flex-direction: column; gap: 15px; 
+            width: 95%; max-width: 900px; padding: 10px 10px 60px 10px; 
+        }
+
+        /* 🔥 BOTONES DE CAPÍTULOS EN FORMATO FILA COMODA */
+        .btn-capitulo { 
+            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+            padding: 18px 25px; background: #3d142b; /* Fondo oscuro rosa sutil reference */
+            border: 1px solid #ff66b2; border-radius: 12px; 
+            text-decoration: none; color: #ffccff; /* Texto rosa claro reference */
+            font-size: 1.1rem; font-weight: bold; transition: 0.3s; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-capitulo:hover { background: #ff66b2; color: white; transform: translateY(-3px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.5); }
         
-        /* NAVEGACIÓN Y REACCIONES */
-        .nav-lector { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.96); 
-            padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; backdrop-filter: blur(12px); z-index: 102; 
-            box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
-        }
-
-        .grupo-navegacion { display: flex; gap: 8px; }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        .nav-btn:disabled { background: #333; opacity: 0.4; }
-        .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
-
-        .btn-votar-pink { position: relative; background: rgba(255, 102, 178, 0.2); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .thumb-pink { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
-
-        .pop-stats {
-            display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
-            background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2; padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110;
-            box-shadow: 0 0 25px rgba(255, 102, 178, 0.7);
-        }
-        .pop-stats.active { display: flex; animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes bounceIn { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
-
-        .stat-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-        .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
-        .num { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
+        .numero-cap { font-size: 1.3rem; margin-right: 15px; color: #ff66b2; } /* Número grande reference */
+        .btn-capitulo:hover .numero-cap { color: white; }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-regreso">
-        <a href="historias.html" class="btn-catalogo">🏠 Volver</a>
+<a href="historias.html" class="btn-volver">🏠 Volver</a>
+
+<header>
+    <img src="salvada.jpg" class="portada-grande" id="portada-grande-salvada">
+    <div class="info-header">
+        <h1 class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
+        <p class="sinopsis-texto" id="sinopsis-completa-salvada">Cargando descripción oficial guardada en Firebase...</p>
     </div>
+</header>
 
-    <header>
-        <h1>Salvada por la pequeña dama sin poderes</h1>
-    </header>
+<div class="seccion-titulo">Capítulos Disponibles</div>
 
-    <div id="lector">
-        <div class="nav-lector">
-            <div class="grupo-navegacion">
-                <button id="btn-ant" class="nav-btn">← Ant.</button>
-                <button id="btn-sig" class="nav-btn">Sig. →</button>
-            </div>
-            
-            <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
+<div class="lista-capitulos">
+    <a href="capitulos/salvada/1.html" class="btn-capitulo"><span><span class="numero-cap">1</span> Capítulo 1</span> <span>➡️</span></a>
+    <a href="capitulos/salvada/2.html" class="btn-capitulo"><span><span class="numero-cap">2</span> Capítulo 2</span> <span>➡️</span></a>
+    <a href="capitulos/salvada/3.html" class="btn-capitulo"><span><span class="numero-cap">3</span> Capítulo 3</span> <span>➡️</span></a>
+    <a href="capitulos/salvada/4.html" class="btn-capitulo"><span><span class="numero-cap">4</span> Capítulo 4</span> <span>➡️</span></a>
+    <a href="capitulos/salvada/5.html" class="btn-capitulo"><span><span class="numero-cap">5</span> Capítulo 5</span> <span>➡️</span></a>
+</div>
 
-            <div class="btn-votar-pink" onclick="toggleStats(event)">
-                <span class="thumb-pink">👍</span>
-                <div class="pop-stats" id="menu-stats">
-                    <div class="stat-btn" onclick="votar('loves', event)">
-                        <span class="pink-fx">❤️</span>
-                        <span id="val-loves" class="num">0</span>
-                    </div>
-                    <div class="stat-btn" onclick="votar('likes', event)">
-                        <span class="pink-fx">👍</span>
-                        <span id="val-likes" class="num">0</span>
-                    </div>
-                    <div class="stat-btn" onclick="votar('haha', event)">
-                        <span>😂</span>
-                        <span id="val-haha" class="num">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="contenido-imagenes"></div>
-    </div>
-
-    <div class="grid-caps" id="grid"></div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+<script>
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -135,94 +108,30 @@
         messagingSenderId: "639472415083",
         appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const historiaID = "salvada"; 
-    let capsOrdenados = [];
-    let idCapActual = "";
-
-    function arreglarLink(url) {
-        if (url.includes('drive.google.com')) {
-            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `http://googleusercontent.com/profile/picture/7{id}`;
-        }
-        return url;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
+    const dbInstancia = firebase.firestore();
 
-    async function cargarBotonesFirebase() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>✨ La dama viene al rescate... ✨</p>";
-        
-        try {
-            const querySnapshot = await getDocs(collection(db, historiaID));
-            let disponibles = [];
-            querySnapshot.forEach((docSnap) => {
-                disponibles.push(docSnap.id.replace("capitulo_", ""));
-            });
-
-            capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
-            grid.innerHTML = ""; 
-
-            capsOrdenados.forEach(id => {
-                const btn = document.createElement('div');
-                btn.className = 'cap-btn-dinamico';
-                btn.innerText = id;
-                btn.onclick = () => abrirLector(id);
-                grid.appendChild(btn);
-            });
-
-            if (capsOrdenados.length === 0) grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Aún no hay capítulos disponibles ✨</p>";
-        } catch (e) { console.error(e); }
-    }
-
-    window.abrirLector = async function(idCap) {
-        idCapActual = idCap;
-        const lector = document.getElementById('lector');
-        const contenedor = document.getElementById('contenido-imagenes');
-        lector.style.display = 'block'; lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando capítulo " + idCap + "... ✨</p>";
-
-        const idx = capsOrdenados.indexOf(idCap.toString());
-        document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[idx - 1]);
-        document.getElementById('btn-sig').onclick = () => abrirLector(capsOrdenados[idx + 1]);
-        document.getElementById('btn-ant').disabled = (idx <= 0);
-        document.getElementById('btn-sig').disabled = (idx >= capsOrdenados.length - 1);
-
-        const snap = await getDoc(doc(db, historiaID, "capitulo_" + idCap));
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById('val-loves').innerText = data.loves || 0;
-            document.getElementById('val-likes').innerText = data.likes || 0;
-            document.getElementById('val-haha').innerText = data.haha || 0;
+    // 🔥 BLINDAJE ESPECIFICO: Sincroniza portada y sinopsis SÓLO de 'salvada'
+    dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
+        if (docSnapshot.exists) {
+            const datos = docSnapshot.data();
             
-            contenedor.innerHTML = "";
-            let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
-            imgs.forEach(url => {
-                const img = document.createElement('img');
-                img.src = arreglarLink(url.trim());
-                contenedor.appendChild(img);
-            });
+            // Actualiza la portada grande si hay link guardado
+            const imgElemento = document.getElementById("portada-grande-salvada");
+            if (imgElemento && datos.portadaUrl) {
+                imgElemento.src = datos.portadaUrl;
+            }
+            
+            // Actualiza la sinopsis completa
+            const sinopsisElemento = document.getElementById("sinopsis-completa-salvada");
+            if (sinopsisElemento) {
+                sinopsisElemento.innerText = datos.sinopsis || "La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al...";
+            }
         }
-    }
-
-    window.votar = async (tipo, e) => {
-        e.stopPropagation();
-        const docRef = doc(db, historiaID, "capitulo_" + idCapActual);
-        await updateDoc(docRef, { [tipo]: increment(1) });
-        const el = document.getElementById('val-' + tipo);
-        el.innerText = parseInt(el.innerText) + 1;
-    }
-
-    window.toggleStats = (e) => {
-        e.stopPropagation();
-        document.getElementById('menu-stats').classList.toggle('active');
-    }
-
-    window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
-    document.addEventListener('click', () => document.getElementById('menu-stats').classList.remove('active'));
-    
-    cargarBotonesFirebase();
+    }).catch((err) => console.log("Error trayendo detalles del proyecto 'salvada': ", err));
 </script>
+
 </body>
 </html>
