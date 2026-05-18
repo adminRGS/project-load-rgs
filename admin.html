@@ -10,11 +10,12 @@
 
     <style>
         :root {
-            --fondo-oscuro: #1e1e24;
-            --rosa-principal: #ff66b2;
-            --rosa-branding: #e60073;
+            --fondo-oscuro: #16151a;
+            --fondo-tarjeta: #1c1b22;
+            --rosa-principal: #ff4fa8;
+            --rosa-borde: #ff4fa8;
             --texto-claro: #ffffff;
-            --gris-input: #2d2d35;
+            --gris-input: #25242a;
         }
 
         body {
@@ -22,7 +23,7 @@
             background-color: var(--fondo-oscuro);
             color: var(--texto-claro);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -30,20 +31,21 @@
         }
 
         h1 { 
-            color: var(--rosa-principal); 
+            color: #ffa1d4; 
             text-align: center;
-            font-family: 'Georgia', serif;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: bold;
             margin-bottom: 25px;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
         }
 
-        /* CUADRO DE ACCESO CON PUNTITOS */
+        /* BLOQUE DE ACCESO CON PUNTITOS */
         #bloque-login {
-            background: #18181c;
+            background: var(--fondo-tarjeta);
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--rosa-principal);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--rosa-borde);
             text-align: center;
             max-width: 340px;
             width: 100%;
@@ -54,56 +56,61 @@
         #bloque-login h2 {
             color: var(--rosa-principal);
             margin-top: 0;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
-        /* EL PANEL SE QUEDA OCULTO HASTA QUE SE VALIDE LA CONTRASEÑA */
         #contenido-panel {
             display: none;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             flex-direction: column;
         }
 
-        /* MENÚ DE TRES BOTONES SUPERIORES */
+        /* REPRODUCCIÓN DEL MENÚ ORIGINAL DE TUS CAPTURAS */
         .menu-administracion {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
             margin-bottom: 25px;
         }
 
         .btn-menu {
             width: 100%;
-            padding: 15px;
-            background: #25252b;
-            border: 2px solid var(--rosa-principal);
+            padding: 14px;
+            background: var(--fondo-tarjeta);
+            border: 2px solid var(--rosa-borde);
             color: var(--texto-claro);
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.3s ease;
+            transition: all 0.2s ease;
             text-align: center;
             box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .btn-menu:hover, .btn-menu.activo {
-            background: var(--rosa-principal);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.4);
+        /* ESTADO ACTIVO: FONDO ROSA ENCIENDE COMO EN TU CAPTURA */
+        .btn-menu.activo {
+            background: #ff55b0;
+            color: #ffffff;
+            border-color: #ff55b0;
+            box-shadow: 0 0 15px rgba(255, 85, 176, 0.5);
         }
 
-        /* SECCIONES DEL PANEL */
+        /* SECCIONES CONTENEDORAS OSCURAS CON BORDE ROSA */
         .seccion-admin {
             display: none; 
             width: 100%;
-            background: #18181c;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            border: 2px solid var(--rosa-principal);
+            background: var(--fondo-tarjeta);
+            padding: 22px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid var(--rosa-borde);
             box-sizing: border-box;
         }
 
@@ -112,15 +119,15 @@
         }
 
         .seccion-admin h2 {
-            color: var(--rosa-principal);
+            color: #ffffff;
             margin-top: 0;
             font-size: 1.3rem;
-            border-bottom: 1px solid rgba(255, 102, 178, 0.2);
-            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 20px;
         }
 
-        /* FORMULARIOS DE ENTRADA */
         .grupo-control {
             margin-bottom: 18px;
             display: flex;
@@ -130,18 +137,18 @@
 
         label { 
             font-weight: bold; 
-            color: var(--rosa-principal); 
+            color: #ff99cc; 
             font-size: 0.8rem; 
             text-transform: uppercase; 
-            letter-spacing: 1px; 
+            letter-spacing: 0.5px; 
         }
         
         input, select, textarea {
             padding: 12px;
             background: var(--gris-input);
-            border: 1px solid #444;
+            border: 1px solid #3a3842;
             color: var(--texto-claro);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
             outline: none;
             width: 100%;
@@ -150,32 +157,32 @@
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--rosa-principal);
-            box-shadow: 0 0 8px rgba(255, 102, 178, 0.4);
+            box-shadow: 0 0 8px rgba(255, 79, 168, 0.3);
         }
 
         .btn-guardar {
-            background: var(--rosa-principal);
+            background: #ff55b0;
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             font-size: 0.95rem;
             width: 100%;
-            transition: 0.3s;
+            transition: 0.2s;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .btn-guardar:hover { 
-            background: var(--rosa-branding); 
-            box-shadow: 0 0 15px rgba(230, 0, 115, 0.4); 
+            background: #e63994; 
+            box-shadow: 0 0 15px rgba(255, 85, 176, 0.4); 
         }
 
         .divisor {
             height: 1px;
-            background: rgba(255, 102, 178, 0.2);
+            background: rgba(255, 102, 178, 0.15);
             margin: 25px 0;
         }
     </style>
@@ -185,7 +192,7 @@
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
     <div id="bloque-login">
-        <h2>🌸 Acceso </h2>
+        <h2>🌸 Acceso Administrativo </h2>
         <div class="grupo-control">
             <label>Contraseña</label>
             <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
@@ -196,17 +203,17 @@
     <div id="contenido-panel">
         
         <div class="menu-administracion">
-            <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu activo" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
             <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
             <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
 
-        <div id="opcion-cargar" class="seccion-admin">
+        <div id="opcion-cargar" class="seccion-admin activa">
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
                 <label>Seleccionar el Proyecto</label>
                 <select id="select-proyecto-capitulo">
-                    <option value="">Cargando historias...</option>
+                    <option value="">Buscando historias en Firebase...</option>
                 </select>
             </div>
             <div class="grupo-control">
@@ -225,12 +232,12 @@
             <div class="grupo-control">
                 <label>Seleccionar Proyecto</label>
                 <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
-                    <option value="">Cargando historias...</option>
+                    <option value="">Buscando historias en Firebase...</option>
                 </select>
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual del Proyecto</label>
-                <input type="text" id="estatus-actual-pantalla" readonly style="background: #25252b; border-color: var(--rosa-principal); color: var(--rosa-principal); font-weight: bold;">
+                <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--gris-input); border-color: var(--rosa-principal); color: var(--rosa-principal); font-weight: bold;">
             </div>
             <div class="grupo-control">
                 <label>Cambiar a Nuevo Estatus</label>
@@ -246,14 +253,14 @@
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
             
-            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 0.95rem;">➕ CREAR NUEVO PROYECTO</h3>
+            <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 0.9rem;">➕ CREAR NUEVO PROYECTO</h3>
             <div class="grupo-control">
                 <label>ID del Proyecto (Firebase - Sin espacios)</label>
-                <input type="text" id="nuevo-id" placeholder="ej: confesion">
+                <input type="text" id="nuevo-id" placeholder="ej: de-fans-para-fans">
             </div>
             <div class="grupo-control">
-                <label>Nombre Completo del Proyecto (Visible)</label>
-                <input type="text" id="nuevo-titulo" placeholder="Ej: Mi Confesión...">
+                <label>Nombre Completo del Proyecto (Nombre Largo)</label>
+                <input type="text" id="nuevo-titulo" placeholder="Ej: Fingí estar embarazada...">
             </div>
             <div class="grupo-control">
                 <label>Link de la Portada</label>
@@ -267,11 +274,11 @@
 
             <div class="divisor"></div>
 
-            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 0.95rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+            <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 0.9rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
             <div class="grupo-control">
                 <label>Seleccionar Proyecto a Editar</label>
                 <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
-                    <option value="">Cargando historias...</option>
+                    <option value="">Buscando historias en Firebase...</option>
                 </select>
             </div>
             <div class="grupo-control">
@@ -288,7 +295,7 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE TU CONFIG DE FIREBASE REAL
+        // CONFIGURACIÓN DE TU FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -302,7 +309,6 @@
 
         let listaProyectosGlobal = {};
 
-        // VALIDACIÓN DE CONTRASEÑA EN PUNTITOS
         function verificarClave() {
             const entrada = document.getElementById("clave-input").value;
             if (entrada === "Rose2026") {
@@ -314,7 +320,6 @@
             }
         }
 
-        // PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -323,12 +328,13 @@
             evento.target.classList.add('activo');
         }
 
-        // CORRECCIÓN: SE MUESTRAN LOS NOMBRES LARGOS COMPLETOS EN LOS MENÚS DESPLEGABLES
+        // SOLUCIÓN DOBLE: Lee simultáneamente ambas opciones por si guardas los títulos largos en colecciones cruzadas
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
+            // Buscamos primero en estados_historias
             db.collection("estados_historias").onSnapshot((querySnapshot) => {
                 selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
@@ -339,8 +345,13 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Condición: Si existe el campo "titulo" (nombre largo completo), se usa ese obligatoriamente
-                    const nombreLargoCompleto = data.titulo || doc.id;
+                    // FORZADO EXTREMO: Si tiene campo "titulo" o "nombre" se usa, si no, se busca mayúscula
+                    let nombreLargoCompleto = data.titulo || data.nombre || data.name || doc.id;
+                    
+                    // Si el nombre largo coincide con el ID corto, intentamos transformarlo visualmente por estética mientras se actualiza
+                    if (nombreLargoCompleto === doc.id) {
+                        nombreLargoCompleto = doc.id.charAt(0).toUpperCase() + doc.id.slice(1);
+                    }
                     
                     let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreLargoCompleto; selectCap.appendChild(opc1);
                     let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreLargoCompleto; selectEst.appendChild(opc2);
