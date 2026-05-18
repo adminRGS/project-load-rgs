@@ -37,7 +37,6 @@
             margin-bottom: 25px;
         }
 
-        /* COMPONENTE DE LOGIN INTEGRADO */
         #bloque-login {
             background: white;
             padding: 30px;
@@ -59,7 +58,6 @@
             align-items: center;
         }
 
-        /* MENÚ PRINCIPAL */
         .menu-administracion {
             display: flex;
             flex-direction: column;
@@ -91,7 +89,6 @@
             transform: translateY(-2px);
         }
 
-        /* CONTENEDORES DE SECCIONES */
         .seccion-admin {
             display: none; 
             width: 100%;
@@ -295,6 +292,20 @@
 
         let listaProyectosGlobal = {};
 
+        // DICCIONARIO FORZADO DE RESPALDO CON LOS NOMBRES LARGOS EXACTOS DE TUS MANHWAS
+        const diccionarioNombresLargos = {
+            "amigos": "Amigos de la infancia",
+            "confesion": "Confesión Cruel",
+            "embarazada": "Fingí estar embarazada en su proyecto",
+            "guarderia": "La guardería del villano",
+            "hermana": "Hermanas de sangre",
+            "leopardo": "El leopardo de la vinteras",
+            "lobo": "Salvada por el lobo",
+            "matrimonio": "Matrimonio por contrato",
+            "princesa": "La princesa perdida",
+            "salvada": "Salvada por la dama de la noche"
+        };
+
         function verificarClave() {
             const entrada = document.getElementById("clave-input").value;
             if (entrada === "Rose2026") {
@@ -314,7 +325,7 @@
             evento.target.classList.add('activo');
         }
 
-        // CONTROL EXTRA EXCLUSIVO PARA OBTENER EL TÍTULO REAL DESDE FIRESTORE
+        // FUNCIÓN MEJORADA: COMPRUEBA CAMPOS Y APLICA EL DICCIONARIO VISUAL DE INMEDIATO
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
@@ -328,15 +339,20 @@
                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
+                    const idLimpio = doc.id.toLowerCase().trim();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Extrae prioritariamente el título largo explícito guardado
+                    // 1. Intenta leer títulos dinámicos si existen en la base de datos
                     let nombreFinal = data.titulo || data.nombre || data.name;
                     
-                    // Si no está definido el campo o coincide exactamente con el ID plano en minúsculas,
-                    // lo procesa de respaldo convirtiendo guiones en espacios y añadiendo capitales limpias.
-                    if (!nombreFinal || nombreFinal === doc.id) {
-                        nombreFinal = doc.id.replace(/-/g, ' ').replace(/\b\w/g, letra => letra.toUpperCase());
+                    // 2. Si no existen o devuelven el ID corto, busca la traducción exacta en nuestro diccionario
+                    if (!nombreFinal || nombreFinal.toLowerCase() === idLimpio) {
+                        if (diccionarioNombresLargos[idLimpio]) {
+                            nombreFinal = diccionarioNombresLargos[idLimpio];
+                        } else {
+                            // Respaldo de seguridad general por si creas uno nuevo en el futuro
+                            nombreFinal = doc.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        }
                     }
                     
                     let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
