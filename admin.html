@@ -10,17 +10,17 @@
 
     <style>
         :root {
-            --rosa-fondo: #fff0f6;
+            --fondo-oscuro: #1e1e24;
             --rosa-principal: #ff66b2;
-            --rosa-claro: #ffe3ec;
-            --rosa-oscuro: #4a1525;
-            --texto-formulario: #333333;
+            --rosa-branding: #e60073;
+            --texto-claro: #ffffff;
+            --gris-input: #2d2d35;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--rosa-fondo) 100%);
-            color: var(--rosa-oscuro);
+            background-color: var(--fondo-oscuro);
+            color: var(--texto-claro);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -30,62 +30,61 @@
         }
 
         h1 { 
-            color: var(--rosa-oscuro); 
-            text-shadow: 0 2px 5px rgba(255, 102, 178, 0.2); 
+            color: var(--rosa-principal); 
             text-align: center;
             font-family: 'Georgia', serif;
             margin-bottom: 25px;
+            font-size: 1.8rem;
         }
 
-        /* PANTALLA DE LOGIN DE SEGURIDAD */
-        #pantalla-bloqueo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--rosa-fondo);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .caja-login {
-            background: white;
+        /* CUADRO DE ACCESO CON PUNTITOS */
+        #bloque-login {
+            background: #18181c;
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             border: 2px solid var(--rosa-principal);
             text-align: center;
-            max-width: 320px;
+            max-width: 340px;
             width: 100%;
             box-sizing: border-box;
+            margin-top: 60px;
         }
 
-        /* MENÚ PRINCIPAL */
+        #bloque-login h2 {
+            color: var(--rosa-principal);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        /* EL PANEL SE QUEDA OCULTO HASTA QUE SE VALIDE LA CONTRASEÑA */
+        #contenido-panel {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            flex-direction: column;
+        }
+
+        /* MENÚ DE TRES BOTONES SUPERIORES */
         .menu-administracion {
             display: flex;
             flex-direction: column;
             gap: 12px;
             width: 100%;
-            max-width: 500px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .btn-menu {
             width: 100%;
-            padding: 16px;
-            background: white;
+            padding: 15px;
+            background: #25252b;
             border: 2px solid var(--rosa-principal);
-            color: var(--rosa-oscuro);
+            color: var(--texto-claro);
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255, 102, 178, 0.1);
             text-align: center;
             box-sizing: border-box;
         }
@@ -93,27 +92,19 @@
         .btn-menu:hover, .btn-menu.activo {
             background: var(--rosa-principal);
             color: white;
-            box-shadow: 0 6px 15px rgba(255, 102, 178, 0.4);
-            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.4);
         }
 
-        /* SECCIONES TOTALMENTE ROSAS */
+        /* SECCIONES DEL PANEL */
         .seccion-admin {
             display: none; 
             width: 100%;
-            max-width: 500px;
-            background: white;
+            background: #18181c;
             padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(255, 102, 178, 0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
             border: 2px solid var(--rosa-principal);
             box-sizing: border-box;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .seccion-admin.activa {
@@ -121,14 +112,15 @@
         }
 
         .seccion-admin h2 {
-            color: var(--rosa-oscuro);
+            color: var(--rosa-principal);
             margin-top: 0;
-            font-size: 1.4rem;
-            border-bottom: 2px solid var(--rosa-claro);
+            font-size: 1.3rem;
+            border-bottom: 1px solid rgba(255, 102, 178, 0.2);
             padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
-        /* FORMULARIOS ESTILO ROSA CLARO */
+        /* FORMULARIOS DE ENTRADA */
         .grupo-control {
             margin-bottom: 18px;
             display: flex;
@@ -138,17 +130,17 @@
 
         label { 
             font-weight: bold; 
-            color: var(--rosa-oscuro); 
-            font-size: 0.85rem; 
+            color: var(--rosa-principal); 
+            font-size: 0.8rem; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
         }
         
         input, select, textarea {
             padding: 12px;
-            background: #fff9fb;
-            border: 1px solid var(--rosa-principal);
-            color: var(--texto-formulario);
+            background: var(--gris-input);
+            border: 1px solid #444;
+            color: var(--texto-claro);
             border-radius: 8px;
             font-size: 1rem;
             outline: none;
@@ -157,9 +149,8 @@
         }
 
         input:focus, select:focus, textarea:focus {
-            background: white;
-            border-color: var(--rosa-oscuro);
-            box-shadow: 0 0 8px rgba(255, 102, 178, 0.3);
+            border-color: var(--rosa-principal);
+            box-shadow: 0 0 8px rgba(255, 102, 178, 0.4);
         }
 
         .btn-guardar {
@@ -170,142 +161,134 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
             width: 100%;
             transition: 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .btn-guardar:hover { 
-            background: #ff3399; 
-            box-shadow: 0 0 15px rgba(255,51,153,0.3); 
+            background: var(--rosa-branding); 
+            box-shadow: 0 0 15px rgba(230, 0, 115, 0.4); 
         }
 
         .divisor {
-            height: 2px;
-            background: var(--rosa-claro);
+            height: 1px;
+            background: rgba(255, 102, 178, 0.2);
             margin: 25px 0;
         }
     </style>
 </head>
 <body>
 
-    <div id="pantalla-bloqueo">
-        <div class="caja-login">
-            <h2 style="color: var(--rosa-oscuro); margin-top: 0;">🌸 Acceso 🌸</h2>
-            <div class="grupo-control">
-                <label>Contraseña</label>
-                <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
-            </div>
-            <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
-        </div>
-    </div>
-
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
-    <div class="menu-administracion">
-        <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
-        <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
-        <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
+    <div id="bloque-login">
+        <h2>🌸 Acceso </h2>
+        <div class="grupo-control">
+            <label>Contraseña</label>
+            <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
+        </div>
+        <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
     </div>
 
-    <div id="opcion-cargar" class="seccion-admin">
-        <h2>📂 Cargar Capítulo</h2>
-        <div class="grupo-control">
-            <label>Seleccionar el Proyecto</label>
-            <select id="select-proyecto-capitulo">
-                <option value="">Cargando historias completas...</option>
-            </select>
-        </div>
-        <div class="grupo-control">
-            <label>Número del Capítulo</label>
-            <input type="number" id="num-capitulo" placeholder="Ej: 12">
-        </div>
-        <div class="grupo-control">
-            <label>Enlaces de las Imágenes (Uno por línea)</label>
-            <textarea id="enlaces-imagenes" rows="8" placeholder="https://enlace1.com/imagen.jpg&#10;https://enlace2.com/imagen.jpg"></textarea>
-        </div>
-        <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
-    </div>
-
-    <div id="opcion-estatus" class="seccion-admin">
-        <h2>🔄 Actualizar Estatus</h2>
-        <div class="grupo-control">
-            <label>Seleccionar Proyecto</label>
-            <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
-                <option value="">Cargando historias completas...</option>
-            </select>
-        </div>
-        <div class="grupo-control">
-            <label>Estatus Actual del Proyecto</label>
-            <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--rosa-claro); border-color: var(--rosa-principal); color: var(--rosa-oscuro); font-weight: bold;">
-        </div>
-        <div class="grupo-control">
-            <label>Cambiar a Nuevo Estatus</label>
-            <select id="nuevo-estado-valor">
-                <option value="emision">🔴 En Emisión</option>
-                <option value="hiatus">🟡 En Hiatus</option>
-                <option value="finalizado">💖 Finalizado</option>
-            </select>
-        </div>
-        <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Actualizar Estado</button>
-    </div>
-
-    <div id="opcion-nuevo" class="seccion-admin">
-        <h2>✨ Crear / Editar Proyecto</h2>
+    <div id="contenido-panel">
         
-        <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
-        <div class="grupo-control">
-            <label>ID del Proyecto (Firebase - Sin espacios ni mayúsculas)</label>
-            <input type="text" id="nuevo-id" placeholder="ej: de-fans-para-fans">
+        <div class="menu-administracion">
+            <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
+            <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
-        <div class="grupo-control">
-            <label>Nombre Completo del Proyecto (Visible)</label>
-            <input type="text" id="nuevo-titulo" placeholder="Ej: Fingí estar embarazada...">
-        </div>
-        <div class="grupo-control">
-            <label>Link de la Portada</label>
-            <input type="text" id="nuevo-portada" placeholder="https://enlace.com/portada.jpg">
-        </div>
-        <div class="grupo-control">
-            <label>Sinopsis / Descripción</label>
-            <textarea id="nuevo-sinopsis" rows="3" placeholder="Escribe la sinopsis aquí..."></textarea>
-        </div>
-        <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo Proyecto</button>
 
-        <div class="divisor"></div>
+        <div id="opcion-cargar" class="seccion-admin">
+            <h2>📂 Cargar Capítulo</h2>
+            <div class="grupo-control">
+                <label>Seleccionar el Proyecto</label>
+                <select id="select-proyecto-capitulo">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Número del Capítulo</label>
+                <input type="number" id="num-capitulo" placeholder="Ej: 12">
+            </div>
+            <div class="grupo-control">
+                <label>Enlaces de las Imágenes (Uno por línea)</label>
+                <textarea id="enlaces-imagenes" rows="8" placeholder="https://enlace1.com/imagen.jpg&#10;https://enlace2.com/imagen.jpg"></textarea>
+            </div>
+            <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
+        </div>
 
-        <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
-        <div class="grupo-control">
-            <label>Seleccionar Proyecto a Editar</label>
-            <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
-                <option value="">Cargando historias completas...</option>
-            </select>
+        <div id="opcion-estatus" class="seccion-admin">
+            <h2>🔄 Actualizar Estatus</h2>
+            <div class="grupo-control">
+                <label>Seleccionar Proyecto</label>
+                <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Estatus Actual del Proyecto</label>
+                <input type="text" id="estatus-actual-pantalla" readonly style="background: #25252b; border-color: var(--rosa-principal); color: var(--rosa-principal); font-weight: bold;">
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar a Nuevo Estatus</label>
+                <select id="nuevo-estado-valor">
+                    <option value="emision">🔴 En Emisión</option>
+                    <option value="hiatus">🟡 En Hiatus</option>
+                    <option value="finalizado">💖 Finalizado</option>
+                </select>
+            </div>
+            <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Actualizar Estado</button>
         </div>
-        <div class="grupo-control">
-            <label>Cambiar Link de la Portada</label>
-            <input type="text" id="editar-portada" placeholder="https://enlace.com/nueva-portada.jpg">
+
+        <div id="opcion-nuevo" class="seccion-admin">
+            <h2>✨ Crear / Editar Proyecto</h2>
+            
+            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 0.95rem;">➕ CREAR NUEVO PROYECTO</h3>
+            <div class="grupo-control">
+                <label>ID del Proyecto (Firebase - Sin espacios)</label>
+                <input type="text" id="nuevo-id" placeholder="ej: confesion">
+            </div>
+            <div class="grupo-control">
+                <label>Nombre Completo del Proyecto (Visible)</label>
+                <input type="text" id="nuevo-titulo" placeholder="Ej: Mi Confesión...">
+            </div>
+            <div class="grupo-control">
+                <label>Link de la Portada</label>
+                <input type="text" id="nuevo-portada" placeholder="https://enlace.com/portada.jpg">
+            </div>
+            <div class="grupo-control">
+                <label>Sinopsis / Descripción</label>
+                <textarea id="nuevo-sinopsis" rows="3" placeholder="Escribe la sinopsis aquí..."></textarea>
+            </div>
+            <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo Proyecto</button>
+
+            <div class="divisor"></div>
+
+            <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 0.95rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+            <div class="grupo-control">
+                <label>Seleccionar Proyecto a Editar</label>
+                <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar Link de la Portada</label>
+                <input type="text" id="editar-portada" placeholder="https://enlace.com/nueva-portada.jpg">
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar Sinopsis</label>
+                <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
+            </div>
+            <button class="btn-guardar" style="background: #2ea44f;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
         </div>
-        <div class="grupo-control">
-            <label>Cambiar Sinopsis</label>
-            <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
-        </div>
-        <button class="btn-guardar" style="background: #3399ff;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
+
     </div>
 
     <script>
-        // FUNCIÓN PARA VERIFICAR TU CONTRASEÑA EN PANTALLA ROSA O CULTA
-        function verificarClave() {
-            const entrada = document.getElementById("clave-input").value;
-            if (entrada === "Rose2026") {
-                document.getElementById("pantalla-bloqueo").style.display = "none";
-                cargarProyectosEnSelects(); // Ejecuta la carga real al pasar la seguridad
-            } else {
-                alert("Contraseña incorrecta.");
-            }
-        }
-
-        // CONFIGURACIÓN DE FIREBASE
+        // CONFIGURACIÓN DE TU CONFIG DE FIREBASE REAL
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -319,7 +302,19 @@
 
         let listaProyectosGlobal = {};
 
-        // MANEJAR PESTAÑAS
+        // VALIDACIÓN DE CONTRASEÑA EN PUNTITOS
+        function verificarClave() {
+            const entrada = document.getElementById("clave-input").value;
+            if (entrada === "Rose2026") {
+                document.getElementById("bloque-login").style.display = "none";
+                document.getElementById("contenido-panel").style.display = "flex";
+                cargarProyectosEnSelects();
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        // PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -328,7 +323,7 @@
             evento.target.classList.add('activo');
         }
 
-        // TRAER LOS CAMPOS "TITULO" DESDE TU FIREBASE
+        // CORRECCIÓN: SE MUESTRAN LOS NOMBRES LARGOS COMPLETOS EN LOS MENÚS DESPLEGABLES
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
@@ -344,7 +339,7 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Obliga al select a usar el campo "titulo" (nombre largo) de Firebase
+                    // Condición: Si existe el campo "titulo" (nombre largo completo), se usa ese obligatoriamente
                     const nombreLargoCompleto = data.titulo || doc.id;
                     
                     let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreLargoCompleto; selectCap.appendChild(opc1);
@@ -354,7 +349,6 @@
             });
         }
 
-        // Mostrar estatus actual
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
@@ -366,7 +360,6 @@
             }
         }
 
-        // Auto-llenar campos para editar
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if(id && listaProyectosGlobal[id]) {
@@ -378,7 +371,6 @@
             }
         }
 
-        // ACCIÓN: CARGAR CAPÍTULO
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -399,7 +391,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: ACTUALIZAR ESTATUS
         function actualizarEstadoFirebase() {
             const idSubido = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -413,7 +404,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: CREAR NUEVO PROYECTO
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
@@ -438,7 +428,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // ACCIÓN: EDITAR PROYECTO EXISTENTE
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             const nuevaPortada = document.getElementById("editar-portada").value.trim();
