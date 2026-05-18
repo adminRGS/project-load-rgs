@@ -59,7 +59,6 @@
         }
         .btn-catalogo:hover { background: #ff66b2; color: white; transform: scale(1.05); }
 
-        /* NUEVA CAJA DE PORTADA CENTRADA */
         .portada-box { 
             width: 220px;
             height: 310px;
@@ -97,7 +96,6 @@
             text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
         }
 
-        /* DISEÑO DE CUADRÍCULA ORIGINAL */
         .grid-caps { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
@@ -179,12 +177,12 @@
 
     <div class="contenedor-manga">
         <div class="portada-box">
-            <img src="https://lh3.googleusercontent.com/d/1X508D64wD_C9n-Y8fU7mS1a7p_Sca4m_" id="portada-grande-salvada">
+            <img src="salvada.jpg" id="portada-grande-salvada" onerror="this.src='portada-defecto.jpg';">
         </div>
 
         <h1 id="titulo-proyecto">Salvada por la pequeña dama sin poderes</h1>
         
-        <p class="sinopsis-texto" id="sinopsis-completa-salvada">Cargando sinopsis oficial...</p>
+        <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
 
         <div class="seccion-titulo">Capítulos Disponibles</div>
         
@@ -245,7 +243,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // CAMBIAMOS LA RUTA AUTOMÁTICAMENTE A TU COLECCIÓN "salvada"
     const historiaID = "salvada"; 
     let capsOrdenados = [];
     let idCapActual = "";
@@ -259,46 +256,28 @@
         return url;
     }
 
-    // CARGAR PORTADA, SINOPSIS Y BOTONES EN AUTOMÁTICO DESDE TU NUEVA COLECCIÓN
     async function cargarProyectoDesdeFirebase() {
         const grid = document.getElementById('grid');
         grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Cargando capítulos...</p>";
         
         try {
-            // Traemos primero los datos base (Portada y Sinopsis)
-            const docBaseRef = doc(db, historiaID, "datos_proyecto");
-            const snapBase = await getDoc(docBaseRef);
-            if (snapBase.exists()) {
-                const datosBase = snapBase.data();
-                if (datosBase.sinopsis) {
-                    document.getElementById("sinopsis-completa-salvada").innerText = datosBase.sinopsis;
-                }
-                if (datosBase.portadaUrl) {
-                    document.getElementById("portada-grande-salvada").src = datosBase.portadaUrl;
-                }
-            }
-
-            // Traemos la lista completa de capítulos publicados
             const querySnapshot = await getDocs(collection(db, historiaID));
             let disponibles = [];
             
             querySnapshot.forEach((docSnap) => {
-                if (docSnap.id !== "datos_proyecto") {
-                    // Limpiamos la palabra "capitulo_" para extraer solo el número decimal o entero
+                if (docSnap.id.startsWith("capitulo_")) {
                     const idOriginal = docSnap.id.replace("capitulo_", "");
                     disponibles.push(idOriginal);
                 }
             });
 
-            // Ordenador numérico avanzado: el capítulo 1.5 quedará perfectamente ordenado entre el 1 y el 2
             capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
-            
             grid.innerHTML = ""; 
 
             capsOrdenados.forEach(idCap => {
                 const btn = document.createElement('div');
                 btn.className = 'cap-btn-dinamico';
-                btn.innerText = idCap; // Muestra solo el número limpio, ej: "1", "2", "3" o "1.5"
+                btn.innerText = idCap;
                 btn.onclick = () => abrirLector(idCap);
                 grid.appendChild(btn);
             });
