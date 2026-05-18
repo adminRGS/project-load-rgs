@@ -202,8 +202,8 @@
                 <input type="number" id="num-capitulo" placeholder="Ej: 12">
             </div>
             <div class="grupo-control">
-                <label>Enlaces de las Imágenes (Uno por línea)</label>
-                <textarea id="enlaces-imagenes" rows="8" placeholder="https://enlace1.com/imagen.jpg&#10;https://enlace2.com/imagen.jpg"></textarea>
+                <label>Enlaces de las Imágenes (Uno por línea - ¡Acepta links de Drive directos!)</label>
+                <textarea id="enlaces-imagenes" rows="8" placeholder="https://drive.google.com/file/d/.../view&#10;https://enlace2.com/imagen.jpg"></textarea>
             </div>
             <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
         </div>
@@ -262,8 +262,8 @@
                 </select>
             </div>
             <div class="grupo-control">
-                <label>Cambiar Link de la Portada</label>
-                <input type="text" id="editar-portada" placeholder="https://enlace.com/nueva-portada.jpg">
+                <label>Cambiar Link de la Portada (¡Acepta Drive directo!)</label>
+                <input type="text" id="editar-portada" placeholder="https://drive.google.com/file/d/.../view">
             </div>
             <div class="grupo-control">
                 <label>Cambiar Sinopsis</label>
@@ -287,6 +287,18 @@
         const db = firebase.firestore();
 
         let listaProyectosGlobal = {};
+
+        // 🔥 FUNCIÓN DE BLINDAJE: Convierte automáticamente enlaces de visualización de Drive a enlaces directos reales
+        function blindarEnlaceDrive(url) {
+            const enlaceLimpio = url.trim();
+            if (enlaceLimpio.includes("drive.google.com")) {
+                let idMatch = enlaceLimpio.match(/\/d\/([a-zA-Z0-9-_]+)/) || enlaceLimpio.match(/id=([a-zA-Z0-9-_]+)/);
+                if (idMatch && idMatch[1]) {
+                    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+                }
+            }
+            return enlaceLimpio;
+        }
 
         function verificarClave() {
             const entrada = document.getElementById("clave-input").value;
@@ -336,7 +348,6 @@
                     default: nombreFinal = id;
                 }
 
-                // Carga la información de portada/sinopsis desde tu documento datos_proyecto
                 db.collection(id).doc("datos_proyecto").get().then((docSnapshot) => {
                     if(docSnapshot.exists) {
                         listaProyectosGlobal[id] = docSnapshot.data();
@@ -386,17 +397,20 @@
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
             const textoEnlaces = document.getElementById("enlaces-imagenes").value;
-            const arrayImagenes = textoEnlaces.split("\n").filter(linea => linea.trim() !== "");
+            
+            // 🔥 BLINDAJE DE CAPÍTULOS: Procesa línea por línea y convierte enlaces de Drive automáticamente
+            const arrayImagenes = textoEnlaces.split("\n")
+                .map(linea => blindarEnlaceDrive(linea))
+                .filter(linea => linea !== "");
 
             if(!idProyecto) { alert("Por favor, selecciona un proyecto."); return; }
             if(!numCap || arrayImagenes.length === 0) { alert("Completa el número de capítulo y agrega imágenes."); return; }
 
-            // Sube el capítulo directo a la subcolección correspondiente a tu estructura
             db.collection(idProyecto).doc("capitulos").collection("lista").doc("cap-" + numCap).set({
                 imagenes: arrayImagenes
             })
             .then(() => {
-                alert(`¡Capítulo ${numCap} publicado con éxito!`);
+                alert(`¡Capítulo ${numCap} publicado con éxito con enlaces blindados!`);
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
             })
@@ -419,8 +433,11 @@
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
-            const portada = document.getElementById("nuevo-portada").value.trim();
+            const portadaRaw = document.getElementById("nuevo-portada").value.trim();
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
+
+            // 🔥 Blindamos la portada del nuevo proyecto
+            const portada = blindarEnlaceDrive(portadaRaw);
 
             if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
 
@@ -447,18 +464,20 @@
 
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
-            const nuevaPortada = document.getElementById("editar-portada").value.trim();
+            const nuevaPortadaRaw = document.getElementById("editar-portada").value.trim();
             const nuevaSinopsis = document.getElementById("editar-sinopsis").value.trim();
 
             if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
 
-            // Usa .set con merge para crear el documento si no existía previamente
+            // 🔥 BLINDAJE DE PORTADA EDITADA: Se auto-convierte si viene de Drive
+            const nuevaPortada = blindarEnlaceDrive(nuevaPortadaRaw);
+
             db.collection(id).doc("datos_proyecto").set({
                 portadaUrl: nuevaPortada,
                 sinopsis: nuevaSinopsis
             }, { merge: true })
             .then(() => {
-                alert("¡Proyecto editado correctamente!");
+                alert("¡Proyecto editado con éxito! El link de la portada se ha blindado automáticamente.");
                 if(!listaProyectosGlobal[id]) listaProyectosGlobal[id] = {};
                 listaProyectosGlobal[id].portadaUrl = nuevaPortada;
                 listaProyectosGlobal[id].sinopsis = nuevaSinopsis;
