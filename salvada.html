@@ -13,13 +13,11 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
-            color: var(--texto-rose, white); 
+            background: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%); 
+            color: white; 
             font-family: 'serif'; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
         
-        /* CONTENEDOR VERTICAL OPTIMIZADO */
         .contenedor-manga {
             width: 90%;
             max-width: 600px;
@@ -35,18 +33,21 @@
         }
         .btn-volver:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
 
-        /* PORTADA CENTRADA CON RESPALDO TRANSPARENTE */
-        .portada-centrada { 
-            width: 85%;
-            max-width: 240px;
-            height: auto;
-            aspect-ratio: 2 / 3;
-            object-fit: cover; 
+        /* MARCO ROSA HERMOSO PARA LA PORTADA */
+        .portada-box { 
+            width: 220px;
+            height: 310px;
             border-radius: 12px; 
             border: 2px solid #ff66b2; 
             box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); 
-            background: rgba(255, 255, 255, 0.05);
+            background: #222;
             margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .portada-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .titulo-manga { 
@@ -67,22 +68,32 @@
             text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
         }
 
-        /* LISTA DE CAPÍTULOS LIMPIOS */
-        .lista-capitulos { 
-            display: flex; flex-direction: column; gap: 12px; 
-            width: 100%; max-width: 500px; padding-bottom: 60px;
+        /* VOLVEMOS A LA RECIPIENTE DE CUADRÍCULA QUE SÍ TE GUSTABA */
+        .grid-capitulos { 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+            padding-bottom: 60px;
         }
 
         .btn-capitulo { 
-            display: block;
-            padding: 14px 20px; background: #3d142b; 
-            border: 1px solid #ff66b2; border-radius: 10px; 
-            text-decoration: none; color: #ffccff; 
-            font-size: 1rem; font-weight: bold; transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px; 
+            background: #3d142b; 
+            border: 1px solid #ff66b2; 
+            border-radius: 10px; 
+            text-decoration: none; 
+            color: #ffccff; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            transition: 0.3s; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-align: center;
         }
-        .btn-capitulo:hover { background: #ff66b2; color: white; transform: translateY(-2px); box-shadow: 0 0 15px rgba(255, 102, 178, 0.5); }
+        .btn-capitulo:hover { background: #ff66b2; color: white; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -90,37 +101,40 @@
 <a href="historias.html" class="btn-volver">🏠 Volver</a>
 
 <div class="contenedor-manga">
-    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='2' height='3'></svg>" class="portada-centrada" id="portada-grande-salvada">
+    <div class="portada-box">
+        <img src="salvada.jpg" id="portada-grande-salvada" onerror="this.src='portada-defecto.jpg';">
+    </div>
     
     <h1 class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
     
-    <p class="sinopsis-texto" id="sinopsis-completa-salvada">Cargando descripción oficial...</p>
+    <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
 
     <div class="seccion-titulo">Capítulos Disponibles</div>
 
-    <div class="lista-capitulos">
-        <a href="capitulos/salvada/1.html" class="btn-capitulo">Capítulo 1</a>
-        <a href="capitulos/salvada/2.html" class="btn-capitulo">Capítulo 2</a>
-        <a href="capitulos/salvada/3.html" class="btn-capitulo">Capítulo 3</a>
-        <a href="capitulos/salvada/4.html" class="btn-capitulo">Capítulo 4</a>
-        <a href="capitulos/salvada/5.html" class="btn-capitulo">Capítulo 5</a>
-        <a href="capitulos/salvada/6.html" class="btn-capitulo">Capítulo 6</a>
-        <a href="capitulos/salvada/7.html" class="btn-capitulo">Capítulo 7</a>
-        <a href="capitulos/salvada/8.html" class="btn-capitulo">Capítulo 8</a>
-        <a href="capitulos/salvada/9.html" class="btn-capitulo">Capítulo 9</a>
-        <a href="capitulos/salvada/10.html" class="btn-capitulo">Capítulo 10</a>
-        <a href="capitulos/salvada/11.html" class="btn-capitulo">Capítulo 11</a>
-        <a href="capitulos/salvada/12.html" class="btn-capitulo">Capítulo 12</a>
-        <a href="capitulos/salvada/13.html" class="btn-capitulo">Capítulo 13</a>
-        <a href="capitulos/salvada/14.html" class="btn-capitulo">Capítulo 14</a>
-        <a href="capitulos/salvada/15.html" class="btn-capitulo">Capítulo 15</a>
-        <a href="capitulos/salvada/16.html" class="btn-capitulo">Capítulo 16</a>
-        <a href="capitulos/salvada/17.html" class="btn-capitulo">Capítulo 17</a>
-        <a href="capitulos/salvada/18.html" class="btn-capitulo">Capítulo 18</a>
+    <div class="grid-capitulos">
+        <a href="salvada/1.html" class="btn-capitulo">1</a>
+        <a href="salvada/2.html" class="btn-capitulo">2</a>
+        <a href="salvada/3.html" class="btn-capitulo">3</a>
+        <a href="salvada/4.html" class="btn-capitulo">4</a>
+        <a href="salvada/5.html" class="btn-capitulo">5</a>
+        <a href="salvada/6.html" class="btn-capitulo">6</a>
+        <a href="salvada/7.html" class="btn-capitulo">7</a>
+        <a href="salvada/8.html" class="btn-capitulo">8</a>
+        <a href="salvada/9.html" class="btn-capitulo">9</a>
+        <a href="salvada/10.html" class="btn-capitulo">10</a>
+        <a href="salvada/11.html" class="btn-capitulo">11</a>
+        <a href="salvada/12.html" class="btn-capitulo">12</a>
+        <a href="capitulos/salvada/13.html" class="btn-capitulo">13</a>
+        <a href="capitulos/salvada/14.html" class="btn-capitulo">14</a>
+        <a href="capitulos/salvada/15.html" class="btn-capitulo">15</a>
+        <a href="capitulos/salvada/16.html" class="btn-capitulo">16</a>
+        <a href="capitulos/salvada/17.html" class="btn-capitulo">17</a>
+        <a href="capitulos/salvada/18.html" class="btn-capitulo">18</a>
     </div>
 </div>
 
 <script>
+    // Configuración básica de Firebase por si quieres actualizar la sinopsis dinámicamente después
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -134,42 +148,17 @@
     }
     const dbInstancia = firebase.firestore();
 
-    function formatearLinkDrive(url) {
-        if (!url) return "";
-        if (url.includes("drive.google.com")) {
-            let id = "";
-            if (url.includes("id=")) { id = url.split("id=")[1].split("&")[0]; }
-            else if (url.includes("/d/")) { id = url.split("/d/")[1].split("/")[0]; }
-            if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
-        }
-        return url;
-    }
-
-    // Traemos de Firebase únicamente la Portada y la Sinopsis del documento base
     dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
         if (docSnapshot.exists) {
             const datos = docSnapshot.data();
-            const imgElemento = document.getElementById("portada-grande-salvada");
-            if (imgElemento && datos.portadaUrl) {
-                imgElemento.src = formatearLinkDrive(datos.portadaUrl);
+            if (datos.sinopsis) {
+                document.getElementById("sinopsis-completa-salvada").innerText = datos.sinopsis;
             }
-            const sinopsisElemento = document.getElementById("sinopsis-completa-salvada");
-            if (sinopsisElemento) {
-                sinopsisElemento.innerText = datos.sinopsis || "Sin descripción disponible.";
+            if (datos.portadaUrl && datos.portadaUrl.includes("http")) {
+                document.getElementById("portada-grande-salvada").src = datos.portadaUrl;
             }
-        } else {
-            // Si el documento exacto no existe, intentamos buscar en toda la colección por si cambió de nombre
-            dbInstancia.collection("salvada").get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    if(doc.id.includes("datos") || doc.data().sinopsis) {
-                        const datos = doc.data();
-                        document.getElementById("portada-grande-salvada").src = formatearLinkDrive(datos.portadaUrl);
-                        document.getElementById("sinopsis-completa-salvada").innerText = datos.sinopsis;
-                    }
-                });
-            });
         }
-    }).catch((err) => console.log("Error trayendo datos: ", err));
+    }).catch((err) => console.log("Firebase sin cambios por ahora: ", err));
 </script>
 
 </body>
