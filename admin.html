@@ -12,14 +12,14 @@
         :root {
             --rosa-fondo: #fff0f6;
             --rosa-principal: #ff66b2;
+            --rosa-claro: #ffe3ec;
             --rosa-oscuro: #4a1525;
-            --panel-oscuro: #1e1e24;
-            --texto-claro: #ffffff;
+            --texto-formulario: #333333;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #ffe3ec 0%, #fff0f6 100%);
+            background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--rosa-fondo) 100%);
             color: var(--rosa-oscuro);
             margin: 0;
             padding: 20px;
@@ -37,7 +37,34 @@
             margin-bottom: 25px;
         }
 
-        /* LAS TRES OPCIONES PRINCIPALES AL ENTRAR */
+        /* PANTALLA DE LOGIN DE SEGURIDAD */
+        #pantalla-bloqueo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--rosa-fondo);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .caja-login {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.2);
+            border: 2px solid var(--rosa-principal);
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* MENÚ PRINCIPAL */
         .menu-administracion {
             display: flex;
             flex-direction: column;
@@ -70,15 +97,15 @@
             transform: translateY(-2px);
         }
 
-        /* CONTENEDORES DE LAS SECCIONES */
+        /* SECCIONES TOTALMENTE ROSAS */
         .seccion-admin {
-            display: none;
+            display: none; 
             width: 100%;
             max-width: 500px;
-            background: var(--panel-oscuro);
+            background: white;
             padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(255, 102, 178, 0.15);
             border: 2px solid var(--rosa-principal);
             box-sizing: border-box;
             animation: fadeIn 0.4s ease;
@@ -94,14 +121,14 @@
         }
 
         .seccion-admin h2 {
-            color: var(--rosa-principal);
+            color: var(--rosa-oscuro);
             margin-top: 0;
             font-size: 1.4rem;
-            border-bottom: 1px solid rgba(255, 102, 178, 0.3);
+            border-bottom: 2px solid var(--rosa-claro);
             padding-bottom: 10px;
         }
 
-        /* FORMULARIOS INTERNOS */
+        /* FORMULARIOS ESTILO ROSA CLARO */
         .grupo-control {
             margin-bottom: 18px;
             display: flex;
@@ -111,7 +138,7 @@
 
         label { 
             font-weight: bold; 
-            color: #ff99cc; 
+            color: var(--rosa-oscuro); 
             font-size: 0.85rem; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
@@ -119,9 +146,9 @@
         
         input, select, textarea {
             padding: 12px;
-            background: #2d2d35;
-            border: 1px solid #444;
-            color: var(--texto-claro);
+            background: #fff9fb;
+            border: 1px solid var(--rosa-principal);
+            color: var(--texto-formulario);
             border-radius: 8px;
             font-size: 1rem;
             outline: none;
@@ -130,8 +157,9 @@
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--rosa-principal);
-            box-shadow: 0 0 8px rgba(255, 102, 178, 0.5);
+            background: white;
+            border-color: var(--rosa-oscuro);
+            box-shadow: 0 0 8px rgba(255, 102, 178, 0.3);
         }
 
         .btn-guardar {
@@ -150,17 +178,28 @@
         }
         .btn-guardar:hover { 
             background: #ff3399; 
-            box-shadow: 0 0 15px rgba(255,51,153,0.5); 
+            box-shadow: 0 0 15px rgba(255,51,153,0.3); 
         }
 
         .divisor {
-            height: 1px;
-            background: rgba(255, 102, 178, 0.3);
+            height: 2px;
+            background: var(--rosa-claro);
             margin: 25px 0;
         }
     </style>
 </head>
 <body>
+
+    <div id="pantalla-bloqueo">
+        <div class="caja-login">
+            <h2 style="color: var(--rosa-oscuro); margin-top: 0;">🌸 Acceso 🌸</h2>
+            <div class="grupo-control">
+                <label>Contraseña</label>
+                <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
+            </div>
+            <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
+        </div>
+    </div>
 
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
@@ -175,7 +214,7 @@
         <div class="grupo-control">
             <label>Seleccionar el Proyecto</label>
             <select id="select-proyecto-capitulo">
-                <option value="">Cargando historias...</option>
+                <option value="">Cargando historias completas...</option>
             </select>
         </div>
         <div class="grupo-control">
@@ -194,12 +233,12 @@
         <div class="grupo-control">
             <label>Seleccionar Proyecto</label>
             <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
-                <option value="">Cargando historias...</option>
+                <option value="">Cargando historias completas...</option>
             </select>
         </div>
         <div class="grupo-control">
             <label>Estatus Actual del Proyecto</label>
-            <input type="text" id="estatus-actual-pantalla" readonly style="background: #1e1e24; border-color: #ff66b2; color: #ff99cc; font-weight: bold;">
+            <input type="text" id="estatus-actual-pantalla" readonly style="background: var(--rosa-claro); border-color: var(--rosa-principal); color: var(--rosa-oscuro); font-weight: bold;">
         </div>
         <div class="grupo-control">
             <label>Cambiar a Nuevo Estatus</label>
@@ -215,10 +254,10 @@
     <div id="opcion-nuevo" class="seccion-admin">
         <h2>✨ Crear / Editar Proyecto</h2>
         
-        <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
+        <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
         <div class="grupo-control">
             <label>ID del Proyecto (Firebase - Sin espacios ni mayúsculas)</label>
-            <input type="text" id="nuevo-id" placeholder="ej: diciembre">
+            <input type="text" id="nuevo-id" placeholder="ej: de-fans-para-fans">
         </div>
         <div class="grupo-control">
             <label>Nombre Completo del Proyecto (Visible)</label>
@@ -236,11 +275,11 @@
 
         <div class="divisor"></div>
 
-        <h3 style="color: #ff99cc; margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+        <h3 style="color: var(--rosa-principal); margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
         <div class="grupo-control">
             <label>Seleccionar Proyecto a Editar</label>
             <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
-                <option value="">Cargando historias...</option>
+                <option value="">Cargando historias completas...</option>
             </select>
         </div>
         <div class="grupo-control">
@@ -255,12 +294,15 @@
     </div>
 
     <script>
-        // === TU CONTRASEÑA MANTENIDA RESPONSABLEMENTE ===
-        const passwordAdmin = prompt("Introduce la contraseña de administradora:");
-        if (passwordAdmin !== "Rose2026") { 
-            alert("Acceso denegado.");
-            document.body.innerHTML = "<h1 style='color:red; margin-top:100px;'>🔒 No tienes autorización para ver este panel.</h1>";
-            window.stop();
+        // FUNCIÓN PARA VERIFICAR TU CONTRASEÑA EN PANTALLA ROSA O CULTA
+        function verificarClave() {
+            const entrada = document.getElementById("clave-input").value;
+            if (entrada === "Rose2026") {
+                document.getElementById("pantalla-bloqueo").style.display = "none";
+                cargarProyectosEnSelects(); // Ejecuta la carga real al pasar la seguridad
+            } else {
+                alert("Contraseña incorrecta.");
+            }
         }
 
         // CONFIGURACIÓN DE FIREBASE
@@ -277,7 +319,7 @@
 
         let listaProyectosGlobal = {};
 
-        // 1. MANEJAR LAS PESTAÑAS
+        // MANEJAR PESTAÑAS
         function abrirSeccion(evento, idSeccion) {
             document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
             document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
@@ -286,32 +328,31 @@
             evento.target.classList.add('activo');
         }
 
-        // 2. CORRECCIÓN PRINCIPAL: MOSTRAR LOS NOMBRES REALES COMPLETOS EN LOS DESPLEGABLES
+        // TRAER LOS CAMPOS "TITULO" DESDE TU FIREBASE
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
             db.collection("estados_historias").onSnapshot((querySnapshot) => {
-                selectCap.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
-                selectEst.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
-                selectEdi.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+                selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
+                selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
+                selectEdi.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 listaProyectosGlobal = {}; 
                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Aquí forzamos que use el título completo del Manhwa
-                    const tituloCompleto = data.titulo || doc.id;
+                    // Obliga al select a usar el campo "titulo" (nombre largo) de Firebase
+                    const nombreLargoCompleto = data.titulo || doc.id;
                     
-                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = tituloCompleto; selectCap.appendChild(opc1);
-                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = tituloCompleto; selectEst.appendChild(opc2);
-                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = tituloCompleto; selectEdi.appendChild(opc3);
+                    let opc1 = document.createElement("option"); opc1.value = doc.id; opc1.text = nombreLargoCompleto; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = doc.id; opc2.text = nombreLargoCompleto; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = doc.id; opc3.text = nombreLargoCompleto; selectEdi.appendChild(opc3);
                 });
             });
         }
-        window.onload = cargarProyectosEnSelects;
 
         // Mostrar estatus actual
         function mostrarEstatusActual() {
@@ -337,7 +378,7 @@
             }
         }
 
-        // 3. ACCIÓN: CARGAR CAPÍTULO
+        // ACCIÓN: CARGAR CAPÍTULO
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -358,7 +399,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 4. ACCIÓN: ACTUALIZAR ESTATUS
+        // ACCIÓN: ACTUALIZAR ESTATUS
         function actualizarEstadoFirebase() {
             const idSubido = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -372,7 +413,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 5. ACCIÓN: CREAR NUEVO PROYECTO
+        // ACCIÓN: CREAR NUEVO PROYECTO
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
@@ -397,7 +438,7 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // 6. ACCIÓN: EDITAR PROYECTO EXISTENTE
+        // ACCIÓN: EDITAR PROYECTO EXISTENTE
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             const nuevaPortada = document.getElementById("editar-portada").value.trim();
