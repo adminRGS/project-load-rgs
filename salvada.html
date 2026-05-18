@@ -33,7 +33,7 @@
         }
         .btn-volver:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
 
-        /* MARCO ROSA HERMOSO PARA LA PORTADA */
+        /* CONTENEDOR DE PORTADA ESTILIZADO */
         .portada-box { 
             width: 220px;
             height: 310px;
@@ -68,7 +68,7 @@
             text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
         }
 
-        /* VOLVEMOS A LA RECIPIENTE DE CUADRÍCULA QUE SÍ TE GUSTABA */
+        /* CUADRÍCULA ORIGINAL DE 3 COLUMNAS QUE SÍ FUNCIONABA */
         .grid-capitulos { 
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -124,17 +124,16 @@
         <a href="salvada/10.html" class="btn-capitulo">10</a>
         <a href="salvada/11.html" class="btn-capitulo">11</a>
         <a href="salvada/12.html" class="btn-capitulo">12</a>
-        <a href="capitulos/salvada/13.html" class="btn-capitulo">13</a>
-        <a href="capitulos/salvada/14.html" class="btn-capitulo">14</a>
-        <a href="capitulos/salvada/15.html" class="btn-capitulo">15</a>
-        <a href="capitulos/salvada/16.html" class="btn-capitulo">16</a>
-        <a href="capitulos/salvada/17.html" class="btn-capitulo">17</a>
-        <a href="capitulos/salvada/18.html" class="btn-capitulo">18</a>
+        <a href="salvada/13.html" class="btn-capitulo">13</a>
+        <a href="salvada/14.html" class="btn-capitulo">14</a>
+        <a href="salvada/15.html" class="btn-capitulo">15</a>
+        <a href="salvada/16.html" class="btn-capitulo">16</a>
+        <a href="salvada/17.html" class="btn-capitulo">17</a>
+        <a href="salvada/18.html" class="btn-capitulo">18</a>
     </div>
 </div>
 
 <script>
-    // Configuración básica de Firebase por si quieres actualizar la sinopsis dinámicamente después
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -148,17 +147,18 @@
     }
     const dbInstancia = firebase.firestore();
 
+    // Conectamos con el documento correcto en Firebase para actualizar los datos visuales
     dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
         if (docSnapshot.exists) {
             const datos = docSnapshot.data();
             if (datos.sinopsis) {
                 document.getElementById("sinopsis-completa-salvada").innerText = datos.sinopsis;
             }
-            if (datos.portadaUrl && datos.portadaUrl.includes("http")) {
+            if (datos.portadaUrl) {
                 document.getElementById("portada-grande-salvada").src = datos.portadaUrl;
             }
         }
-    }).catch((err) => console.log("Firebase sin cambios por ahora: ", err));
+    }).catch((err) => console.log("Firebase cargará los datos en un momento: ", err));
 </script>
 
 </body>
