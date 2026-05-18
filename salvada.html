@@ -33,7 +33,6 @@
         }
         .btn-volver:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
 
-        /* CONTENEDOR DE PORTADA ESTILIZADO */
         .portada-box { 
             width: 220px;
             height: 310px;
@@ -68,7 +67,6 @@
             text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
         }
 
-        /* CUADRÍCULA ORIGINAL DE 3 COLUMNAS QUE SÍ FUNCIONABA */
         .grid-capitulos { 
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -134,31 +132,35 @@
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-        authDomain: "prgs-f2ef8.firebaseapp.com",
-        projectId: "prgs-f2ef8",
-        storageBucket: "prgs-f2ef8.firebasestorage.app",
-        messagingSenderId: "639472415083",
-        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
-    };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const dbInstancia = firebase.firestore();
-
-    // Conectamos con el documento correcto en Firebase para actualizar los datos visuales
-    dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
-        if (docSnapshot.exists) {
-            const datos = docSnapshot.data();
-            if (datos.sinopsis) {
-                document.getElementById("sinopsis-completa-salvada").innerText = datos.sinopsis;
-            }
-            if (datos.portadaUrl) {
-                document.getElementById("portada-grande-salvada").src = datos.portadaUrl;
-            }
+    try {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-    }).catch((err) => console.log("Firebase cargará los datos en un momento: ", err));
+        const dbInstancia = firebase.firestore();
+
+        // El bloque try/catch evita que cualquier error aquí abajo rompa la pantalla
+        dbInstancia.collection("salvada").doc("datos_proyecto").get().then((docSnapshot) => {
+            if (docSnapshot.exists) {
+                const datos = docSnapshot.data();
+                if (datos.sinopsis) {
+                    document.getElementById("sinopsis-completa-salvada").innerText = datos.sinopsis;
+                }
+                if (datos.portadaUrl) {
+                    document.getElementById("portada-grande-salvada").src = datos.portadaUrl;
+                }
+            }
+        }).catch((e) => console.log("Firebase pausado, usando datos locales nativos."));
+    } catch (error) {
+        console.log("Error general de Firebase protegido.");
+    }
 </script>
 
 </body>
