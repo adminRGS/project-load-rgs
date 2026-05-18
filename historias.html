@@ -45,7 +45,6 @@
 
         .seccion-titulo { width: 90%; max-width: 1000px; margin: 30px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
-        /* 🔥 VOLVEMOS A LA CUADRICULA RÍGIDA ORIGINAL */
         .grid-historias { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 95%; max-width: 1000px; padding: 10px 10px 40px 10px; }
         
         .card { 
@@ -82,6 +81,23 @@
             line-height: 1.3; 
             background: var(--fondo-info, transparent); 
             border-top: 1px solid var(--linea-caja, rgba(255, 255, 255, 0.05));
+        }
+
+        .sub-menu-colores {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #ff66b2;
+            padding: 10px;
+            border-radius: 20px;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
+        }
+        .sub-menu-colores.visible-rose {
+            display: flex;
         }
     </style>
 </head>
@@ -181,32 +197,24 @@
     }
     const dbInstancia = firebase.firestore();
 
-    const historiasIds = ["amigos", "confesion", "embarazada", "guarderia", "hermana", "leopardo", "lobo", "matrimonio", "princesa", "salvada"];
-
-    // 🔥 BLINDAJE DE PORTADAS: Sincroniza dinámicamente las imágenes guardadas en Firebase
-    historiasIds.forEach((id) => {
-        dbInstancia.collection(id).doc("datos_proyecto").get().then((docSnapshot) => {
-            if (docSnapshot.exists) {
-                const datos = docSnapshot.data();
-                const imgElemento = document.getElementById("img-" + id);
-                if (imgElemento && datos.portadaUrl) {
-                    imgElemento.src = datos.portadaUrl;
-                }
-            }
-        }).catch((err) => console.log("Error trayendo detalles del proyecto: ", err));
-    });
-
-    // Sincronizar estados para organizarlos en cuadrículas
     dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             const idHistoria = doc.id; 
-            const nuevoEstado = doc.data().estado; 
+            const datos = doc.data();
+            const nuevoEstado = datos.estado; 
+            const nuevaPortada = datos.portadaUrl;
+
+            const imgElemento = document.getElementById("img-" + idHistoria);
+            if (imgElemento && nuevaPortada && nuevaPortada.trim() !== "") {
+                imgElemento.src = nuevaPortada;
+            }
+
             const tarjeta = document.getElementById("card-" + idHistoria);
-            if (tarjeta) {
-                const tag = tarjeta.querySelector(".estado-tag");
+            if (tarjeta && nuevoEstado) {
                 let destinoGrid = document.getElementById("grid-" + nuevoEstado);
                 if (destinoGrid) {
                     destinoGrid.appendChild(tarjeta);
+                    const tag = tarjeta.querySelector(".estado-tag");
                     if (tag) {
                         tag.className = "estado-tag"; 
                         if (nuevoEstado === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
@@ -216,9 +224,8 @@
                 }
             }
         });
-    }).catch((error) => console.log("Error sincronizando los estados de las historias: ", error));
+    }).catch((error) => console.log("Error al actualizar catálogo:", error));
 
-    // Sistema integrador de temas
     function cambiarTemaRose(modo) {
         const root = document.documentElement;
         if (modo === 'dark') {
