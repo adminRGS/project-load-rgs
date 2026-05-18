@@ -311,13 +311,13 @@
             evento.target.classList.add('activo');
         }
 
-        // REVISIÓN MULTICAMPO DE FIREBASE PARA EXTRAER EL TÍTULO REAL
+        // APUNTADO DIRECTO A LA COLECCIÓN ORIGINAL DE HISTORIAS Y AL CAMPO NOMBRE
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
             
-            db.collection("estados_historias").onSnapshot((querySnapshot) => {
+            db.collection("historias").onSnapshot((querySnapshot) => {
                 selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
                 selectEdi.innerHTML = '<option value="">-- Selecciona una historia --</option>';
@@ -327,11 +327,10 @@
                     const data = doc.data();
                     listaProyectosGlobal[doc.id] = data; 
                     
-                    // Revisa de manera flexible cualquier campo de texto que pueda contener el nombre largo real
-                    let nombreFinal = data.titulo || data.nombre || data.title || data.name || data.nombreLargo;
+                    // Extrae el nombre largo desde la propiedad original
+                    let nombreFinal = data.nombre || data.titulo || data.title;
                     
-                    // Si no encuentra ningún campo de texto con el título largo, usará provisionalmente el ID 
-                    // formateado con mayúsculas iniciales para no dejarlo todo en minúsculas planas.
+                    // Si el documento carece del campo, limpia el ID plano quitando guiones como protección
                     if (!nombreFinal) {
                         nombreFinal = doc.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     }
@@ -346,9 +345,17 @@
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const campo = document.getElementById("estatus-actual-pantalla");
-            if(id && listaProyectosGlobal[id]) {
-                const est = listaProyectosGlobal[id].estado;
-                campo.value = est === "emision" ? "🔴 En Emisión" : est === "hiatus" ? "🟡 En Hiatus" : "💖 Finalizado";
+            
+            // Buscamos el estado cruzando la info con estados_historias por debajo
+            if(id) {
+                db.collection("estados_historias").doc(id).get().then((doc) => {
+                    if (doc.exists) {
+                        const est = doc.data().estado;
+                        campo.value = est === "emision" ? "🔴 En Emisión" : est === "hiatus" ? "🟡 En Hiatus" : "💖 Finalizado";
+                    } else {
+                        campo.value = "🔴 En Emisión"; // Por defecto si es nuevo
+                    }
+                });
             } else {
                 campo.value = "";
             }
@@ -391,9 +398,9 @@
 
             if(!idSubido) { alert("Selecciona un proyecto primero."); return; }
 
-            db.collection("estados_historias").doc(idSubido).update({
+            db.collection("estados_historias").doc(idSubido).set({
                 estado: nuevoEstado
-            })
+            }, { merge: true })
             .then(() => alert("¡Estatus actualizado correctamente!"))
             .catch(error => alert("Error: " + error));
         }
@@ -406,11 +413,16 @@
 
             if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
 
-            db.collection("estados_historias").doc(id).set({
-                titulo: titulo,
-                estado: "emision",
+            // Se guarda tanto en historias como en estados para mantener la sincronía perfecta
+            db.collection("historias").doc(id).set({
+                nombre: titulo,
                 portadaUrl: portada,
                 sinopsis: sinopsis
+            })
+            .then(() => {
+                return db.collection("estados_historias").doc(id).set({
+                    estado: "emision"
+                }, { merge: true });
             })
             .then(() => {
                 alert(`¡Proyecto "${titulo}" creado con éxito!`);
@@ -429,7 +441,7 @@
 
             if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
 
-            db.collection("estados_historias").doc(id).update({
+            db.collection("historias").doc(id).update({
                 portadaUrl: nuevaPortada,
                 sinopsis: nuevaSinopsis
             })
