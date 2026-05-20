@@ -7,12 +7,14 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <link rel="stylesheet" href="estilos-rose.css">
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Modificado para que responda a los temas globales (Gris / Sepia / Negro) */
         body { 
             font-family: sans-serif; 
             background: var(--fondo-rose, #000); 
@@ -25,21 +27,20 @@
             transition: background 0.3s ease;
         }
 
-        /* CONTENEDOR DE BUCLE INFINITO (SOLO 4 IMÁGENES, SIN CORTES) */
+        /* CONTENEDOR DE BUCLE INFINITO */
         #bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: #000; }
         .bg-slide { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background-size: cover; background-position: center; 
             opacity: 0; transition: opacity 2s ease-in-out; 
         }
-        .bg-slide.active { opacity: 0.55; } /* Opacidad para que el texto resalte */
+        .bg-slide.active { opacity: 0.55; } 
 
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.3); z-index: -1; }
 
         /* CONTENIDO PRINCIPAL */
         .content { position: relative; z-index: 10; text-align: center; width: 95%; max-width: 450px; }
         
-        /* TÍTULO Y SUBTÍTULO */
         h1.titulo-principal { 
             font-family: 'Dancing Script', cursive; font-size: 3.5rem; font-weight: 500; margin-bottom: 0px;
             background: linear-gradient(90deg, #ff0000, #ff66b2, #800080, #ff0000);
@@ -56,7 +57,6 @@
 
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* --- BOTONES MÁS DELICADOS Y ESTILIZADOS --- */
         .btn { 
             display: block; width: 85%; 
             margin: 0 auto 15px auto; 
@@ -84,9 +84,101 @@
         }
 
         .btn-regresar { padding: 10px 20px; background: white; color: black; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+
+        /* --- 🌸 NOTIFICACIONES FLOTANTES CON BOTÓN DE CIERRE 🌸 --- */
+        #contenedor-notificaciones-flotantes {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 360px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notificacion-flotante {
+            background: rgba(20, 0, 10, 0.75); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255, 102, 178, 0.4);
+            border-radius: 16px;
+            padding: 12px 15px;
+            box-shadow: 0 10px 25px rgba(255, 51, 133, 0.2);
+            animation: slideDownIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .notificacion-header {
+            font-size: 0.75rem;
+            color: #ff66b2;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Estilos de la hermosa X para cerrar */
+        .btn-cerrar-notif {
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.2s, transform 0.2s;
+            padding: 0 5px;
+            line-height: 1;
+        }
+        .btn-cerrar-notif:hover {
+            color: #ff3385;
+            transform: scale(1.2);
+        }
+
+        .notificacion-titulo {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.3;
+            margin: 0;
+            text-align: left;
+            padding-right: 15px; /* Espacio para que no choque con la X */
+        }
+
+        .notificacion-caps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .badge-cap-flotante {
+            background: linear-gradient(135deg, #ff3385, #b30047);
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .badge-cap-flotante:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes slideDownIn {
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
     </style>
 </head>
 <body>
+
+    <div id="contenedor-notificaciones-flotantes"></div>
 
     <div id="bg-container">
         <div class="bg-slide active" style="background-image: url('guarderia.jpg');"></div>
@@ -112,7 +204,6 @@
     </div>
 
     <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
-        
         <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
             🎨
         </button>
@@ -127,7 +218,77 @@
     <script src="funciones-rose.js"></script>
 
     <script>
-        // Lógica del Bucle Infinito (Corregida para 4 imágenes)
+        // CONFIGURACIÓN DE TU BASE DE DATOS FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // TRADUCTOR HÍBRIDO DE NOMBRES LARGOS
+        function obtenerNombreBonito(id, nombreFirebase) {
+            if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
+            switch(id) {
+                case "amigos": return "Los amigos no hacen esto";
+                case "confesion": return "Confesión";
+                case "embarazada": return "Finge estar embarazada pero mi esposo regresó";
+                case "guarderia": return "La guardería de la villana";
+                case "hermana": return "Mi hermana que era mi enemiga ahora me ama";
+                case "leopardo": return "La pequeña bebé leopardo de las nieves de la familia de panteras negras";
+                case "lobo": return "Soy un lobo pero no te lastimaré";
+                case "matrimonio": return "Matrimonio conveniencia a una obsesión";
+                case "princesa": return "No solo encante a la princesa";
+                case "salvada": return "Salvada por la pequeña dama sin poderes";
+                default: return id;
+            }
+        }
+
+        // DISPARADOR DE NOTIFICACIONES FLOTANTES AUTOMÁTICAS
+        document.addEventListener("DOMContentLoaded", () => {
+            const contenedorAlertas = document.getElementById("contenedor-notificaciones-flotantes");
+            
+            db.collection("notificaciones_index").orderBy("fecha", "desc").limit(2).get()
+              .then((querySnapshot) => {
+                  querySnapshot.forEach((doc) => {
+                      const idProyecto = doc.id;
+                      const datos = doc.data();
+                      const nombreProyecto = obtenerNombreBonito(idProyecto, datos.nombre);
+                      
+                      let capitulos = datos.capitulos || [];
+                      capitulos.sort((a, b) => parseFloat(b) - parseFloat(a)); 
+                      let ultimosCaps = capitulos.slice(0, 2);
+
+                      let alerta = document.createElement("div");
+                      alerta.className = "notificacion-flotante";
+                      
+                      // Se agrega el botón de cerrar con la acción nativa .remove()
+                      let alertaHTML = `
+                          <div class="notificacion-header">
+                              <span>✨ ¡Actualización! <small style="font-size:0.65rem; opacity:0.6; text-transform:lowercase;">reciente</small></span>
+                              <span class="btn-cerrar-notif" onclick="this.closest('.notificacion-flotante').remove()">✕</span>
+                          </div>
+                          <div class="notificacion-titulo">${nombreProyecto}</div>
+                          <div class="notificacion-caps">
+                      `;
+                      
+                      ultimosCaps.forEach(cap => {
+                          alertaHTML += `<a href="lector.html?id=${idProyecto}&cap=${cap}" class="badge-cap-flotante">Cap. ${cap}</a>`;
+                      });
+                      
+                      alertaHTML += `</div>`;
+                      alerta.innerHTML = alertaHTML;
+                      contenedorAlertas.appendChild(alerta);
+                  });
+              })
+              .catch(err => console.log("Error cargando burbujas de notificación:", err));
+        });
+
+        // Lógica del Bucle Infinito de Fondos
         const slides = document.querySelectorAll('.bg-slide');
         let currentSlide = 0;
 
