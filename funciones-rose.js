@@ -79,3 +79,23 @@ window.conectarAdminConManga = async function(db, getDoc, doc, historiaID, porta
         console.error("Error en funciones-rose al conectar con el Admin:", error);
     }
 };
+
+// Abrir y cerrar la paletita de colores en el lector
+window.toggleMenuLector = (e) => {
+    e.stopPropagation();
+    const menuLector = document.getElementById('sub-menu-colores-lector');
+    if (menuLector) {
+        menuLector.classList.toggle('visible-rose');
+    }
+};
+
+// Cerrar menús automáticamente si hacen clic en cualquier otra parte de la pantalla
+document.addEventListener('click', () => {
+    // Cierra el menú de reacciones/votos
+    const menuStats = document.getElementById('stats-menu');
+    if (menuStats) menuStats.classList.remove('active');
+    
+    // Cierra la paletita de colores
+    const menuLector = document.getElementById('sub-menu-colores-lector');
+    if (menuLector) menuLector.classList.remove('visible-rose');
+});
