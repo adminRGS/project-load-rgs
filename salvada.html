@@ -85,7 +85,7 @@
         @keyframes shineText { to { background-position: 200% center; } }
 
         .sinopsis-texto { 
-            font-size: 0.95rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85); 
+            font-size: 0.95rem; line-height: 1.6; color: var(--texto-rose, rgba(255, 255, 255, 0.85)); 
             margin: 0 0 30px 0; font-family: sans-serif;
             text-align: justify; text-align-last: center;
         }
@@ -180,7 +180,7 @@
             <img src="salvada.jpg" id="portada-grande-salvada" onerror="this.src='portada-defecto.jpg';">
         </div>
 
-        <h1 id="titulo-proyecto">Salvada por la pequeña dama sin poderes</h1>
+        <h1 id="titulo-proyecto" class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
         
         <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
 
@@ -192,9 +192,9 @@
     <div id="lector">
         <div class="nav-lector">
             <div class="dots-container">
-                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')"></div>
-                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')"></div>
-                <div class="dot" style="background: #f4ecd8;" onclick="cambiarTemaRose('sepia')"></div>
+                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
+                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
+                <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
             </div>
 
             <div class="grupo-flechas">
@@ -247,6 +247,18 @@
     let capsOrdenados = [];
     let idCapActual = "";
 
+    // Conectar automáticamente con el Admin para jalar Portada y Sinopsis desde Firebase
+    if (window.conectarAdminConManga) {
+        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-grande-salvada", "sinopsis-completa-salvada");
+    }
+
+    function determinarNombreBonito(id) {
+        switch(id) {
+            case "salvada": return "Salvada por la pequeña dama sin poderes";
+            default: return id;
+        }
+    }
+
     function arreglarLink(url) {
         if (!url) return "";
         if (url.includes('drive.google.com')) {
@@ -292,6 +304,7 @@
         }
     }
 
+    // Inicializa la carga de capítulos en la cuadrícula
     cargarProyectoDesdeFirebase();
 
     window.abrirLector = async function(idCap) {
