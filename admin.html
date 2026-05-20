@@ -199,7 +199,7 @@
             </div>
             <div class="grupo-control">
                 <label>Número del Capítulo</label>
-                <input type="number" id="num-capitulo" placeholder="Ej: 12">
+                <input type="number" id="num-capitulo" step="any" placeholder="Ej: 12 o 14.5">
             </div>
             <div class="grupo-control">
                 <label>Enlaces de las Imágenes (Uno por línea - ¡Acepta links de Drive directos!)</label>
@@ -230,7 +230,8 @@
             </div>
             <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Actualizar Estado</button>
         </div>
-                <div id="opcion-nuevo" class="seccion-admin">
+
+        <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
             
             <h3 style="color: #ad1457; margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
@@ -273,8 +274,7 @@
         </div>
 
     </div>
-
-    <script>
+        <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -287,6 +287,25 @@
         const db = firebase.firestore();
 
         let listaProyectosGlobal = {};
+
+        // TRADUCTOR HÍBRIDO: Asegura los nombres largos de tus 10 historias base si Firebase no los tiene aún
+        function obtenerNombreBonito(id, nombreFirebase) {
+            if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
+            
+            switch(id) {
+                case "amigos": return "Los amigos no hacen esto";
+                case "confesion": return "Confesión";
+                case "embarazada": return "Finge estar embarazada pero mi esposo regresó";
+                case "guarderia": return "La guardería de la villana";
+                case "hermana": return "Mi hermana que era mi enemiga ahora me ama";
+                case "leopardo": return "La pequeña bebé leopardo de las nieves de la familia de panteras negras";
+                case "lobo": return "Soy un lobo pero no te lastimaré";
+                case "matrimonio": return "Matrimonio conveniencia a una obsesión";
+                case "princesa": return "No solo encante a la princesa";
+                case "salvada": return "Salvada por la pequeña dama sin poderes";
+                default: return id;
+            }
+        }
 
         // 🔥 FUNCIÓN DE BLINDAJE: Convierte automáticamente enlaces de visualización de Drive a enlaces directos reales
         function blindarEnlaceDrive(url) {
@@ -319,49 +338,34 @@
             evento.target.classList.add('activo');
         }
 
+        // Lee en automático de Firebase pero aplica el "nombre bonito" largo para tus 10 historias de siempre
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
             const selectEdi = document.getElementById("select-proyecto-editar");
-            
-            const misIds = ["amigos", "confesion", "embarazada", "guarderia", "hermana", "leopardo", "lobo", "matrimonio", "princesa", "salvada"];
             
             selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
             selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
             selectEdi.innerHTML = '<option value="">-- Selecciona una historia --</option>';
             listaProyectosGlobal = {}; 
             
-            misIds.forEach((id) => {
-                let nombreFinal = "";
-                
-                switch(id) {
-                    case "amigos": nombreFinal = "Los amigos no hacen esto"; break;
-                    case "confesion": nombreFinal = "Confesión"; break;
-                    case "embarazada": nombreFinal = "Finge estar embarazada pero mi esposo regresó"; break;
-                    case "guarderia": nombreFinal = "La guardería de la villana"; break;
-                    case "hermana": nombreFinal = "Mi hermana que era mi enemiga ahora me ama"; break;
-                    case "leopardo": nombreFinal = "La pequeña bebé leopardo de las nieves de la familia de panteras negras"; break;
-                    case "lobo": nombreFinal = "Soy un lobo pero no te lastimaré"; break;
-                    case "matrimonio": nombreFinal = "Matrimonio conveniencia a una obsesión"; break;
-                    case "princesa": nombreFinal = "No solo encante a la princesa"; break;
-                    case "salvada": nombreFinal = "Salvada por la pequeña dama sin poderes"; break;
-                    default: nombreFinal = id;
-                }
+            db.collection("estados_historias").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const id = doc.id;
+                    const datos = doc.data();
+                    const nombreFinal = obtenerNombreBonito(id, datos.nombre);
 
-                db.collection(id).doc("datos_proyecto").get().then((docSnapshot) => {
-                    if(docSnapshot.exists) {
-                        listaProyectosGlobal[id] = docSnapshot.data();
-                    } else {
-                        listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
-                    }
-                }).catch(() => {
-                    listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
+                    listaProyectosGlobal[id] = {
+                        nombre: nombreFinal,
+                        portadaUrl: datos.portadaUrl || "",
+                        sinopsis: datos.sinopsis || ""
+                    };
+                    
+                    let opc1 = document.createElement("option"); opc1.value = id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
+                    let opc2 = document.createElement("option"); opc2.value = id; opc2.text = nombreFinal; selectEst.appendChild(opc2);
+                    let opc3 = document.createElement("option"); opc3.value = id; opc3.text = nombreFinal; selectEdi.appendChild(opc3);
                 });
-                
-                let opc1 = document.createElement("option"); opc1.value = id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
-                let opc2 = document.createElement("option"); opc2.value = id; opc2.text = nombreFinal; selectEst.appendChild(opc2);
-                let opc3 = document.createElement("option"); opc3.value = id; opc3.text = nombreFinal; selectEdi.appendChild(opc3);
-            });
+            }).catch(error => console.log("Error al cargar proyectos de Firebase:", error));
         }
 
         function mostrarEstatusActual() {
@@ -393,12 +397,12 @@
             }
         }
 
+        // REGISTRO AGRUPADO AUTOMÁTICO DE NOTIFICACIONES PARA EL INDEX
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
             const textoEnlaces = document.getElementById("enlaces-imagenes").value;
             
-            // 🔥 BLINDAJE DE CAPÍTULOS: Procesa línea por línea y convierte enlaces de Drive automáticamente
             const arrayImagenes = textoEnlaces.split("\n")
                 .map(linea => blindarEnlaceDrive(linea))
                 .filter(linea => linea !== "");
@@ -410,7 +414,17 @@
                 imagenes: arrayImagenes
             })
             .then(() => {
-                alert(`¡Capítulo ${numCap} publicado con éxito con enlaces blindados!`);
+                const nombreProyecto = listaProyectosGlobal[idProyecto]?.nombre || idProyecto;
+                
+                // Guarda y agrupa el capítulo en la colección para las notificaciones del Index
+                return db.collection("notificaciones_index").doc(idProyecto).set({
+                    nombre: nombreProyecto,
+                    capitulos: firebase.firestore.FieldValue.arrayUnion(numCap),
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            })
+            .then(() => {
+                alert(`¡Capítulo ${numCap} publicado con éxito y notificación registrada en el Index!`);
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
             })
@@ -430,13 +444,13 @@
             .catch(error => alert("Error: " + error));
         }
 
+        // GUARDADO DOBLE: Asegura la persistencia de datos del nuevo proyecto en Firebase
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
             const portadaRaw = document.getElementById("nuevo-portada").value.trim();
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
 
-            // 🔥 Blindamos la portada del nuevo proyecto
             const portada = blindarEnlaceDrive(portadaRaw);
 
             if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
@@ -448,6 +462,9 @@
             }, { merge: true })
             .then(() => {
                 return db.collection("estados_historias").doc(id).set({
+                    nombre: titulo,
+                    portadaUrl: portada,
+                    sinopsis: sinopsis,
                     estado: "emision"
                 }, { merge: true });
             })
@@ -467,9 +484,8 @@
             const nuevaPortadaRaw = document.getElementById("editar-portada").value.trim();
             const nuevaSinopsis = document.getElementById("editar-sinopsis").value.trim();
 
-            if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
+            if(!id) { alert("Selecciona un proyecto para editar."); return; }
 
-            // 🔥 BLINDAJE DE PORTADA EDITADA: Se auto-convierte si viene de Drive
             const nuevaPortada = blindarEnlaceDrive(nuevaPortadaRaw);
 
             db.collection(id).doc("datos_proyecto").set({
@@ -477,15 +493,16 @@
                 sinopsis: nuevaSinopsis
             }, { merge: true })
             .then(() => {
-                alert("¡Proyecto editado con éxito! El link de la portada se ha blindado automáticamente.");
-                if(!listaProyectosGlobal[id]) listaProyectosGlobal[id] = {};
-                listaProyectosGlobal[id].portadaUrl = nuevaPortada;
-                listaProyectosGlobal[id].sinopsis = nuevaSinopsis;
-                
-                document.getElementById("editar-portada").value = "";
-                document.getElementById("editar-sinopsis").value = "";
+                return db.collection("estados_historias").doc(id).set({
+                    portadaUrl: nuevaPortada,
+                    sinopsis: nuevaSinopsis
+                }, { merge: true });
             })
-            .catch(error => alert("Error: " + error));
+            .then(() => {
+                alert("¡Cambios del proyecto guardados y portada blindada correctamente!");
+                cargarProyectosEnSelects();
+            })
+            .catch(error => alert("Error al editar proyecto: " + error));
         }
     </script>
 </body>
