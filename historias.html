@@ -197,44 +197,97 @@
     }
     const dbInstancia = firebase.firestore();
 
-    dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const idHistoria = doc.id; 
-            const datos = doc.data();
-            const nuevoEstado = datos.estado; 
-            const nuevaPortada = datos.portadaUrl;
+    // Traductor auxiliar para títulos si Firebase no envía un nombre explícito
+    function obtenerNombreBonito(id, nombreFirebase) {
+        if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
+        switch(id) {
+            case "amigos": return "Los amigos no hacen esto";
+            case "confesion": return "Confesión";
+            case "embarazada": return "Fingí estar embarazada pero mi marido regresó";
+            case "guarderia": return "La guardería de la villana";
+            case "hermana": return "Mi hermana que era mi enemiga ahora me ama";
+            case "leopardo": return "La pequeña leopardo de las nieves de la familia de panteras negras";
+            case "lobo": return "Soy un lobo pero no te lastimaré";
+            case "matrimonio": return "Matrimonio de conveniencia a una obsesión";
+            case "princesa": return "¡No, solo encanté a la princesa!";
+            case "salvada": return "Salvada por la pequeña dama sin poderes";
+            default: return id;
+        }
+    }
 
-            const imgElemento = document.getElementById("img-" + idHistoria);
-            if (imgElemento && nuevaPortada && nuevaPortada.trim() !== "") {
-                imgElemento.src = nuevaPortada;
-            }
+    document.addEventListener("DOMContentLoaded", () => {
+        // Carga el tema elegido previamente por el usuario al entrar a la página
+        const temaGlobal = localStorage.getItem('tema-rose') || 'dark';
+        cambiarTemaRose(temaGlobal);
 
-            const tarjeta = document.getElementById("card-" + idHistoria);
-            if (tarjeta && nuevoEstado) {
+        // Conecta con Firestore para reordenar o crear tarjetas dinámicas
+        dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const idHistoria = doc.id; 
+                const datos = doc.data();
+                const nuevoEstado = datos.estado; // emision, hiatus, finalizado
+                const nuevaPortada = datos.portadaUrl || (idHistoria + ".jpg");
+                const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
+
                 let destinoGrid = document.getElementById("grid-" + nuevoEstado);
-                if (destinoGrid) {
-                    destinoGrid.appendChild(tarjeta);
-                    const tag = tarjeta.querySelector(".estado-tag");
-                    if (tag) {
-                        tag.className = "estado-tag"; 
-                        if (nuevoEstado === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
-                        else if (nuevoEstado === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
-                        else if (nuevoEstado === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
-                    }
-                }
-            }
-        });
-    }).catch((error) => console.log("Error al actualizar catálogo:", error));
+                if (!destinoGrid) return; // Si el estado está mal escrito en la DB, lo ignora
 
+                let tarjeta = document.getElementById("card-" + idHistoria);
+
+                if (tarjeta) {
+                    // SI YA EXISTE LA TARJETA EN TU HTML: La actualizamos y movemos de sección
+                    const imgElemento = document.getElementById("img-" + idHistoria);
+                    if (imgElemento && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                        imgElemento.src = datos.portadaUrl;
+                    }
+                    destinoGrid.appendChild(tarjeta);
+                } else {
+                    // SI ES UNA HISTORIA NUEVA CREADA EN FIREBASE: ¡El script la fabrica por ti!
+                    tarjeta = document.createElement("a");
+                    tarjeta.href = idHistoria + ".html";
+                    tarjeta.className = "card";
+                    tarjeta.id = "card-" + idHistoria;
+                    
+                    tarjeta.innerHTML = `
+                        <span class="estado-tag"></span>
+                        <img src="${nuevaPortada}" class="portada" id="img-${idHistoria}">
+                        <div class="info">${nombreProyecto}</div>
+                    `;
+                    destinoGrid.appendChild(tarjeta);
+                }
+
+                // Ajusta los cartelitos dinámicos según el estado definitivo
+                const tag = tarjeta.querySelector(".estado-tag");
+                if (tag) {
+                    tag.className = "estado-tag"; 
+                    if (nuevoEstado === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
+                    else if (nuevoEstado === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
+                    else if (nuevoEstado === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
+                }
+            });
+        }).catch((error) => console.log("Error al actualizar catálogo desde Firebase:", error));
+    });
+
+    // Mantiene el selector de temas y además lo memoriza para las demás ventanas
     function cambiarTemaRose(modo) {
         const root = document.documentElement;
+        localStorage.setItem('tema-rose', modo); // Guarda tu elección
+
         if (modo === 'dark') {
             document.body.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
-            document.body.style.setProperty('--texto-rose', '#ffffff'); root.style.setProperty('--panel-rose', '#161616'); root.style.setProperty('--borde-tarjeta', 'rgba(255, 102, 178, 0.2)');
+            document.body.style.setProperty('--texto-rose', '#ffffff'); 
+            root.style.setProperty('--panel-rose', '#161616'); 
+            root.style.setProperty('--borde-tarjeta', 'rgba(255, 102, 178, 0.2)');
         } else if (modo === 'gris') {
-            document.body.style.setProperty('--fondo-rose', '#242426'); document.body.style.setProperty('--texto-rose', '#f5f5f5'); root.style.setProperty('--panel-rose', '#1c1c1e'); root.style.setProperty('--borde-tarjeta', 'rgba(255, 255, 255, 0.1)');
+            document.body.style.setProperty('--fondo-rose', '#242426'); 
+            document.body.style.setProperty('--texto-rose', '#f5f5f5'); 
+            root.style.setProperty('--panel-rose', '#1c1c1e'); 
+            root.style.setProperty('--borde-tarjeta', 'rgba(255, 255, 255, 0.1)');
         } else if (modo === 'malva') {
-            document.body.style.setProperty('--fondo-rose', '#dfd3e3'); document.body.style.setProperty('--texto-rose', '#351f38'); root.style.setProperty('--panel-rose', '#f3ebf5'); root.style.setProperty('--borde-tarjeta', '#bcabbf');
+            document.body.style.setProperty('--fondo-rose', '#dfd3e3'); 
+            document.body.style.setProperty('--texto-rose', '#351f38'); 
+            root.style.setProperty('--panel-rose', '#f3ebf5'); 
+            root.style.setProperty('--borde-tarjeta', '#bcabbf');
         }
     }
 </script>
