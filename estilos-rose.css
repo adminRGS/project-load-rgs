@@ -1,31 +1,16 @@
 /* --- VARIABLES DE COLOR (CEREBRO DEL DISEÑO) --- */
 :root {
-    /* Modo Oscuro (El que ya tienes) */
-    --fondo-rose: #050505;
+    /* Valores iniciales por defecto (Modo Oscuro) */
+    --fondo-rose: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%);
     --texto-rose: #ffffff;
     --acentos-rose: #ff66b2; /* Tu rosa característico */
-    --panel-rose: rgba(0, 0, 0, 0.9);
-}
-
-/* Cuando el lector elija Modo Gris */
-.tema-gris {
-    --fondo-rose: #2c2c2c;
-    --texto-rose: #e0e0e0;
-    --acentos-rose: #ff85c2;
-    --panel-rose: rgba(45, 45, 45, 0.95);
-}
-
-/* Cuando el lector elija Modo Sepia */
-.tema-sepia {
-    --fondo-rose: #f4ecd8;
-    --texto-rose: #5f4b32;
-    --acentos-rose: #d4a373;
-    --panel-rose: rgba(244, 236, 216, 0.95);
+    --panel-rose: #161616;
+    --borde-tarjeta: rgba(255, 102, 178, 0.2);
 }
 
 /* --- APLICACIÓN AUTOMÁTICA --- */
 body {
-    background-color: var(--fondo-rose);
+    background: var(--fondo-rose);
     color: var(--texto-rose);
     transition: background 0.3s ease, color 0.3s ease;
     margin: 0;
@@ -51,7 +36,8 @@ body {
     border-radius: 50%;
     border: none;
     cursor: pointer;
-  }
+}
+
 /* --- MENÚ DESPLEGABLE DE COLORES --- */
 .menu-colores-flotante {
     position: relative;
@@ -66,7 +52,7 @@ body {
     bottom: 55px; /* Aparece arriba del botón */
     left: 50%;
     transform: translateX(-50%);
-    background: var(--panel-rose, rgba(15, 15, 15, 0.98));
+    background: var(--panel-rose, #161616);
     border: 1px solid #ff66b2;
     padding: 10px;
     border-radius: 25px;
