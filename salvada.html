@@ -182,7 +182,7 @@
 
         <h1 id="titulo-proyecto" class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
         
-        <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despreciada por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
+        <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despised por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
 
         <div class="seccion-titulo">Capítulos Disponibles</div>
         
@@ -191,10 +191,15 @@
 
     <div id="lector">
         <div class="nav-lector">
-            <div class="dots-container">
-                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
-                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
-                <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
+            
+            <div style="position: relative; display: flex; align-items: center; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px;">
+                <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">🎨</button>
+                
+                <div id="sub-menu-colores-lector" class="sub-menu-colores">
+                    <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
+                    <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
+                    <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
+                </div>
             </div>
 
             <div class="grupo-flechas">
@@ -304,7 +309,6 @@
         }
     }
 
-    // Inicializa la carga de capítulos en la cuadrícula
     cargarProyectoDesdeFirebase();
 
     window.abrirLector = async function(idCap) {
@@ -357,9 +361,18 @@
     }
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
+
+    window.toggleMenuLector = (e) => {
+        e.stopPropagation();
+        document.getElementById('sub-menu-colores-lector').classList.toggle('visible-rose');
+    }
+
     document.addEventListener('click', () => {
         const menu = document.getElementById('stats-menu');
         if(menu) menu.classList.remove('active');
+        
+        const menuLector = document.getElementById('sub-menu-colores-lector');
+        if(menuLector) menuLector.classList.remove('visible-rose');
     });
 </script>
 </body>
