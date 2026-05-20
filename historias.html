@@ -216,10 +216,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Carga el tema elegido previamente por el usuario al entrar a la página
-        const temaGlobal = localStorage.getItem('tema-rose') || 'dark';
-        cambiarTemaRose(temaGlobal);
-
         // Conecta con Firestore para reordenar o crear tarjetas dinámicas
         dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
@@ -267,29 +263,6 @@
             });
         }).catch((error) => console.log("Error al actualizar catálogo desde Firebase:", error));
     });
-
-    // Mantiene el selector de temas y además lo memoriza para las demás ventanas
-    function cambiarTemaRose(modo) {
-        const root = document.documentElement;
-        localStorage.setItem('tema-rose', modo); // Guarda tu elección
-
-        if (modo === 'dark') {
-            document.body.style.setProperty('--fondo-rose', 'radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)');
-            document.body.style.setProperty('--texto-rose', '#ffffff'); 
-            root.style.setProperty('--panel-rose', '#161616'); 
-            root.style.setProperty('--borde-tarjeta', 'rgba(255, 102, 178, 0.2)');
-        } else if (modo === 'gris') {
-            document.body.style.setProperty('--fondo-rose', '#242426'); 
-            document.body.style.setProperty('--texto-rose', '#f5f5f5'); 
-            root.style.setProperty('--panel-rose', '#1c1c1e'); 
-            root.style.setProperty('--borde-tarjeta', 'rgba(255, 255, 255, 0.1)');
-        } else if (modo === 'malva') {
-            document.body.style.setProperty('--fondo-rose', '#dfd3e3'); 
-            document.body.style.setProperty('--texto-rose', '#351f38'); 
-            root.style.setProperty('--panel-rose', '#f3ebf5'); 
-            root.style.setProperty('--borde-tarjeta', '#bcabbf');
-        }
-    }
 </script>
 </body>
 </html>
