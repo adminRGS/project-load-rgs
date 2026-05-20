@@ -254,7 +254,6 @@
             <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo Proyecto</button>
 
             <div class="divisor"></div>
-
             <h3 style="color: #ad1457; margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
             <div class="grupo-control">
                 <label>Seleccionar Proyecto a Editar</label>
@@ -338,7 +337,6 @@
             evento.target.classList.add('activo');
         }
 
-        // Lee en automático de Firebase pero aplica el "nombre bonito" largo para tus 10 historias de siempre
         function cargarProyectosEnSelects() {
             const selectCap = document.getElementById("select-proyecto-capitulo");
             const selectEst = document.getElementById("select-proyecto-estatus");
@@ -397,7 +395,7 @@
             }
         }
 
-        // REGISTRO AGRUPADO AUTOMÁTICO DE NOTIFICACIONES PARA EL INDEX
+        // 🛠️ FUNCIÓN CORREGIDA DE RAÍZ: Ahora guarda directo como 'capitulo_X' en la carpeta de la historia
         function subirCapitulo() {
             const idProyecto = document.getElementById("select-proyecto-capitulo").value;
             const numCap = document.getElementById("num-capitulo").value;
@@ -410,7 +408,8 @@
             if(!idProyecto) { alert("Por favor, selecciona un proyecto."); return; }
             if(!numCap || arrayImagenes.length === 0) { alert("Completa el número de capítulo y agrega imágenes."); return; }
 
-            db.collection(idProyecto).doc("capitulos").collection("lista").doc("cap-" + numCap).set({
+            // CORRECCIÓN AQUÍ: Se eliminó el laberinto .doc("capitulos").collection("lista").doc("cap-")
+            db.collection(idProyecto).doc("capitulo_" + numCap).set({
                 imagenes: arrayImagenes
             })
             .then(() => {
@@ -424,7 +423,7 @@
                 }, { merge: true });
             })
             .then(() => {
-                alert(`¡Capítulo ${numCap} publicado con éxito y notificación registrada en el Index!`);
+                alert(`¡Capítulo ${numCap} publicado con éxito directo en la raíz y registrado en el Index!`);
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
             })
@@ -444,7 +443,6 @@
             .catch(error => alert("Error: " + error));
         }
 
-        // GUARDADO DOBLE: Asegura la persistencia de datos del nuevo proyecto en Firebase
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
