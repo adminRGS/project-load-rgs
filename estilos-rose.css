@@ -72,3 +72,33 @@ body {
     from { opacity: 0; transform: translate(-50%, 10px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+/* ==========================================
+   BARRA DEL LECTOR Y PALETA DE COLORES GLOBAL
+   ========================================== */
+.sub-menu-colores {
+    display: none;             /* Oculto por defecto */
+    position: absolute;
+    bottom: 50px;              /* Aparece arriba de la paleta */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 15, 15, 0.98); 
+    border: 1.5px solid #ff66b2;
+    padding: 10px;
+    border-radius: 25px;
+    flex-direction: column;    /* En fila hacia arriba */
+    gap: 10px;
+    z-index: 105;
+    box-shadow: 0 0 20px rgba(255, 102, 178, 0.5);
+}
+
+/* Clase que activa JavaScript para mostrarlo */
+.sub-menu-colores.visible-rose {
+    display: flex;
+    animation: emergerMenu 0.2s ease-out;
+}
+
+@keyframes emergerMenu {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
