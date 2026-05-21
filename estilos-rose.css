@@ -1,14 +1,13 @@
-/* --- VARIABLES DE COLOR (CEREBRO DEL DISEÑO) --- */
+/* --- VARIABLES GLOBALES --- */
 :root {
-    /* Valores iniciales por defecto (Modo Oscuro) */
     --fondo-rose: radial-gradient(circle at center, #1a0a1a 0%, #050505 100%);
     --texto-rose: #ffffff;
-    --acentos-rose: #ff66b2; /* Tu rosa característico */
+    --acentos-rose: #ff66b2;
     --panel-rose: #161616;
     --borde-tarjeta: rgba(255, 102, 178, 0.2);
 }
 
-/* --- APLICACIÓN AUTOMÁTICA --- */
+/* Aplicación de colores base al body */
 body {
     background: var(--fondo-rose);
     color: var(--texto-rose);
@@ -17,82 +16,42 @@ body {
     font-family: sans-serif;
 }
 
-/* --- ESTILO DE LA BARRA DE PROGRESO --- */
-#barra-progreso-rose {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 0%; /* Empezará en cero */
-    height: 5px;
-    background: linear-gradient(90deg, var(--acentos-rose), #ffd700);
-    z-index: 9999;
-    box-shadow: 0 0 10px var(--acentos-rose);
+/* --- CLASES DE TEMAS (JS cambia el body a estas clases) --- */
+body.tema-gris {
+    --fondo-rose: #2c2c2c;
+    --panel-rose: #1a1a1a;
+}
+body.tema-malva {
+    --fondo-rose: #dfd3e3;
+    --texto-rose: #2d1b36;
+    --panel-rose: #c4b5ce;
+    --acentos-rose: #9b72aa;
 }
 
-/* --- ESTILO DEL BOTÓN DE CIERRE O REACCIONES (OPCIONAL) --- */
-.btn-rose-flotante {
-    background-color: var(--acentos-rose);
-    color: white;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
+/* --- BARRA DE PROGRESO --- */
+#barra-progreso-rose {
+    position: fixed; top: 0; left: 0; width: 0%; height: 5px;
+    background: linear-gradient(90deg, var(--acentos-rose), #ffd700);
+    z-index: 9999;
 }
 
 /* --- MENÚ DESPLEGABLE DE COLORES --- */
-.menu-colores-flotante {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .sub-menu-colores {
     display: none;
     position: absolute;
-    bottom: 55px; /* Aparece arriba del botón */
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--panel-rose, #161616);
-    border: 1px solid #ff66b2;
+    background: var(--panel-rose);
+    border: 1.5px solid var(--acentos-rose);
     padding: 10px;
     border-radius: 25px;
-    flex-direction: column; /* Círculos en vertical */
-    gap: 10px;
-    z-index: 120;
-    box-shadow: 0 0 20px rgba(255, 102, 178, 0.5);
-}
-
-/* Animación de aparición */
-.sub-menu-colores.visible-rose {
-    display: flex;
-    animation: aparecerArriba 0.3s ease-out;
-}
-
-@keyframes aparecerArriba {
-    from { opacity: 0; transform: translate(-50%, 10px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-/* ==========================================
-   BARRA DEL LECTOR Y PALETA DE COLORES GLOBAL
-   ========================================== */
-.sub-menu-colores {
-    display: none;             /* Oculto por defecto */
-    position: absolute;
-    bottom: 50px;              /* Aparece arriba de la paleta */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 15, 15, 0.98); 
-    border: 1.5px solid #ff66b2;
-    padding: 10px;
-    border-radius: 25px;
-    flex-direction: column;    /* En fila hacia arriba */
+    flex-direction: column;
     gap: 10px;
     z-index: 105;
     box-shadow: 0 0 20px rgba(255, 102, 178, 0.5);
 }
 
-/* Clase que activa JavaScript para mostrarlo */
 .sub-menu-colores.visible-rose {
     display: flex;
     animation: emergerMenu 0.2s ease-out;
@@ -102,3 +61,5 @@ body {
     from { opacity: 0; transform: translate(-50%, 10px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+.dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 1px solid white; }
