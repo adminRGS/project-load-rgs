@@ -147,15 +147,11 @@
             {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
         ];
 
-        // --- FUNCIÓN CORREGIDA PARA LIMPIAR LINKS ---
+        // --- FUNCIÓN CORREGIDA ---
+        // Ahora devuelve el link tal cual lo recibe, sin modificar el ID para que coincida 
+        // con el formato que ya funciona en tus capítulos anteriores.
         function limpiarLink(url) {
-            if (!url || typeof url !== 'string') return "";
-            if (url.includes('firebasestorage.googleapis.com')) return url;
-            if (url.includes('drive.google.com')) {
-                let id = url.match(/\/d\/([^/]+)/) ? url.match(/\/d\/([^/]+)/)[1] : (url.match(/[?&]id=([^&]+)/) ? url.match(/[?&]id=([^&]+)/)[1] : null);
-                return id ? `https://docs.google.com/uc?export=view&id=${id}` : url;
-            }
-            return url;
+            return url ? url.trim() : "";
         }
 
         function verificarClave() {
@@ -206,7 +202,6 @@
             });
         }
 
-        // --- FUNCIÓN SUBIR CAPÍTULO CORREGIDA ---
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value.trim();
@@ -214,9 +209,8 @@
 
             const texto = document.getElementById("enlaces-imagenes").value;
             const imgs = texto.split('\n')
-                              .map(l => l.trim())
-                              .filter(l => l.length > 0)
-                              .map(l => limpiarLink(l));
+                              .map(l => limpiarLink(l))
+                              .filter(l => l.length > 0);
 
             if(imgs.length === 0) { alert("Agrega al menos un enlace válido."); return; }
             
@@ -238,7 +232,7 @@
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
-            const portada = limpiarLink(document.getElementById("nuevo-portada").value.trim());
+            const portada = document.getElementById("nuevo-portada").value.trim();
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
 
             if(!id || !titulo) { alert("Faltan campos obligatorios."); return; }
@@ -253,7 +247,7 @@
             const id = document.getElementById("select-proyecto-editar").value;
             if(!id) return;
 
-            const portada = limpiarLink(document.getElementById("editar-portada").value.trim());
+            const portada = document.getElementById("editar-portada").value.trim();
             const sinopsis = document.getElementById("editar-sinopsis").value.trim();
 
             db.collection(id).doc("informacion_proyecto").set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
