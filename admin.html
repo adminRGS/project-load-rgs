@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <title>Panel Admin - Rose Garden</title>
     <style>
-        body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px; }
-        #login-screen, #admin-panel { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1; width: 90%; max-width: 450px; }
+        body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+        #login-screen, #admin-panel { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.2); border: 2px solid #f48fb1; }
         #admin-panel { display: none; }
-        h1 { color: #d81b60; font-size: 1.5rem; margin-bottom: 20px; }
-        .menu-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #fce4ec; border: none; border-radius: 8px; cursor: pointer; color: #d81b60; font-weight: bold; }
+        h1 { color: #d81b60; text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
+        .menu-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 15px; background: #fce4ec; border: none; border-radius: 10px; cursor: pointer; color: #d81b60; font-weight: bold; font-size: 1rem; }
         .tab-btn.active { background: #f48fb1; color: white; }
         .section { display: none; }
         .section.active { display: block; }
-        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; text-align: left; }
-        select, input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; margin-top: 20px; background: #ec407a; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+        label { display: block; margin-top: 20px; color: #d81b60; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 15px; margin-top: 8px; border-radius: 10px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; font-size: 1rem; }
+        button { width: 100%; padding: 18px; margin-top: 25px; background: #ec407a; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <h2>Panel de Control</h2>
+    <h1>Acceso</h1>
     <input type="password" id="passInput" placeholder="Contraseña...">
     <button onclick="verificarClave()">Entrar</button>
 </div>
@@ -35,26 +35,16 @@
     </div>
 
     <div id="cargar" class="section active">
-        <select id="historiaID">
-            <option value="guarderia">La guardería de la villana</option>
-            <option value="confesion">Confesión</option>
-            <option value="embarazada">Fingí estar embarazada...</option>
-            <option value="salvada">Salvada por la pequeña dama...</option>
-            <option value="leopardo">La pequeña leopardo de las nieves...</option>
-            <option value="lobo">Soy un lobo pero no te lastimaré</option>
-            <option value="princesa">No solo encanté a la princesa</option>
-            <option value="matrimonio">Matrimonio de conveniencia...</option>
-            <option value="amigos">Los amigos no hacen esto</option>
-            <option value="hermana">Mi hermana ahora me ama</option>
-        </select>
+        <label>Historia</label>
+        <select id="historiaID" class="listaHistorias"></select>
         <input type="number" id="capNum" step="any" placeholder="Capítulo (Ej: 65 o 14.5)">
-        <textarea id="linksRaw" placeholder="Pega links aquí..."></textarea>
+        <textarea id="linksRaw" rows="5" placeholder="Pega links aquí..."></textarea>
         <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
     </div>
 
     <div id="estatus" class="section">
-        <label>Seleccionar Historia</label>
-        <select id="estatusID"></select>
+        <label>Historia</label>
+        <select id="estatusID" class="listaHistorias"></select>
         <select id="nuevoEstatus">
             <option value="emision">En Emisión</option>
             <option value="hiatus">En Hiatus</option>
@@ -64,18 +54,40 @@
     </div>
 
     <div id="info" class="section">
-        <label>Seleccionar Historia</label>
-        <select id="infoID"></select>
+        <label>Historia</label>
+        <select id="infoID" class="listaHistorias"></select>
         <input type="text" id="portadaURL" placeholder="Link de Portada">
-        <textarea id="sinopsis" placeholder="Sinopsis"></textarea>
-        <button onclick="updateInfo()">Guardar Cambios</button>
+        <textarea id="sinopsis" rows="5" placeholder="Sinopsis"></textarea>
+        <button onclick="updateInfo()">Guardar Info</button>
     </div>
-    <p id="status" style="margin-top:20px; font-weight: bold; text-align: center;"></p>
+    <p id="status" style="text-align:center; margin-top:20px; font-weight: bold;"></p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const historias = [
+        {id: "guarderia", nombre: "La guardería de la villana"},
+        {id: "confesion", nombre: "Confesión"},
+        {id: "embarazada", nombre: "Fingí estar embarazada..."},
+        {id: "salvada", nombre: "Salvada por la pequeña dama..."},
+        {id: "leopardo", nombre: "La pequeña leopardo de las nieves..."},
+        {id: "lobo", nombre: "Soy un lobo pero no te lastimaré"},
+        {id: "princesa", nombre: "No solo encanté a la princesa"},
+        {id: "matrimonio", nombre: "Matrimonio de conveniencia..."},
+        {id: "amigos", nombre: "Los amigos no hacen esto"},
+        {id: "hermana", nombre: "Mi hermana era mi enemiga y ahora me ama"}
+    ];
+
+    // Llenar todos los selects de historias
+    document.querySelectorAll('.listaHistorias').forEach(sel => {
+        historias.forEach(h => {
+            let opt = document.createElement('option');
+            opt.value = h.id; opt.innerText = h.nombre;
+            sel.appendChild(opt);
+        });
+    });
 
     const db = getFirestore(initializeApp({
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -93,16 +105,16 @@
     window.guardarCapitulo = async () => {
         const id = document.getElementById('historiaID').value;
         const num = document.getElementById('capNum').value;
-        const rawText = document.getElementById('linksRaw').value;
+        const raw = document.getElementById('linksRaw').value;
         
-        let linksLimpios = rawText.split('\n').filter(l => l.trim()).map(l => {
-            const idMatch = l.match(/[-\w]{25,}/);
-            return idMatch ? `https://lh3.googleusercontent.com/d/${idMatch[0]}=s1600` : null;
+        let links = raw.split('\n').filter(l => l.trim()).map(l => {
+            const idM = l.match(/[-\w]{25,}/);
+            return idM ? `https://lh3.googleusercontent.com/d/${idM[0]}=s1600` : null;
         }).filter(l => l);
 
         try {
-            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: linksLimpios });
-            alert("✅ ¡Capítulo guardado exitosamente!");
+            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: links });
+            alert("✅ ¡Guardado!");
             document.getElementById('capNum').value = "";
             document.getElementById('linksRaw').value = "";
         } catch (e) { alert("Error: " + e.message); }
@@ -114,9 +126,6 @@
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
     }
-
-    window.updateEstado = async () => alert("Estado actualizado");
-    window.updateInfo = async () => alert("Información guardada");
 </script>
 </body>
 </html>
