@@ -2,142 +2,104 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Admin - Rose Garden</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rose Garden - Admin Panel</title>
     <style>
-        body { font-family: sans-serif; background: #ffeef4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #login-screen, #admin-panel { background: white; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1; width: 320px; text-align: center; box-shadow: 0 5px 15px rgba(216, 27, 96, 0.15); }
+        body { font-family: 'Segoe UI', sans-serif; background: #fce4ec; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding-top: 20px; }
+        #login-screen, #admin-panel { background: white; padding: 25px; border-radius: 20px; border: 2px solid #ec407a; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         #admin-panel { display: none; }
-        h1 { color: #d81b60; font-size: 1.3rem; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #fce4ec; border: none; border-radius: 8px; font-weight: bold; color: #d81b60; cursor: pointer; }
-        .tab-btn.active { background: #f48fb1; color: white; }
-        .section { display: none; }
+        h1 { color: #880e4f; font-size: 1.4rem; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: #f8bbd0; color: #880e4f; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { background: #ec407a; color: white; }
+        .section { display: none; text-align: left; }
         .section.active { display: block; }
-        label { display: block; margin-top: 15px; font-size: 0.75rem; font-weight: bold; color: #d81b60; text-transform: uppercase; text-align: left; }
-        select, input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #fbc4b6; border-radius: 8px; background: #fff5f8; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 20px; background: #ec407a; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        label { display: block; font-size: 0.75rem; font-weight: bold; color: #880e4f; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 6px; box-sizing: border-box; background: #fff5f8; }
+        button { width: 100%; padding: 12px; margin-top: 20px; background: #d81b60; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <h1>🌸 Rose Garden 🌸</h1>
-    <input type="password" id="passInput" placeholder="Contraseña...">
+    <input type="password" id="passInput" placeholder="Contraseña">
     <button onclick="verificarClave()">Entrar</button>
 </div>
 
 <div id="admin-panel">
     <h1>🌸 Panel Administrativo 🌸</h1>
     <div class="tabs">
-        <button class="tab-btn active" onclick="showSection('cargar', this)">Cargar</button>
-        <button class="tab-btn" onclick="showSection('estatus', this)">Estatus</button>
-        <button class="tab-btn" onclick="showSection('info', this)">Info</button>
+        <button class="tab-btn active" onclick="mostrarSeccion('cargar', this)">Cargar</button>
+        <button class="tab-btn" onclick="mostrarSeccion('estatus', this)">Estatus</button>
+        <button class="tab-btn" onclick="mostrarSeccion('info', this)">Info</button>
     </div>
 
     <div id="cargar" class="section active">
         <label>Historia</label>
         <select id="historiaID" class="lista"></select>
         <label>Capítulo</label>
-        <input type="number" id="capNum" step="any">
-        <label>Links Imágenes</label>
-        <textarea id="linksRaw" rows="4"></textarea>
-        <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
+        <input type="number" id="capNum" step="any" placeholder="Ej: 14.5">
+        <label>Links Imágenes (lh3)</label>
+        <textarea id="linksRaw" rows="5"></textarea>
+        <button onclick="guardarCapitulo()">Guardar Capítulo</button>
     </div>
 
     <div id="estatus" class="section">
         <label>Historia</label>
-        <select id="estatusID" class="lista"></select>
-        <label>Nuevo Estatus</label>
+        <select id="estatusID" class="lista" onchange="cargarEstatus()"></select>
+        <label>Estado Actual</label>
+        <input type="text" id="statusActual" readonly>
+        <label>Nuevo Estado</label>
         <select id="nuevoEstatus">
-            <option value="Emisión">En Emisión</option>
-            <option value="Hiatus">En Hiatus</option>
-            <option value="Finalizado">Finalizado</option>
+            <option>En Emisión</option><option>Hiatus</option><option>Finalizado</option>
         </select>
-        <button onclick="updateEstado()">Actualizar Estatus</button>
+        <button onclick="actualizarEstatus()">Actualizar Estado</button>
     </div>
 
     <div id="info" class="section">
-        <label>Historia</label>
-        <select id="infoID" class="lista"></select>
-        <label>Portada URL</label>
-        <input type="text" id="portadaURL">
-        <label>Sinopsis</label>
-        <textarea id="sinopsis" rows="4"></textarea>
-        <button onclick="updateInfo()">Guardar Cambios</button>
+        <label>-- MODIFICAR --</label>
+        <select id="infoID" class="lista" onchange="cargarInfo()"></select>
+        <input type="text" id="portadaURL" placeholder="Link Portada (lh3)">
+        <textarea id="sinopsis" rows="3" placeholder="Sinopsis"></textarea>
+        <button onclick="actualizarInfo()">Guardar Cambios</button>
+        <hr>
+        <label>-- CREAR NUEVO --</label>
+        <input type="text" id="newID" placeholder="ID Corto">
+        <input type="text" id="newName" placeholder="Nombre Largo">
+        <input type="text" id="newPortada" placeholder="Portada (lh3)">
+        <textarea id="newSinopsis" rows="2" placeholder="Sinopsis"></textarea>
+        <button onclick="crearProyecto()">Crear Proyecto</button>
     </div>
-    <p id="status" style="margin-top:15px; font-weight:bold;"></p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const db = getFirestore(initializeApp({
-        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-        projectId: "prgs-f2ef8",
-        storageBucket: "prgs-f2ef8.firebasestorage.app"
-    }));
-
+    const db = getFirestore(initializeApp({apiKey:"AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",projectId:"prgs-f2ef8",storageBucket:"prgs-f2ef8.firebasestorage.app"}));
+    
     const historias = [
-        {id: "guarderia", nombre: "La guardería de la villana"},
-        {id: "confesion", nombre: "Confesión de amor"},
-        {id: "embarazada", nombre: "Fingí estar embarazada..."},
-        {id: "salvada", nombre: "Salvada por la pequeña dama..."},
-        {id: "leopardo", nombre: "La pequeña leopardo de las nieves..."},
-        {id: "lobo", nombre: "Soy un lobo pero no te lastimaré"},
-        {id: "princesa", nombre: "No solo encanté a la princesa"},
-        {id: "matrimonio", nombre: "Matrimonio de conveniencia..."},
-        {id: "amigos", nombre: "Los amigos no hacen esto"},
-        {id: "hermana", nombre: "Mi hermana era mi enemiga y ahora me ama"}
+        {id:"guarderia", nombre:"La guardería de la villana"}, {id:"confesion", nombre:"Confesión"},
+        {id:"embarazada", nombre:"Fingí estar embarazada..."}, {id:"salvada", nombre:"Salvada por la pequeña dama..."},
+        {id:"leopardo", nombre:"La pequeña leopardo de las nieves..."}, {id:"lobo", nombre:"Soy un lobo pero no te lastimaré"},
+        {id:"princesa", nombre:"No solo encanté a la princesa"}, {id:"matrimonio", nombre:"Matrimonio de conveniencia..."},
+        {id:"amigos", nombre:"Los amigos no hacen esto"}, {id:"hermana", nombre:"Mi hermana era mi enemiga ahora me ama"}
     ];
 
-    document.querySelectorAll('.lista').forEach(s => historias.forEach(h => {
-        let o = document.createElement('option');
-        o.value = h.id; o.innerText = h.nombre; s.appendChild(o);
-    }));
+    document.querySelectorAll('.lista').forEach(s => historias.forEach(h => { let o = document.createElement('option'); o.value=h.id; o.innerText=h.nombre; s.appendChild(o); }));
 
-    window.verificarClave = () => {
-        if(document.getElementById('passInput').value === "Rose2026") {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'block';
-        } else alert("Contraseña incorrecta.");
-    }
+    const convertLh3 = (l) => { const m = l.match(/[-\w]{25,}/); return m ? `https://lh3.googleusercontent.com/d/$${m[0]}` : l; };
 
-    window.guardarCapitulo = async () => {
-        const id = document.getElementById('historiaID').value;
-        const num = document.getElementById('capNum').value;
-        const raw = document.getElementById('linksRaw').value;
-        let links = raw.split('\n').filter(l => l.trim()).map(l => {
-            const m = l.match(/[-\w]{25,}/);
-            return m ? `https://lh3.googleusercontent.com/d/${m[0]}=s1600` : null;
-        }).filter(l => l);
-        await setDoc(doc(db, id, "capitulo_" + num), { imagenes: links });
-        alert("¡Guardado!");
-        document.getElementById('capNum').value = "";
-        document.getElementById('linksRaw').value = "";
-    }
-
-    window.updateEstado = async () => {
-        const id = document.getElementById('estatusID').value;
-        await updateDoc(doc(db, "estados_historias", id), { estado: document.getElementById('nuevoEstatus').value });
-        alert("Estatus actualizado");
-    }
-
-    window.updateInfo = async () => {
-        const id = document.getElementById('infoID').value;
-        await updateDoc(doc(db, "estados_historias", id), { 
-            sinopsis: document.getElementById('sinopsis').value,
-            portadaUrl: document.getElementById('portadaURL').value 
-        });
-        alert("Info guardada");
-    }
-
-    window.showSection = (id, btn) => {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-    }
+    window.verificarClave = () => { if(document.getElementById('passInput').value === "Rose2026") { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-panel').style.display='block'; } else alert("Clave incorrecta"); }
+    window.mostrarSeccion = (id, btn) => { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); };
+    
+    window.guardarCapitulo = async () => { const id = document.getElementById('historiaID').value; const num = document.getElementById('capNum').value; const links = document.getElementById('linksRaw').value.split('\n').filter(l=>l.trim()).map(convertLh3); await setDoc(doc(db, id, "capitulo_"+num), {imagenes: links}); document.getElementById('capNum').value=''; document.getElementById('linksRaw').value=''; alert("Guardado"); };
+    window.cargarEstatus = async () => { const s = await getDoc(doc(db, "estados_historias", document.getElementById('estatusID').value)); if(s.exists()) document.getElementById('statusActual').value = s.data().estado || ""; };
+    window.actualizarEstatus = async () => { await updateDoc(doc(db, "estados_historias", document.getElementById('estatusID').value), {estado: document.getElementById('nuevoEstatus').value}); alert("Actualizado"); };
+    window.cargarInfo = async () => { const s = await getDoc(doc(db, "estados_historias", document.getElementById('infoID').value)); if(s.exists()) { document.getElementById('portadaURL').value = s.data().portadaUrl || ""; document.getElementById('sinopsis').value = s.data().sinopsis || ""; } };
+    window.actualizarInfo = async () => { await updateDoc(doc(db, "estados_historias", document.getElementById('infoID').value), {sinopsis: document.getElementById('sinopsis').value, portadaUrl: convertLh3(document.getElementById('portadaURL').value)}); alert("Actualizado"); };
+    window.crearProyecto = async () => { await setDoc(doc(db, "estados_historias", document.getElementById('newID').value), {nombre: document.getElementById('newName').value, sinopsis: document.getElementById('newSinopsis').value, portadaUrl: convertLh3(document.getElementById('newPortada').value)}); alert("Proyecto Creado"); };
 </script>
 </body>
 </html>
