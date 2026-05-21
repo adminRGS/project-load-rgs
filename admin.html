@@ -5,30 +5,30 @@
     <title>Panel Admin - Rose Garden</title>
     <style>
         body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-        #login-screen, #admin-panel { width: 100%; max-width: 480px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.1); border: 2px solid #f48fb1; }
+        #login-screen, #admin-panel { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; border: 2px solid #f48fb1; box-shadow: 0 5px 15px rgba(216, 27, 96, 0.1); }
         #admin-panel { display: none; }
-        h1 { color: #d81b60; text-align: center; font-size: 1.4rem; margin-bottom: 20px; }
-        .menu-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; background: #fce4ec; border: none; border-radius: 8px; cursor: pointer; color: #d81b60; font-weight: bold; }
+        h1 { color: #d81b60; font-size: 1.2rem; text-align: center; }
+        .tabs { display: flex; gap: 5px; margin: 20px 0; }
+        .tab-btn { flex: 1; padding: 10px; background: #fce4ec; border: none; border-radius: 8px; font-weight: bold; color: #d81b60; cursor: pointer; }
         .tab-btn.active { background: #f48fb1; color: white; }
         .section { display: none; }
         .section.active { display: block; }
-        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; font-size: 0.95rem; }
-        button { width: 100%; padding: 12px; margin-top: 20px; background: #ec407a; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        label { display: block; margin-top: 10px; font-size: 0.7rem; font-weight: bold; color: #d81b60; text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 2px solid #fbc4b6; border-radius: 8px; background: #fff5f8; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 15px; background: #ec407a; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <h2>Panel de Control</h2>
+    <h1>🌸 Panel Admin - Rose Garden 🌸</h1>
     <input type="password" id="passInput" placeholder="Contraseña...">
     <button onclick="verificarClave()">Entrar</button>
 </div>
 
 <div id="admin-panel">
-    <h1>🌸 Panel Administrativo</h1>
-    <div class="menu-tabs">
+    <h1>🌸 Panel Administrativo 🌸</h1>
+    <div class="tabs">
         <button class="tab-btn active" onclick="showSection('cargar', this)">Cargar</button>
         <button class="tab-btn" onclick="showSection('estatus', this)">Estatus</button>
         <button class="tab-btn" onclick="showSection('info', this)">Info</button>
@@ -36,45 +36,51 @@
 
     <div id="cargar" class="section active">
         <label>Historia</label>
-        <select id="historiaID" class="listaHistorias"></select>
+        <select id="historiaID" class="lista"></select>
         <label>Capítulo</label>
-        <input type="number" id="capNum" step="any" placeholder="Ej: 65 o 14.5">
-        <label>Links de Imágenes</label>
-        <textarea id="linksRaw" rows="4" placeholder="Pega links aquí..."></textarea>
+        <input type="number" id="capNum" step="any">
+        <label>Links Imágenes</label>
+        <textarea id="linksRaw" rows="3"></textarea>
         <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
     </div>
 
     <div id="estatus" class="section">
         <label>Historia</label>
-        <select id="estatusID" class="listaHistorias"></select>
+        <select id="estatusID" class="lista"></select>
+        <label>Estatus Actual</label>
+        <input type="text" id="statusActual" disabled>
         <label>Nuevo Estatus</label>
         <select id="nuevoEstatus">
-            <option value="emision">En Emisión</option>
-            <option value="hiatus">En Hiatus</option>
-            <option value="finalizado">Finalizado</option>
+            <option value="Emisión">En Emisión</option>
+            <option value="Hiatus">En Hiatus</option>
+            <option value="Finalizado">Finalizado</option>
         </select>
         <button onclick="updateEstado()">Actualizar Estatus</button>
     </div>
 
     <div id="info" class="section">
-        <label>Historia</label>
-        <select id="infoID" class="listaHistorias"></select>
-        <label>Portada URL</label>
-        <input type="text" id="portadaURL" placeholder="Link">
+        <label>Seleccionar Historia</label>
+        <select id="infoID" class="lista"></select>
+        <label>Nueva Portada (Link)</label>
+        <input type="text" id="portadaURL" placeholder="Link (se convertirá a lh3)">
         <label>Sinopsis</label>
-        <textarea id="sinopsis" rows="4"></textarea>
+        <textarea id="sinopsis" rows="3"></textarea>
         <button onclick="updateInfo()">Guardar Cambios</button>
+        <hr style="border:0; border-top:1px solid #fbc4b6; margin: 20px 0;">
+        <h2 style="font-size:0.9rem; color:#d81b60;">Crear nuevo proyecto</h2>
+        <input type="text" id="newID" placeholder="ID Corto">
+        <input type="text" id="newName" placeholder="Nombre Largo">
+        <button onclick="crearProyecto()">Crear Proyecto</button>
     </div>
-    <p id="status" style="text-align:center; margin-top:20px; font-weight: bold;"></p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const historias = [
         {id: "guarderia", nombre: "La guardería de la villana"},
-        {id: "confesion", nombre: "Confesión"},
+        {id: "confesion", nombre: "Confesión de amor"},
         {id: "embarazada", nombre: "Fingí estar embarazada..."},
         {id: "salvada", nombre: "Salvada por la pequeña dama..."},
         {id: "leopardo", nombre: "La pequeña leopardo de las nieves..."},
@@ -85,13 +91,10 @@
         {id: "hermana", nombre: "Mi hermana era mi enemiga y ahora me ama"}
     ];
 
-    document.querySelectorAll('.listaHistorias').forEach(sel => {
-        historias.forEach(h => {
-            let opt = document.createElement('option');
-            opt.value = h.id; opt.innerText = h.nombre;
-            sel.appendChild(opt);
-        });
-    });
+    document.querySelectorAll('.lista').forEach(s => historias.forEach(h => {
+        let o = document.createElement('option');
+        o.value = h.id; o.innerText = h.nombre; s.appendChild(o);
+    }));
 
     const db = getFirestore(initializeApp({
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -103,26 +106,22 @@
         if(document.getElementById('passInput').value === "Rose2026") {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
-        } else alert("Contraseña incorrecta.");
+        } else alert("Clave incorrecta");
     }
 
     window.guardarCapitulo = async () => {
         const id = document.getElementById('historiaID').value;
         const num = document.getElementById('capNum').value;
         const raw = document.getElementById('linksRaw').value;
-        const status = document.getElementById('status');
-        
         let links = raw.split('\n').filter(l => l.trim()).map(l => {
-            const idM = l.match(/[-\w]{25,}/);
-            return idM ? `https://lh3.googleusercontent.com/d/${idM[0]}=s1600` : null;
+            const m = l.match(/[-\w]{25,}/);
+            return m ? `https://lh3.googleusercontent.com/d/${m[0]}=s1600` : null;
         }).filter(l => l);
 
-        try {
-            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: links });
-            status.innerText = "✅ ¡Guardado!";
-            document.getElementById('capNum').value = "";
-            document.getElementById('linksRaw').value = "";
-        } catch (e) { status.innerText = "❌ Error"; }
+        await setDoc(doc(db, id, "capitulo_" + num), { imagenes: links });
+        alert("¡Guardado!");
+        document.getElementById('capNum').value = "";
+        document.getElementById('linksRaw').value = "";
     }
 
     window.showSection = (id, btn) => {
@@ -131,9 +130,8 @@
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
     }
-
-    window.updateEstado = () => alert("Actualizado");
-    window.updateInfo = () => alert("Información guardada");
+    
+    // Las funciones updateEstado e updateInfo ahora pueden ser completadas con la lógica de Firebase
 </script>
 </body>
 </html>
