@@ -7,7 +7,7 @@
     --borde-tarjeta: rgba(255, 102, 178, 0.2);
 }
 
-/* Aplicación de colores base al body */
+/* Aplicación base */
 body {
     background: var(--fondo-rose);
     color: var(--texto-rose);
@@ -16,9 +16,10 @@ body {
     font-family: sans-serif;
 }
 
-/* --- CLASES DE TEMAS (JS cambia el body a estas clases) --- */
+/* --- CLASES DE TEMA --- */
 body.tema-gris {
     --fondo-rose: #2c2c2c;
+    --texto-rose: #ffffff;
     --panel-rose: #1a1a1a;
 }
 body.tema-malva {
