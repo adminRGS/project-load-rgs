@@ -2,129 +2,100 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Rose Garden</title>
     <style>
-        body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px; }
-        #admin-panel { width: 100%; max-width: 450px; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1; }
-        h1 { color: #d81b60; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
-        .menu-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #fce4ec; border: none; border-radius: 8px; cursor: pointer; color: #d81b60; font-weight: bold; }
-        .tab-btn.active { background: #f48fb1; color: white; }
-        .section { display: none; }
-        .section.active { display: block; }
-        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; margin-top: 20px; background: #ec407a; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+        body { font-family: sans-serif; background: #0f0f0f; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
+        #login-screen { text-align: center; background: #1a1a1a; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 350px; }
+        #admin-panel { display: none; width: 95%; max-width: 450px; background: #1a1a1a; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        h1 { color: #ff66b2; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; color: #ff66b2; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #444; background: #252525; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; margin-top: 25px; background: #ff66b2; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.95); background: #e6559d; }
     </style>
 </head>
 <body>
 
-<div id="admin-panel">
-    <h1>🌸 Panel Administrativo</h1>
-    <div class="menu-tabs">
-        <button class="tab-btn active" onclick="showSection('cargar', this)">Cargar</button>
-        <button class="tab-btn" onclick="showSection('estatus', this)">Estatus</button>
-        <button class="tab-btn" onclick="showSection('info', this)">Info</button>
+    <div id="login-screen">
+        <h2>Panel de Control</h2>
+        <input type="password" id="passInput" placeholder="Contraseña...">
+        <button onclick="verificarClave()">Entrar</button>
     </div>
 
-    <div id="cargar" class="section active">
+    <div id="admin-panel">
+        <h1>Panel Admin</h1>
+        <label>Selecciona la Historia</label>
         <select id="historiaID">
             <option value="guarderia">La guardería de la villana</option>
-            <option value="confesion">Confesión</option>
+            <option value="confesion">Confesión de amor</option>
             <option value="embarazada">Fingí estar embarazada...</option>
-            <option value="leopardo">La pequeña leopardo...</option>
+            <option value="salvada">Salvada por la pequeña dama...</option>
+            <option value="leopardo">La pequeña leopardo de las nieves...</option>
+            <option value="lobo">Soy un lobo pero no te lastimaré</option>
+            <option value="princesa">No solo encanté a la princesa</option>
+            <option value="matrimonio">Matrimonio de conveniencia...</option>
             <option value="amigos">Los amigos no hacen esto</option>
             <option value="hermana">Mi hermana ahora me ama</option>
         </select>
-        <input type="number" id="capNum" placeholder="Nº Capítulo">
-        <textarea id="linksRaw" placeholder="Pega links de Drive aquí..."></textarea>
+
+        <label>Número de Capítulo (Acepta decimales)</label>
+        <input type="number" id="capNum" step="any" placeholder="Ej: 1 o 14.5">
+
+        <label>Links de Imágenes (Drive)</label>
+        <textarea id="linksRaw" placeholder="Pega aquí los links..."></textarea>
+
         <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
+        <p id="status" style="text-align:center; margin-top:20px; font-weight: bold;"></p>
     </div>
 
-    <div id="estatus" class="section">
-        <select id="estatusID"></select>
-        <select id="nuevoEstatus">
-            <option value="emision">En Emisión</option>
-            <option value="hiatus">En Hiatus</option>
-            <option value="finalizado">Finalizado</option>
-        </select>
-        <button onclick="updateEstado()">Actualizar Estatus</button>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <div id="info" class="section">
-        <select id="infoID"></select>
-        <input type="text" id="portadaURL" placeholder="Link de Portada">
-        <textarea id="sinopsis" placeholder="Sinopsis"></textarea>
-        <button onclick="updateInfo()">Guardar Cambios</button>
-    </div>
-    <p id="status" style="margin-top:20px; font-weight: bold; text-align: center;"></p>
-</div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app"
+        };
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const db = getFirestore(initializeApp(firebaseConfig));
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-        authDomain: "prgs-f2ef8.firebaseapp.com",
-        projectId: "prgs-f2ef8",
-        storageBucket: "prgs-f2ef8.firebasestorage.app",
-        messagingSenderId: "639472415083",
-        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
-    };
+        window.verificarClave = function() {
+            if(document.getElementById('passInput').value === "Rose2026") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+            } else alert("Contraseña incorrecta.");
+        }
 
-    const db = getFirestore(initializeApp(firebaseConfig));
+        window.guardarCapitulo = async function() {
+            const id = document.getElementById('historiaID').value;
+            const num = document.getElementById('capNum').value;
+            const rawText = document.getElementById('linksRaw').value;
+            const status = document.getElementById('status');
 
-    window.guardarCapitulo = async function() {
-        const id = document.getElementById('historiaID').value;
-        const num = document.getElementById('capNum').value;
-        const rawText = document.getElementById('linksRaw').value;
-        const status = document.getElementById('status');
-
-        let linksLimpios = [];
-        rawText.split('\n').forEach(linea => {
-            let url = linea.trim();
-            if(url.length > 0) {
-                let idMatch = url.match(/[-\w]{25,}/);
+            let linksLimpios = [];
+            rawText.split('\n').forEach(linea => {
+                let idMatch = linea.match(/[-\w]{25,}/);
                 if(idMatch) {
-                    // AQUÍ ESTÁ LA CORRECCIÓN: el formato lh3 con el ID capturado
-                    let linkFinal = `https://lh3.googleusercontent.com/d/${idMatch[0]}=s1600`;
-                    linksLimpios.push(linkFinal);
+                    // Formato lh3 correcto
+                    linksLimpios.push(`https://lh3.googleusercontent.com/d/${idMatch[0]}=s1600`);
                 }
+            });
+
+            if(linksLimpios.length === 0) { alert("No se detectaron links válidos."); return; }
+
+            try {
+                await setDoc(doc(db, id, "capitulo_" + num), { imagenes: linksLimpios });
+                status.style.color = "#00ff00";
+                status.innerText = "✅ ¡Capítulo " + num + " guardado con éxito!";
+                // Limpiar campos para la siguiente carga
+                document.getElementById('capNum').value = "";
+                document.getElementById('linksRaw').value = "";
+            } catch (e) {
+                status.style.color = "#ff0000";
+                status.innerText = "❌ Error: " + e.message;
             }
-        });
-
-        if(linksLimpios.length === 0) { alert("No se detectaron links válidos."); return; }
-
-        try {
-            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: linksLimpios });
-            status.innerText = "✅ ¡Guardado con formato lh3!";
-            console.log("Guardado:", linksLimpios);
-        } catch (e) { status.innerText = "❌ Error: " + e.message; }
-    }
-
-    window.updateEstado = async () => {
-        const id = document.getElementById('estatusID').value;
-        await updateDoc(doc(db, "estados_historias", id), { estado: document.getElementById('nuevoEstatus').value });
-        alert("Estado actualizado");
-    }
-
-    window.updateInfo = async () => {
-        const id = document.getElementById('infoID').value;
-        await updateDoc(doc(db, "estados_historias", id), { 
-            portadaUrl: document.getElementById('portadaURL').value, 
-            sinopsis: document.getElementById('sinopsis').value 
-        });
-        alert("Información actualizada");
-    }
-
-    window.showSection = (id, btn) => {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
