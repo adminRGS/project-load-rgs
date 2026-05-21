@@ -147,7 +147,7 @@
             {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
         ];
 
-        // --- FUNCIÓN MÁGICA: LIMPIA Y CONVIERTE CUALQUIER LINK ---
+        // --- FUNCIÓN CORREGIDA PARA LIMPIAR LINKS ---
         function limpiarLink(url) {
             if (!url || typeof url !== 'string') return "";
             if (url.includes('firebasestorage.googleapis.com')) return url;
@@ -206,18 +206,22 @@
             });
         }
 
+        // --- FUNCIÓN SUBIR CAPÍTULO CORREGIDA ---
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value.trim();
             if(!id || !num) { alert("Selecciona proyecto y capítulo."); return; }
 
-            const bloques = document.getElementById("enlaces-imagenes").value.split(/[\n\s]+/);
-            let imgs = bloques.filter(l => l.startsWith("http")).map(l => limpiarLink(l));
+            const texto = document.getElementById("enlaces-imagenes").value;
+            const imgs = texto.split('\n')
+                              .map(l => l.trim())
+                              .filter(l => l.length > 0)
+                              .map(l => limpiarLink(l));
 
             if(imgs.length === 0) { alert("Agrega al menos un enlace válido."); return; }
             
-            db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
-            .then(() => alert("¡Capítulo " + num + " publicado!"))
+            db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs, loves: 0, likes: 0, haha: 0 })
+            .then(() => alert("¡Capítulo " + num + " publicado correctamente!"))
             .catch(e => alert("Error: " + e));
         }
 
