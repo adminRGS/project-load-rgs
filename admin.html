@@ -216,10 +216,14 @@
             });
         }
 
+        // NUEVA FUNCIÓN OPTIMIZADA CON ALERTA GLOBAL PARA EL INDEX
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
-            const num = document.getElementById("num-capitulo").value;
+            const num = document.getElementById("num-capitulo").value.trim();
             if(!id || !num) { alert("Selecciona proyecto y número de capítulo."); return; }
+
+            const proyectoEncontrado = MAPA_PROYECTOS.find(p => p.id === id);
+            const nombreLargo = proyectoEncontrado ? proyectoEncontrado.nombre : id;
 
             const lineas = document.getElementById("enlaces-imagenes").value.split("\n");
             let imgs = [];
@@ -234,25 +238,49 @@
             
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
             .then(() => {
-                alert("¡Capítulo " + num + " publicado con éxito!");
+                const refActualizacion = db.collection("ultimas_actualizaciones").doc(id);
+                
+                return refActualizacion.get().then(doc => {
+                    let capitulosActuales = [num];
+                    
+                    if (doc.exists) {
+                        const datosViejos = doc.data();
+                        if (datosViejos.capitulos && Array.isArray(datosViejos.capitulos)) {
+                            if (!datosViejos.capitulos.includes(num)) {
+                                capitulosActuales = [...datosViejos.capitulos, num];
+                            } else {
+                                capitulosActuales = datosViejos.capitulos;
+                            }
+                        }
+                    }
+                    
+                    capitulosActuales.sort((a, b) => parseFloat(a) - parseFloat(b));
+
+                    return refActualizacion.set({
+                        idProyecto: id,
+                        nombreProyecto: nombreLargo,
+                        capitulos: capitulosActuales,
+                        fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                });
+            })
+            .then(() => {
+                alert("¡Capítulo " + num + " publicado y registrado en el índice de actualizaciones con éxito!");
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
             })
-            .catch(e => alert("Error al subir capítulo: " + e));
+            .catch(e => alert("Error en el proceso de subida: " + e));
         }
 
-        // CONTROLADOR DE ESTATUS COMPATIBLE CON HISTORIAS.HTML
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
             if(!id) { alert("Selecciona un proyecto."); return; }
             
-            // 1. Actualiza el documento interno del proyecto
             db.collection(id).doc("informacion_proyecto").set({
                 estado: nuevoEstado
             }, { merge: true })
             .then(() => {
-                // 2. Sincroniza con la lista global que lee historias.html
                 return db.collection("proyectos_lista").doc(id).set({
                     estado: nuevoEstado
                 }, { merge: true });
@@ -274,14 +302,12 @@
 
             portada = blindarEnlaceDrive(portada);
 
-            // 1. Crea la info del proyecto
             db.collection(id).doc("informacion_proyecto").set({
                 nombre: titulo,
                 portadaUrl: portada,
                 sinopsis: sinopsis,
                 estado: "🔴 En Emisión"
             }).then(() => {
-                // 2. Lo mete al índice maestro con su estado inicial para historias.html
                 return db.collection("proyectos_lista").doc(id).set({
                     nombre: titulo,
                     estado: "🔴 En Emisión",
@@ -312,7 +338,6 @@
                 portadaUrl: portadaEditada,
                 sinopsis: sinopsisEditada
             }, { merge: true }).then(() => {
-                // Sincroniza la portada también en la lista general por si historias.html la lee de ahí
                 return db.collection("proyectos_lista").doc(id).set({
                     portadaUrl: portadaEditada
                 }, { merge: true });
