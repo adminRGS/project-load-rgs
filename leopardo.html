@@ -8,71 +8,54 @@
 </head>
 <body>
 
-    <div class="contenedor-manga">
-        <div class="portada-box">
-            <img id="portada-dinamica" src="leopardo.jpg" alt="Portada">
-        </div>
-        <h1 id="titulo-proyecto" class="titulo-manga">La pequeña leopardo de las nieves</h1>
-        <p id="sinopsis-dinamica" class="sinopsis-texto">Cargando...</p>
-        <div class="seccion-titulo">Capítulos Disponibles</div>
-        <div id="grid" class="grid-caps"></div>
+    <div class="contenedor-regreso">
+        <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
     </div>
 
+    <div class="contenedor-manga">
+        <div class="portada-box">
+            <img src="leopardo.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';">
+        </div>
+        
+        <h1 id="titulo-proyecto" class="titulo-manga">La pequeña leopardo de las nieves</h1>
+        
+        <p class="sinopsis-texto" id="sinopsis-dinamica">Cargando...</p>
+
+        <div class="seccion-titulo">Capítulos Disponibles</div>
+        <div class="grid-caps" id="grid"></div>
+    </div>
+
+    <div id="lector">
+        </div>
+
+    <script src="funciones-rose.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        // ... (Tu configuración de Firebase aquí) ...
+        const db = getFirestore(initializeApp({ /* tus datos */ }));
+        const historiaID = "leopardo";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-            authDomain: "prgs-f2ef8.firebaseapp.com",
-            projectId: "prgs-f2ef8",
-            storageBucket: "prgs-f2ef8.firebasestorage.app",
-            messagingSenderId: "639472415083",
-            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        // IMPORTANTE: Esta es la función que arregla tus links
+        window.arreglarLink = (url) => {
+            if (!url) return "";
+            if (url.includes('drive.google.com')) {
+                let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
+                return `https://docs.google.com/uc?export=view&id=${id}`;
+            }
+            return url;
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // --- AQUÍ ESTÁ EL ERROR QUE TENÍAS ---
-        // Aseguramos que la historiaID sea exactamente "leopardo"
-        const historiaID = "leopardo"; 
-
-        async function cargarDatos() {
-            try {
-                // Cargar Sinopsis
-                const infoRef = doc(db, historiaID, "informacion_proyecto");
-                const infoSnap = await getDoc(infoRef);
-                if (infoSnap.exists()) {
-                    const data = infoSnap.data();
-                    document.getElementById('sinopsis-dinamica').innerText = data.sinopsis || "Sin sinopsis.";
-                    if(data.portadaUrl) document.getElementById('portada-dinamica').src = data.portadaUrl;
-                }
-
-                // Cargar Capítulos
-                const querySnapshot = await getDocs(collection(db, historiaID));
-                const grid = document.getElementById('grid');
-                grid.innerHTML = "";
-                
-                let capitulos = [];
-                querySnapshot.forEach((docSnap) => {
-                    if (docSnap.id.startsWith("capitulo_")) {
-                        capitulos.push(docSnap.id);
-                    }
-                });
-
-                capitulos.sort().forEach(idCap => {
-                    const btn = document.createElement('div');
-                    btn.className = 'cap-btn-dinamico';
-                    btn.innerText = idCap.replace("capitulo_", "");
-                    btn.onclick = () => window.location.href = `lector.html?id=${idCap}`;
-                    grid.appendChild(btn);
-                });
-            } catch (e) {
-                console.error("Error crítico:", e);
+        // Esta función carga la info desde Firebase
+        async function cargar() {
+            const snap = await getDoc(doc(db, historiaID, "informacion_proyecto"));
+            if (snap.exists()) {
+                document.getElementById('sinopsis-dinamica').innerText = snap.data().sinopsis;
             }
+            // ... (resto de tu carga de capítulos)
         }
-        cargarDatos();
+        cargar();
     </script>
 </body>
 </html>
