@@ -50,14 +50,14 @@
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
                 <label>Proyecto</label>
-                <select id="select-proyecto-capitulo"><option value="">Cargando proyectos reales...</option></select>
+                <select id="select-proyecto-capitulo"><option value="">Cargando...</option></select>
             </div>
             <div class="grupo-control">
                 <label>Número del Capítulo</label>
                 <input type="number" id="num-capitulo" step="any">
             </div>
             <div class="grupo-control">
-                <label>Enlaces de Imágenes (Drive o Directos)</label>
+                <label>Enlaces de Imágenes (Cualquier link de Drive)</label>
                 <textarea id="enlaces-imagenes" rows="8" placeholder="Pega tus enlaces de Drive aquí, uno por línea..."></textarea>
             </div>
             <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
@@ -67,7 +67,7 @@
             <h2>🔄 Actualizar Estatus</h2>
             <div class="grupo-control">
                 <label>Proyecto</label>
-                <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()"><option value="">Cargando proyectos reales...</option></select>
+                <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()"><option value="">Cargando...</option></select>
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual</label>
@@ -108,8 +108,8 @@
             <div class="divisor"></div>
             <h3>✏️ EDITAR EXISTENTE</h3>
             <div class="grupo-control">
-                <label>Seleccionar Proyecto</label>
-                <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()"><option value="">Cargando proyectos reales...</option></select>
+                <label>Seleccionar Proyecto (Nombres Largos)</label>
+                <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()"><option value="">Cargando...</option></select>
             </div>
             <div class="grupo-control">
                 <label>Cambiar Portada</label>
@@ -135,10 +135,21 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Mapa dinámico vacío: Se poblará 100% en vivo desde Firebase
-        let MAPA_PROYECTOS = [];
+        // TUS PROYECTOS REALES ASOCIADOS Y FIJOS
+        let MAPA_PROYECTOS = [
+            {id: "amigos", nombre: "Los amigos no hacen esto"},
+            {id: "confesion", nombre: "Confesión"},
+            {id: "embarazada", nombre: "Finge estar embarazada pero mi marido regresó"},
+            {id: "guarderia", nombre: "La guardería de la villana"},
+            {id: "hermana", nombre: "Mi hermana que era mi enemiga ahora me ama"},
+            {id: "leopardo", nombre: "La pequeña leopardo de las nieves de la familia panteras negras"},
+            {id: "princesa", nombre: "No solo encante a la princesa"},
+            {id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión"},
+            {id: "lobo", nombre: "Soy un lobo pero no te lastimaré"},
+            {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
+        ];
 
-        // FUNCIÓN DE BLINDAJE PARA DRIVE
+        // BLINDAJE DE DRIVE SEGURO
         function blindarEnlaceDrive(url) {
             let texto = url.trim();
             if (texto.includes("drive.google.com")) {
@@ -154,7 +165,7 @@
             if (document.getElementById("clave-input").value === "Rose2026") {
                 document.getElementById("bloque-login").style.display = "none";
                 document.getElementById("contenido-panel").style.display = "flex";
-                cargarProyectosDesdeFirebase(); 
+                cargarProyectosEnSelects(); 
             } else alert("Contraseña incorrecta.");
         }
 
@@ -165,28 +176,11 @@
             e.target.classList.add('activo');
         }
 
-        // SE CONECTA A FIREBASE Y LEE TUS PROYECTOS REALES DIRECTAMENTE
-        function cargarProyectosDesdeFirebase() {
-            db.collection("proyectos_lista").get().then((querySnapshot) => {
-                MAPA_PROYECTOS = [];
-                querySnapshot.forEach((doc) => {
-                    MAPA_PROYECTOS.push({
-                        id: doc.id,
-                        nombre: doc.data().nombre || doc.id
-                    });
-                });
-                actualizarSelectsPantalla();
-            }).catch((error) => {
-                console.log("Error cargando base de datos: ", error);
-                alert("Conectando con el índice de tus historias...");
-            });
-        }
-
-        function actualizarSelectsPantalla() {
+        function cargarProyectosEnSelects() {
             const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
             selects.forEach(s => {
                 const el = document.getElementById(s);
-                el.innerHTML = '<option value="">-- Selecciona tu Proyecto Real --</option>';
+                el.innerHTML = '<option value="">-- Selecciona tu Proyecto --</option>';
                 MAPA_PROYECTOS.forEach(p => {
                     let opc = document.createElement("option");
                     opc.value = p.id;
@@ -226,7 +220,7 @@
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value;
-            if(!id || !num) { alert("Por favor selecciona tu proyecto y número de capítulo."); return; }
+            if(!id || !num) { alert("Selecciona proyecto y número de capítulo."); return; }
 
             const lineas = document.getElementById("enlaces-imagenes").value.split("\n");
             let imgs = [];
@@ -241,7 +235,7 @@
             
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
             .then(() => {
-                alert("¡Capítulo " + num + " publicado exitosamente!");
+                alert("¡Capítulo " + num + " publicado con éxito!");
                 document.getElementById("num-capitulo").value = "";
                 document.getElementById("enlaces-imagenes").value = "";
             })
@@ -251,7 +245,7 @@
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
-            if(!id) { alert("Selecciona un proyecto primero."); return; }
+            if(!id) { alert("Selecciona un proyecto."); return; }
             
             db.collection(id).doc("informacion_proyecto").set({
                 estado: nuevoEstado
@@ -269,7 +263,7 @@
             let portada = document.getElementById("nuevo-portada").value.trim();
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
 
-            if(!id || !titulo) { alert("El ID y el Nombre Completo son obligatorios."); return; }
+            if(!id || !titulo) { alert("El ID y el Nombre Largo son obligatorios."); return; }
 
             portada = blindarEnlaceDrive(portada);
 
@@ -279,11 +273,10 @@
                 sinopsis: sinopsis,
                 estado: "🔴 En Emisión"
             }).then(() => {
-                return db.collection("proyectos_lista").doc(id).set({ nombre: titulo });
-            }).then(() => {
                 alert("¡Proyecto '" + titulo + "' creado con éxito!");
                 
-                cargarProyectosDesdeFirebase(); // Recarga de inmediato los selectores en pantalla
+                MAPA_PROYECTOS.push({ id: id, nombre: titulo });
+                cargarProyectosEnSelects();
 
                 document.getElementById("nuevo-id").value = "";
                 document.getElementById("nuevo-titulo").value = "";
