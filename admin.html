@@ -57,8 +57,8 @@
                 <input type="number" id="num-capitulo" step="any">
             </div>
             <div class="grupo-control">
-                <label>Enlaces de Imágenes (Cualquier link de Drive)</label>
-                <textarea id="enlaces-imagenes" rows="8" placeholder="Pega tus enlaces de Drive aquí, uno por línea..."></textarea>
+                <label>Enlaces de Imágenes</label>
+                <textarea id="enlaces-imagenes" rows="8" placeholder="Pega tus enlaces aquí..."></textarea>
             </div>
             <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
         </div>
@@ -71,10 +71,10 @@
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual</label>
-                <input type="text" id="estatus-actual-pantalla" readonly style="background-color: #f0f0f0 !important; font-weight: bold;">
+                <input type="text" id="estatus-actual-pantalla" readonly style="background-color: #f0f0f0 !important;">
             </div>
             <div class="grupo-control">
-                <label>Cambiar Estatus Opciones</label>
+                <label>Nuevo Estatus</label>
                 <select id="nuevo-estado-valor">
                     <option value="🔴 En Emisión">🔴 En Emisión</option>
                     <option value="🟡 En Hiatus">🟡 En Hiatus</option>
@@ -86,17 +86,16 @@
 
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-            <h3>➕ CREAR NUEVO</h3>
             <div class="grupo-control">
-                <label>ID del Proyecto (Ej: id_corto)</label>
+                <label>ID del Proyecto</label>
                 <input type="text" id="nuevo-id">
             </div>
             <div class="grupo-control">
-                <label>Nombre Completo (Largo)</label>
+                <label>Nombre Completo</label>
                 <input type="text" id="nuevo-titulo">
             </div>
             <div class="grupo-control">
-                <label>Link Portada (Drive o Directo)</label>
+                <label>Link Portada</label>
                 <input type="text" id="nuevo-portada">
             </div>
             <div class="grupo-control">
@@ -108,7 +107,7 @@
             <div class="divisor"></div>
             <h3>✏️ EDITAR EXISTENTE</h3>
             <div class="grupo-control">
-                <label>Seleccionar Proyecto (Nombres Largos)</label>
+                <label>Seleccionar Proyecto</label>
                 <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()"><option value="">Cargando...</option></select>
             </div>
             <div class="grupo-control">
@@ -144,21 +143,19 @@
             {id: "leopardo", nombre: "La pequeña leopardo de las nieves de la familia panteras negras"},
             {id: "princesa", nombre: "No solo encante a la princesa"},
             {id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión"},
-            {id: "lobo", font_name: "Soy un lobo pero no te lastimaré", nombre: "Soy un lobo pero no te lastimaré"},
+            {id: "lobo", nombre: "Soy un lobo pero no te lastimaré"},
             {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
         ];
 
-        // CORRECCIÓN 1: Extractor robusto de IDs de Google Drive
-        function blindarEnlaceDrive(url) {
-            let texto = url.trim();
-            if (texto.includes("drive.google.com")) {
-                // Captura el ID tanto si viene con /d/ como si viene con ?id= o &id=
-                let idMatch = texto.match(/\/d\/([^/]+)/) || texto.match(/[?&]id=([^&]+)/);
-                if (idMatch && idMatch[1]) {
-                    return "https://docs.google.com/uc?export=download&id=" + idMatch[1];
-                }
+        // --- FUNCIÓN MÁGICA: LIMPIA Y CONVIERTE CUALQUIER LINK ---
+        function limpiarLink(url) {
+            if (!url || typeof url !== 'string') return "";
+            if (url.includes('firebasestorage.googleapis.com')) return url;
+            if (url.includes('drive.google.com')) {
+                let id = url.match(/\/d\/([^/]+)/) ? url.match(/\/d\/([^/]+)/)[1] : (url.match(/[?&]id=([^&]+)/) ? url.match(/[?&]id=([^&]+)/)[1] : null);
+                return id ? `https://docs.google.com/uc?export=view&id=${id}` : url;
             }
-            return texto;
+            return url;
         }
 
         function verificarClave() {
@@ -192,14 +189,9 @@
 
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
-            if(!id) {
-                document.getElementById("estatus-actual-pantalla").value = "";
-                return;
-            }
+            if(!id) return;
             db.collection(id).doc("informacion_proyecto").get().then(doc => {
                 document.getElementById("estatus-actual-pantalla").value = doc.exists ? (doc.data().estado || "🔴 En Emisión") : "🔴 En Emisión";
-            }).catch(e => {
-                document.getElementById("estatus-actual-pantalla").value = "🔴 En Emisión";
             });
         }
 
@@ -210,143 +202,60 @@
                 if(doc.exists) {
                     document.getElementById("editar-portada").value = doc.data().portadaUrl || "";
                     document.getElementById("editar-sinopsis").value = doc.data().sinopsis || "";
-                } else {
-                    document.getElementById("editar-portada").value = "";
-                    document.getElementById("editar-sinopsis").value = "";
                 }
             });
         }
 
-        // CORRECCIÓN 2: Separador inteligente de texto para evitar trabas por espacios ocultos
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value.trim();
-            if(!id || !num) { alert("Selecciona proyecto y número de capítulo."); return; }
+            if(!id || !num) { alert("Selecciona proyecto y capítulo."); return; }
 
-            const proyectoEncontrado = MAPA_PROYECTOS.find(p => p.id === id);
-            const nombreLargo = proyectoEncontrado ? proyectoEncontrado.nombre : id;
-
-            // Extrae los links dividiendo por saltos de línea O espacios en blanco consecutivos
-            const bloquesTexto = document.getElementById("enlaces-imagenes").value.split(/[\n\s]+/);
-            let imgs = [];
-            
-            bloquesTexto.forEach(enlace => {
-                let limpio = enlace.trim();
-                if (limpio !== "" && limpio.startsWith("http")) {
-                    imgs.push(blindarEnlaceDrive(limpio));
-                }
-            });
+            const bloques = document.getElementById("enlaces-imagenes").value.split(/[\n\s]+/);
+            let imgs = bloques.filter(l => l.startsWith("http")).map(l => limpiarLink(l));
 
             if(imgs.length === 0) { alert("Agrega al menos un enlace válido."); return; }
             
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
-            .then(() => {
-                const refActualizacion = db.collection("ultimas_actualizaciones").doc(id);
-                
-                return refActualizacion.get().then(doc => {
-                    let capitulosActuales = [num];
-                    
-                    if (doc.exists) {
-                        const datosViejos = doc.data();
-                        if (datosViejos.capitulos && Array.isArray(datosViejos.capitulos)) {
-                            if (!datosViejos.capitulos.includes(num)) {
-                                capitulosActuales = [...datosViejos.capitulos, num];
-                            } else {
-                                capitulosActuales = datosViejos.capitulos;
-                            }
-                        }
-                    }
-                    
-                    capitulosActuales.sort((a, b) => parseFloat(a) - parseFloat(b));
-
-                    return refActualizacion.set({
-                        idProyecto: id,
-                        nombreProyecto: nombreLargo,
-                        capitulos: capitulosActuales,
-                        fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                });
-            })
-            .then(() => {
-                alert("¡Capítulo " + num + " publicado y registrado en el índice de actualizaciones con éxito!");
-                document.getElementById("num-capitulo").value = "";
-                document.getElementById("enlaces-imagenes").value = "";
-            })
-            .catch(e => alert("Error en el proceso de subida: " + e));
+            .then(() => alert("¡Capítulo " + num + " publicado!"))
+            .catch(e => alert("Error: " + e));
         }
 
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
-            const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
-            if(!id) { alert("Selecciona un proyecto."); return; }
-            
-            db.collection(id).doc("informacion_proyecto").set({
-                estado: nuevoEstado
-            }, { merge: true })
-            .then(() => {
-                return db.collection("proyectos_lista").doc(id).set({
-                    estado: nuevoEstado
-                }, { merge: true });
-            })
-            .then(() => {
-                alert("Estatus actualizado y acomodado para historias.html con éxito.");
-                mostrarEstatusActual();
-            })
-            .catch(e => alert("Error al actualizar estatus: " + e));
+            const estado = document.getElementById("nuevo-estado-valor").value;
+            if(!id) return;
+            db.collection(id).doc("informacion_proyecto").set({ estado }, { merge: true })
+            .then(() => db.collection("proyectos_lista").doc(id).set({ estado }, { merge: true }))
+            .then(() => alert("Estatus actualizado."))
+            .catch(e => alert("Error: " + e));
         }
 
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
-            let portada = document.getElementById("nuevo-portada").value.trim();
+            const portada = limpiarLink(document.getElementById("nuevo-portada").value.trim());
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
 
-            if(!id || !titulo) { alert("El ID y el Nombre Largo son obligatorios."); return; }
+            if(!id || !titulo) { alert("Faltan campos obligatorios."); return; }
 
-            portada = blindarEnlaceDrive(portada);
-
-            db.collection(id).doc("informacion_proyecto").set({
-                nombre: titulo,
-                portadaUrl: portada,
-                sinopsis: sinopsis,
-                estado: "🔴 En Emisión"
-            }).then(() => {
-                return db.collection("proyectos_lista").doc(id).set({
-                    nombre: titulo,
-                    estado: "🔴 En Emisión",
-                    portadaUrl: portada
-                });
-            }).then(() => {
-                alert("¡Proyecto '" + titulo + "' creado y registrado en historias.html!");
-                
-                MAPA_PROYECTOS.push({ id: id, nombre: titulo });
-                cargarProyectosEnSelects();
-
-                document.getElementById("nuevo-id").value = "";
-                document.getElementById("nuevo-titulo").value = "";
-                document.getElementById("nuevo-portada").value = "";
-                document.getElementById("nuevo-sinopsis").value = "";
-            }).catch(e => alert("Error al crear proyecto: " + e));
+            db.collection(id).doc("informacion_proyecto").set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis, estado: "🔴 En Emisión" })
+            .then(() => db.collection("proyectos_lista").doc(id).set({ nombre: titulo, estado: "🔴 En Emisión", portadaUrl: portada }))
+            .then(() => alert("Proyecto creado."))
+            .catch(e => alert("Error: " + e));
         }
 
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
-            if(!id) { alert("Selecciona un proyecto para editar."); return; }
+            if(!id) return;
 
-            let portadaEditada = document.getElementById("editar-portada").value.trim();
-            portadaEditada = blindarEnlaceDrive(portadaEditada);
-            const sinopsisEditada = document.getElementById("editar-sinopsis").value.trim();
+            const portada = limpiarLink(document.getElementById("editar-portada").value.trim());
+            const sinopsis = document.getElementById("editar-sinopsis").value.trim();
 
-            db.collection(id).doc("informacion_proyecto").set({
-                portadaUrl: portadaEditada,
-                sinopsis: sinopsisEditada
-            }, { merge: true }).then(() => {
-                return db.collection("proyectos_lista").doc(id).set({
-                    portadaUrl: portadaEditada
-                }, { merge: true });
-            }).then(() => {
-                alert("Cambios de portada y sinopsis guardados correctamente.");
-            }).catch(e => alert("Error al guardar edición: " + e));
+            db.collection(id).doc("informacion_proyecto").set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
+            .then(() => db.collection("proyectos_lista").doc(id).set({ portadaUrl: portada }, { merge: true }))
+            .then(() => alert("Cambios guardados correctamente."))
+            .catch(e => alert("Error: " + e));
         }
     </script>
 </body>
