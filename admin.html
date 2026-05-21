@@ -6,118 +6,117 @@
     <title>Panel Admin - Rose Garden</title>
     <style>
         body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px; }
-        
-        #login-screen, #admin-panel { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1; width: 90%; max-width: 450px; }
-        
-        #admin-panel { display: none; }
-        h1 { color: #d81b60; font-size: 1.5rem; margin-bottom: 20px; }
-
+        #admin-panel { width: 100%; max-width: 450px; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1; }
+        h1 { color: #d81b60; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
         .menu-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; background: #fce4ec; border: none; border-radius: 8px; cursor: pointer; color: #d81b60; font-weight: bold; }
         .tab-btn.active { background: #f48fb1; color: white; }
-
         .section { display: none; }
         .section.active { display: block; }
-
-        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; text-align: left; }
+        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
         select, input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; }
-        
         button { width: 100%; padding: 15px; margin-top: 20px; background: #ec407a; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <h2>Panel de Control</h2>
-        <input type="password" id="passInput" placeholder="Contraseña...">
-        <button onclick="verificarClave()">Entrar</button>
+<div id="admin-panel">
+    <h1>🌸 Panel Administrativo</h1>
+    <div class="menu-tabs">
+        <button class="tab-btn active" onclick="showSection('cargar', this)">Cargar</button>
+        <button class="tab-btn" onclick="showSection('estatus', this)">Estatus</button>
+        <button class="tab-btn" onclick="showSection('info', this)">Info</button>
     </div>
 
-    <div id="admin-panel">
-        <h1>🌸 Panel Administrativo</h1>
-        <div class="menu-tabs">
-            <button class="tab-btn active" onclick="showSection('cargar')">Cargar</button>
-            <button class="tab-btn" onclick="showSection('estatus')">Estatus</button>
-            <button class="tab-btn" onclick="showSection('info')">Info</button>
-        </div>
-
-        <div id="cargar" class="section active">
-            <select id="historiaID">
-                <option value="" disabled selected>-- Elige un Manhwa --</option>
-                <option value="guarderia">La guardería de la villana</option>
-                <option value="confesion">Confesión</option>
-                <option value="embarazada">Fingí estar embarazada...</option>
-                <option value="leopardo">La pequeña leopardo...</option>
-                <option value="amigos">Los amigos no hacen esto</option>
-                <option value="hermana">Mi hermana ahora me ama</option>
-            </select>
-            <input type="number" id="capNum" placeholder="Nº Capítulo">
-            <textarea id="linksRaw" placeholder="Pega links de Drive..."></textarea>
-            <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
-        </div>
-
-        <div id="estatus" class="section">
-            <select id="estatusID"></select>
-            <select id="nuevoEstatus">
-                <option value="emision">En Emisión</option>
-                <option value="hiatus">En Hiatus</option>
-                <option value="finalizado">Finalizado</option>
-            </select>
-            <button onclick="updateEstado()">Actualizar Estatus</button>
-        </div>
-
-        <div id="info" class="section">
-            <select id="infoID"></select>
-            <input type="text" id="portadaURL" placeholder="Link de Portada">
-            <textarea id="sinopsis" placeholder="Sinopsis"></textarea>
-            <button onclick="updateInfo()">Guardar Cambios</button>
-        </div>
-        
-        <p id="status" style="margin-top:20px; font-weight: bold;"></p>
+    <div id="cargar" class="section active">
+        <select id="historiaID">
+            <option value="guarderia">La guardería de la villana</option>
+            <option value="confesion">Confesión</option>
+            <option value="embarazada">Fingí estar embarazada...</option>
+            <option value="leopardo">La pequeña leopardo...</option>
+            <option value="amigos">Los amigos no hacen esto</option>
+            <option value="hermana">Mi hermana ahora me ama</option>
+        </select>
+        <input type="number" id="capNum" placeholder="Nº Capítulo">
+        <textarea id="linksRaw" placeholder="Pega links de Drive aquí..."></textarea>
+        <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div id="estatus" class="section">
+        <select id="estatusID"></select>
+        <select id="nuevoEstatus">
+            <option value="emision">En Emisión</option>
+            <option value="hiatus">En Hiatus</option>
+            <option value="finalizado">Finalizado</option>
+        </select>
+        <button onclick="updateEstado()">Actualizar Estatus</button>
+    </div>
 
-        const firebaseConfig = { /* ... TU CONFIG ... */ };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    <div id="info" class="section">
+        <select id="infoID"></select>
+        <input type="text" id="portadaURL" placeholder="Link de Portada">
+        <textarea id="sinopsis" placeholder="Sinopsis"></textarea>
+        <button onclick="updateInfo()">Guardar Cambios</button>
+    </div>
+    <p id="status" style="margin-top:20px; font-weight: bold; text-align: center;"></p>
+</div>
 
-        // --- TU CÓDIGO DE CARGA ORIGINAL ---
-        window.guardarCapitulo = async function() {
-            const id = document.getElementById('historiaID').value;
-            const num = document.getElementById('capNum').value;
-            const rawText = document.getElementById('linksRaw').value;
-            
-            // ... (AQUÍ VA TU LÓGICA DE REGEX QUE YA TENÍAS) ...
-            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: ["tu_lista_procesada"] });
-            alert("Capítulo guardado");
-        }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- NUEVAS FUNCIONES ---
-        window.updateEstado = async () => {
-            const id = document.getElementById('estatusID').value;
-            const est = document.getElementById('nuevoEstatus').value;
-            await updateDoc(doc(db, "estados_historias", id), { estado: est });
-            alert("Estado actualizado");
-        }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+        authDomain: "prgs-f2ef8.firebaseapp.com",
+        projectId: "prgs-f2ef8",
+        storageBucket: "prgs-f2ef8.firebasestorage.app",
+        messagingSenderId: "639472415083",
+        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+    };
 
-        window.updateInfo = async () => {
-            const id = document.getElementById('infoID').value;
-            const p = document.getElementById('portadaURL').value;
-            const s = document.getElementById('sinopsis').value;
-            await updateDoc(doc(db, "estados_historias", id), { portadaUrl: p, sinopsis: s });
-            alert("Info actualizada");
-        }
+    const db = getFirestore(initializeApp(firebaseConfig));
 
-        // Helper para secciones
-        window.showSection = (id) => {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
-        }
-    </script>
+    window.guardarCapitulo = async function() {
+        const id = document.getElementById('historiaID').value;
+        const num = document.getElementById('capNum').value;
+        const rawText = document.getElementById('linksRaw').value;
+        const status = document.getElementById('status');
+
+        let linksLimpios = [];
+        rawText.split('\n').forEach(linea => {
+            let url = linea.trim();
+            // Extraer ID y forzar formato de descarga directa
+            let idMatch = url.match(/[-\w]{25,}/);
+            if(idMatch) linksLimpios.push(`https://drive.google.com/uc?export=view&id=${idMatch[0]}`);
+        });
+
+        try {
+            await setDoc(doc(db, id, "capitulo_" + num), { imagenes: linksLimpios });
+            status.innerText = "✅ ¡Guardado con éxito!";
+        } catch (e) { status.innerText = "❌ Error: " + e.message; }
+    }
+
+    window.updateEstado = async () => {
+        const id = document.getElementById('estatusID').value;
+        await updateDoc(doc(db, "estados_historias", id), { estado: document.getElementById('nuevoEstatus').value });
+        alert("Estado actualizado");
+    }
+
+    window.updateInfo = async () => {
+        const id = document.getElementById('infoID').value;
+        await updateDoc(doc(db, "estados_historias", id), { 
+            portadaUrl: document.getElementById('portadaURL').value, 
+            sinopsis: document.getElementById('sinopsis').value 
+        });
+        alert("Información actualizada");
+    }
+
+    window.showSection = (id, btn) => {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
 </body>
 </html>
