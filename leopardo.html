@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La pequeña leopardo de las nieves - Rose Garden Scan</title>
-    
     <link rel="stylesheet" href="estilos-rose.css">
-
     <style>
         body { margin: 0; padding: 0; background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); color: var(--texto-rose, white); font-family: 'serif'; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; transition: background 0.3s ease; }
         body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px); background-size: 80px 80px, 150px 150px; opacity: 0.2; animation: moveStars 30s linear infinite; pointer-events: none; z-index: 1; }
@@ -44,157 +42,87 @@
     </style>
 </head>
 <body>
-
     <div id="barra-progreso-rose"></div>
-
-    <div class="contenedor-regreso">
-        <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
-    </div>
-
+    <div class="contenedor-regreso"><a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a></div>
     <div class="contenedor-manga">
-        <div class="portada-box">
-            <img src="leopardo.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';">
-        </div>
-
+        <div class="portada-box"><img src="leopardo.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';"></div>
         <h1 id="titulo-proyecto" class="titulo-manga">La pequeña leopardo de las nieves</h1>
-        
         <p class="sinopsis-texto" id="sinopsis-dinamica">✨ Cargando los detalles... ✨</p>
-
         <div class="seccion-titulo">Capítulos Disponibles</div>
-        
         <div class="grid-caps" id="grid"></div>
     </div>
-
     <div id="lector">
         <div class="nav-lector">
-            
             <div style="position: relative; display: flex; align-items: center; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px;">
                 <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">🎨</button>
-                
                 <div id="sub-menu-colores-lector" class="sub-menu-colores">
                     <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
                     <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
                     <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
                 </div>
             </div>
-
             <div class="grupo-flechas">
                 <button id="btn-ant" class="nav-btn">← Ant.</button>
                 <button id="btn-sig" class="nav-btn">Sig. →</button>
             </div>
-            
             <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
-
             <div class="btn-votar-pink" onclick="toggleStats(event)">
                 <span class="thumb-icon">👍</span>
                 <div class="popover-stats" id="stats-menu">
-                    <div class="stat-item" onclick="votar('loves', event)">
-                        <span class="emoji pink-fx">❤️</span>
-                        <span id="txt-loves" class="count">0</span>
-                    </div>
-                    <div class="stat-item" onclick="votar('likes', event)">
-                        <span class="emoji pink-fx">👍</span>
-                        <span id="txt-likes" class="count">0</span>
-                    </div>
-                    <div class="stat-item" onclick="votar('haha', event)">
-                        <span class="emoji">😂</span>
-                        <span id="txt-haha" class="count">0</span>
-                    </div>
+                    <div class="stat-item" onclick="votar('loves', event)"><span class="emoji pink-fx">❤️</span><span id="txt-loves" class="count">0</span></div>
+                    <div class="stat-item" onclick="votar('likes', event)"><span class="emoji pink-fx">👍</span><span id="txt-likes" class="count">0</span></div>
+                    <div class="stat-item" onclick="votar('haha', event)"><span class="emoji">😂</span><span id="txt-haha" class="count">0</span></div>
                 </div>
             </div>
         </div>
         <div id="contenido-imagenes"></div>
     </div>
-
 <script src="funciones-rose.js"></script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-        authDomain: "prgs-f2ef8.firebaseapp.com",
-        projectId: "prgs-f2ef8",
-        storageBucket: "prgs-f2ef8.firebasestorage.app",
-        messagingSenderId: "639472415083",
-        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs", authDomain: "prgs-f2ef8.firebaseapp.com", projectId: "prgs-f2ef8", storageBucket: "prgs-f2ef8.firebasestorage.app", messagingSenderId: "639472415083", appId: "1:639472415083:web:2940245a8a70ed6c88dc2e" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
-    // AQUÍ ESTÁ EL CAMBIO PARA TU PROYECTO
     const historiaID = "leopardo"; 
     let capsOrdenados = [];
     let idCapActual = "";
-
-    if (window.conectarAdminConManga) {
-        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica");
-    }
-
-    // Esta función garantiza que tus imágenes carguen
+    if (window.conectarAdminConManga) { window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica"); }
+    
+    // Función blindada contra errores de guardado de Firebase
     function arreglarLink(url) {
-        if (!url) return "";
-        if (url.includes('drive.google.com')) {
-            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://docs.google.com/uc?export=view&id=${id}`;
+        if (!url || typeof url !== 'string') return "";
+        let urlLimpia = url.replace(/[\n\r\t]/g, "").trim();
+        if (urlLimpia.includes('drive.google.com')) {
+            let id = urlLimpia.includes('/d/') ? urlLimpia.split('/d/')[1].split('/')[0] : (urlLimpia.includes('id=') ? urlLimpia.split('id=')[1].split('&')[0] : "");
+            if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
         }
-        return url;
+        return urlLimpia;
     }
 
     async function cargarProyectoDesdeFirebase() {
         const grid = document.getElementById('grid');
-        grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>✨ Cargando capítulos... ✨</p>";
-        
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
             let disponibles = [];
-            
-            querySnapshot.forEach((docSnap) => {
-                if (docSnap.id.startsWith("capitulo_")) {
-                    const idOriginal = docSnap.id.replace("capitulo_", "");
-                    disponibles.push(idOriginal);
-                }
-            });
-
+            querySnapshot.forEach((docSnap) => { if (docSnap.id.startsWith("capitulo_")) disponibles.push(docSnap.id.replace("capitulo_", "")); });
             capsOrdenados = disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
             grid.innerHTML = ""; 
-
             capsOrdenados.forEach(idCap => {
-                const btn = document.createElement('div');
-                btn.className = 'cap-btn-dinamico';
-                btn.innerText = idCap;
-                btn.onclick = () => abrirLector(idCap);
-                grid.appendChild(btn);
+                const btn = document.createElement('div'); btn.className = 'cap-btn-dinamico'; btn.innerText = idCap;
+                btn.onclick = () => abrirLector(idCap); grid.appendChild(btn);
             });
-
-            if (capsOrdenados.length === 0) {
-                grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Próximamente más capítulos ✨</p>";
-            }
-
-        } catch (e) { 
-            console.error(e); 
-            grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center; color:#ff4d4d;'>Error cargando el servidor.</p>";
-        }
+        } catch (e) { console.error(e); }
     }
-
     cargarProyectoDesdeFirebase();
-
     window.abrirLector = async function(idCap) {
         idCapActual = idCap;
-        const lector = document.getElementById('lector');
-        const contenedor = document.getElementById('contenido-imagenes');
-        lector.style.display = 'block'; 
-        lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando... ✨</p>";
-
+        const lector = document.getElementById('lector'), contenedor = document.getElementById('contenido-imagenes');
+        lector.style.display = 'block'; lector.scrollTop = 0; contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando... ✨</p>";
         const index = capsOrdenados.indexOf(idCap.toString());
         document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[index - 1]);
         document.getElementById('btn-sig').onclick = () => abrirLector(capsOrdenados[index + 1]);
-        document.getElementById('btn-ant').disabled = (index <= 0);
-        document.getElementById('btn-sig').disabled = (index >= capsOrdenados.length - 1);
-
+        document.getElementById('btn-ant').disabled = (index <= 0); document.getElementById('btn-sig').disabled = (index >= capsOrdenados.length - 1);
         try {
             const docRef = doc(db, historiaID, "capitulo_" + idCap);
             const snap = await getDoc(docRef);
@@ -203,33 +131,14 @@
                 document.getElementById('txt-loves').innerText = data.loves || 0;
                 document.getElementById('txt-likes').innerText = data.likes || 0;
                 document.getElementById('txt-haha').innerText = data.haha || 0;
-                
                 contenedor.innerHTML = "";
                 let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
-                imgs.forEach(url => {
-                    if (url && url.trim() !== "") {
-                        const img = document.createElement('img');
-                        img.src = arreglarLink(url.trim());
-                        contenedor.appendChild(img);
-                    }
-                });
+                imgs.forEach(url => { if (url && url.trim() !== "") { const img = document.createElement('img'); img.src = arreglarLink(url); contenedor.appendChild(img); } });
             }
         } catch (e) { console.error(e); }
     }
-
-    window.votar = async (tipo, e) => {
-        e.stopPropagation();
-        const docRef = doc(db, historiaID, "capitulo_" + idCapActual);
-        await updateDoc(docRef, { [tipo]: increment(1) });
-        const txt = document.getElementById('txt-' + tipo);
-        txt.innerText = parseInt(txt.innerText) + 1;
-    }
-
-    window.toggleStats = (e) => {
-        e.stopPropagation();
-        document.getElementById('stats-menu').classList.toggle('active');
-    }
-
+    window.votar = async (tipo, e) => { e.stopPropagation(); const docRef = doc(db, historiaID, "capitulo_" + idCapActual); await updateDoc(docRef, { [tipo]: increment(1) }); const txt = document.getElementById('txt-' + tipo); txt.innerText = parseInt(txt.innerText) + 1; }
+    window.toggleStats = (e) => { e.stopPropagation(); document.getElementById('stats-menu').classList.toggle('active'); }
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
     document.addEventListener('click', () => document.getElementById('stats-menu').classList.remove('active'));
 </script>
