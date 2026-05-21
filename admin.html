@@ -135,7 +135,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // TUS 10 PROYECTOS REALES ASOCIADOS Y FIJOS
         let MAPA_PROYECTOS = [
             {id: "amigos", nombre: "Los amigos no hacen esto"},
             {id: "confesion", nombre: "Confesión"},
@@ -145,14 +144,16 @@
             {id: "leopardo", nombre: "La pequeña leopardo de las nieves de la familia panteras negras"},
             {id: "princesa", nombre: "No solo encante a la princesa"},
             {id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión"},
-            {id: "lobo", nombre: "Soy un lobo pero no te lastimaré"},
+            {id: "lobo", font_name: "Soy un lobo pero no te lastimaré", nombre: "Soy un lobo pero no te lastimaré"},
             {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
         ];
 
+        // CORRECCIÓN 1: Extractor robusto de IDs de Google Drive
         function blindarEnlaceDrive(url) {
             let texto = url.trim();
             if (texto.includes("drive.google.com")) {
-                let idMatch = texto.match(/\/d\/([^/]+)/) || texto.match(/id=([^&]+)/);
+                // Captura el ID tanto si viene con /d/ como si viene con ?id= o &id=
+                let idMatch = texto.match(/\/d\/([^/]+)/) || texto.match(/[?&]id=([^&]+)/);
                 if (idMatch && idMatch[1]) {
                     return "https://docs.google.com/uc?export=download&id=" + idMatch[1];
                 }
@@ -216,7 +217,7 @@
             });
         }
 
-        // NUEVA FUNCIÓN OPTIMIZADA CON ALERTA GLOBAL PARA EL INDEX
+        // CORRECCIÓN 2: Separador inteligente de texto para evitar trabas por espacios ocultos
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value.trim();
@@ -225,16 +226,18 @@
             const proyectoEncontrado = MAPA_PROYECTOS.find(p => p.id === id);
             const nombreLargo = proyectoEncontrado ? proyectoEncontrado.nombre : id;
 
-            const lineas = document.getElementById("enlaces-imagenes").value.split("\n");
+            // Extrae los links dividiendo por saltos de línea O espacios en blanco consecutivos
+            const bloquesTexto = document.getElementById("enlaces-imagenes").value.split(/[\n\s]+/);
             let imgs = [];
             
-            lineas.forEach(linea => {
-                if (linea.trim() !== "") {
-                    imgs.push(blindarEnlaceDrive(linea));
+            bloquesTexto.forEach(enlace => {
+                let limpio = enlace.trim();
+                if (limpio !== "" && limpio.startsWith("http")) {
+                    imgs.push(blindarEnlaceDrive(limpio));
                 }
             });
 
-            if(imgs.length === 0) { alert("Agrega al menos un enlace."); return; }
+            if(imgs.length === 0) { alert("Agrega al menos un enlace válido."); return; }
             
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
             .then(() => {
