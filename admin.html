@@ -5,23 +5,23 @@
     <title>Panel Admin - Rose Garden</title>
     <style>
         body { font-family: sans-serif; background: #ffeef4; color: #4a1525; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-        #login-screen, #admin-panel { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.2); border: 2px solid #f48fb1; }
+        #login-screen, #admin-panel { width: 100%; max-width: 480px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.1); border: 2px solid #f48fb1; }
         #admin-panel { display: none; }
-        h1 { color: #d81b60; text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
-        .menu-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab-btn { flex: 1; padding: 15px; background: #fce4ec; border: none; border-radius: 10px; cursor: pointer; color: #d81b60; font-weight: bold; font-size: 1rem; }
+        h1 { color: #d81b60; text-align: center; font-size: 1.4rem; margin-bottom: 20px; }
+        .menu-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; background: #fce4ec; border: none; border-radius: 8px; cursor: pointer; color: #d81b60; font-weight: bold; }
         .tab-btn.active { background: #f48fb1; color: white; }
         .section { display: none; }
         .section.active { display: block; }
-        label { display: block; margin-top: 20px; color: #d81b60; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 15px; margin-top: 8px; border-radius: 10px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; font-size: 1rem; }
-        button { width: 100%; padding: 18px; margin-top: 25px; background: #ec407a; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        label { display: block; margin-top: 15px; color: #d81b60; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 2px solid #fbc4b6; background: #fff5f8; color: #4a1525; box-sizing: border-box; font-size: 0.95rem; }
+        button { width: 100%; padding: 12px; margin-top: 20px; background: #ec407a; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <h1>Acceso</h1>
+    <h2>Panel de Control</h2>
     <input type="password" id="passInput" placeholder="Contraseña...">
     <button onclick="verificarClave()">Entrar</button>
 </div>
@@ -37,14 +37,17 @@
     <div id="cargar" class="section active">
         <label>Historia</label>
         <select id="historiaID" class="listaHistorias"></select>
-        <input type="number" id="capNum" step="any" placeholder="Capítulo (Ej: 65 o 14.5)">
-        <textarea id="linksRaw" rows="5" placeholder="Pega links aquí..."></textarea>
+        <label>Capítulo</label>
+        <input type="number" id="capNum" step="any" placeholder="Ej: 65 o 14.5">
+        <label>Links de Imágenes</label>
+        <textarea id="linksRaw" rows="4" placeholder="Pega links aquí..."></textarea>
         <button onclick="guardarCapitulo()">🚀 Guardar Capítulo</button>
     </div>
 
     <div id="estatus" class="section">
         <label>Historia</label>
         <select id="estatusID" class="listaHistorias"></select>
+        <label>Nuevo Estatus</label>
         <select id="nuevoEstatus">
             <option value="emision">En Emisión</option>
             <option value="hiatus">En Hiatus</option>
@@ -56,9 +59,11 @@
     <div id="info" class="section">
         <label>Historia</label>
         <select id="infoID" class="listaHistorias"></select>
-        <input type="text" id="portadaURL" placeholder="Link de Portada">
-        <textarea id="sinopsis" rows="5" placeholder="Sinopsis"></textarea>
-        <button onclick="updateInfo()">Guardar Info</button>
+        <label>Portada URL</label>
+        <input type="text" id="portadaURL" placeholder="Link">
+        <label>Sinopsis</label>
+        <textarea id="sinopsis" rows="4"></textarea>
+        <button onclick="updateInfo()">Guardar Cambios</button>
     </div>
     <p id="status" style="text-align:center; margin-top:20px; font-weight: bold;"></p>
 </div>
@@ -80,7 +85,6 @@
         {id: "hermana", nombre: "Mi hermana era mi enemiga y ahora me ama"}
     ];
 
-    // Llenar todos los selects de historias
     document.querySelectorAll('.listaHistorias').forEach(sel => {
         historias.forEach(h => {
             let opt = document.createElement('option');
@@ -106,6 +110,7 @@
         const id = document.getElementById('historiaID').value;
         const num = document.getElementById('capNum').value;
         const raw = document.getElementById('linksRaw').value;
+        const status = document.getElementById('status');
         
         let links = raw.split('\n').filter(l => l.trim()).map(l => {
             const idM = l.match(/[-\w]{25,}/);
@@ -114,10 +119,10 @@
 
         try {
             await setDoc(doc(db, id, "capitulo_" + num), { imagenes: links });
-            alert("✅ ¡Guardado!");
+            status.innerText = "✅ ¡Guardado!";
             document.getElementById('capNum').value = "";
             document.getElementById('linksRaw').value = "";
-        } catch (e) { alert("Error: " + e.message); }
+        } catch (e) { status.innerText = "❌ Error"; }
     }
 
     window.showSection = (id, btn) => {
@@ -126,6 +131,9 @@
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
     }
+
+    window.updateEstado = () => alert("Actualizado");
+    window.updateInfo = () => alert("Información guardada");
 </script>
 </body>
 </html>
