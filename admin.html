@@ -121,8 +121,9 @@
             </div>
             <button class="btn-guardar" style="background: #2575fc !important;" onclick="guardarEdicionProyecto()">Guardar Cambios</button>
         </div>
-                                          </div>
-            <script>
+    </div>
+
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -134,16 +135,15 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let listaProyectosGlobal = {};
-
-        function blindarEnlaceDrive(url) {
-            const enlace = url.trim();
-            if (enlace.includes("drive.google.com")) {
-                let idMatch = enlace.match(/\/d\/([a-zA-Z0-9-_]+)/) || enlace.match(/id=([a-zA-Z0-9-_]+)/);
-                if (idMatch && idMatch[1]) return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
-            }
-            return enlace;
-        }
+        // Mapeo fijo para asegurar que el ID coincida con tu lista
+        const MAPA_PROYECTOS = [
+            {id: "amigos", nombre: "Los amigos no hacen esto"},
+            {id: "confesion", nombre: "Confesión de amor"},
+            {id: "embarazada", nombre: "Embarazada por accidente"},
+            {id: "guarderia", nombre: "La guardería del rey"},
+            {id: "hermana", nombre: "Mi querida hermana"},
+            {id: "leopardo", nombre: "La pequeña bebé leopardo"}
+        ];
 
         function verificarClave() {
             if (document.getElementById("clave-input").value === "Rose2026") {
@@ -162,48 +162,44 @@
 
         function cargarProyectosEnSelects() {
             const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
-            selects.forEach(s => document.getElementById(s).innerHTML = '<option value="">-- Selecciona --</option>');
-            listaProyectosGlobal = {}; 
-            
-            db.collection("estados_historias").get().then((snap) => {
-                snap.forEach((doc) => {
-                    listaProyectosGlobal[doc.id] = doc.data();
-                    selects.forEach(s => {
-                        let opc = document.createElement("option");
-                        opc.value = doc.id; opc.text = doc.data().nombre || doc.id;
-                        document.getElementById(s).appendChild(opc);
-                    });
+            selects.forEach(s => {
+                const el = document.getElementById(s);
+                el.innerHTML = '<option value="">-- Selecciona --</option>';
+                MAPA_PROYECTOS.forEach(p => {
+                    let opc = document.createElement("option");
+                    opc.value = p.id;
+                    opc.text = p.nombre;
+                    el.appendChild(opc);
                 });
             });
         }
 
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
-            const campo = document.getElementById("estatus-actual-pantalla");
-            if(id) {
-                db.collection("estados_historias").doc(id).get().then(doc => {
-                    campo.value = doc.exists ? (doc.data().estado || "emision") : "emision";
-                });
-            }
+            if(!id) return;
+            db.collection("estados_historias").doc(id).get().then(doc => {
+                document.getElementById("estatus-actual-pantalla").value = doc.exists ? (doc.data().estado || "emision") : "emision";
+            });
         }
 
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
-            if(id && listaProyectosGlobal[id]) {
-                document.getElementById("editar-portada").value = listaProyectosGlobal[id].portadaUrl || "";
-                document.getElementById("editar-sinopsis").value = listaProyectosGlobal[id].sinopsis || "";
-            }
+            if(!id) return;
+            db.collection("estados_historias").doc(id).get().then(doc => {
+                if(doc.exists) {
+                    document.getElementById("editar-portada").value = doc.data().portadaUrl || "";
+                    document.getElementById("editar-sinopsis").value = doc.data().sinopsis || "";
+                }
+            });
         }
 
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value;
-            const imgs = document.getElementById("enlaces-imagenes").value.split("\n").filter(l => l.trim() !== "").map(l => blindarEnlaceDrive(l));
-            
+            const imgs = document.getElementById("enlaces-imagenes").value.split("\n").filter(l => l.trim() !== "");
             if(!id || !num || imgs.length === 0) { alert("Llena todos los campos"); return; }
-
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
-            .then(() => alert("¡Capítulo publicado!"))
+            .then(() => alert("¡Capítulo publicado en " + id + "!"))
             .catch(e => alert("Error: " + e));
         }
 
@@ -220,16 +216,16 @@
             const titulo = document.getElementById("nuevo-titulo").value.trim();
             db.collection("estados_historias").doc(id).set({
                 nombre: titulo,
-                portadaUrl: blindarEnlaceDrive(document.getElementById("nuevo-portada").value),
+                portadaUrl: document.getElementById("nuevo-portada").value,
                 sinopsis: document.getElementById("nuevo-sinopsis").value,
                 estado: "emision"
-            }).then(() => { alert("Proyecto creado"); cargarProyectosEnSelects(); });
+            }).then(() => alert("Proyecto creado"));
         }
 
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
             db.collection("estados_historias").doc(id).update({
-                portadaUrl: blindarEnlaceDrive(document.getElementById("editar-portada").value),
+                portadaUrl: document.getElementById("editar-portada").value,
                 sinopsis: document.getElementById("editar-sinopsis").value
             }).then(() => alert("Cambios guardados."));
         }
