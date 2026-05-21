@@ -4,115 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La pequeña leopardo de las nieves - Rose Garden Scan</title>
-    
     <link rel="stylesheet" href="estilos-rose.css">
-
-    <style>
-        /* (Tus estilos se mantienen iguales, solo cambiamos los IDs y nombres específicos) */
-        body { margin: 0; padding: 0; background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); color: var(--texto-rose, white); font-family: 'serif'; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; transition: background 0.3s ease; }
-        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px); background-size: 80px 80px, 150px 150px; opacity: 0.2; animation: moveStars 30s linear infinite; pointer-events: none; z-index: 1; }
-        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-150px); } }
-        .contenedor-manga { width: 90%; max-width: 600px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px; z-index: 10; }
-        .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
-        .btn-catalogo { text-decoration: none; color: #ff66b2; border: 2px solid #ff66b2; padding: 10px 22px; border-radius: 30px; font-weight: bold; font-size: 0.95rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; background: rgba(255, 102, 178, 0.1); backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2); }
-        .btn-catalogo:hover { background: #ff66b2; color: white; transform: scale(1.05); }
-        .portada-box { width: 220px; height: 310px; border-radius: 12px; border: 2px solid #ff66b2; box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); background: #222; margin-bottom: 25px; overflow: hidden; }
-        .portada-box img { width: 100%; height: 100%; object-fit: cover; }
-        .titulo-manga { font-size: 2.2rem; color: #ff66b2; margin: 10px 0 15px 0; font-family: 'Georgia', serif; font-weight: bold; line-height: 1.3; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shineText 4s linear infinite; }
-        @keyframes shineText { to { background-position: 200% center; } }
-        .sinopsis-texto { font-size: 0.95rem; line-height: 1.6; color: var(--texto-rose, rgba(255, 255, 255, 0.85)); margin: 0 0 30px 0; font-family: sans-serif; text-align: justify; text-align-last: center; }
-        .seccion-titulo { width: 100%; max-width: 500px; margin: 20px 0 10px 0; font-size: 1.1rem; border-bottom: 2px solid #ff66b2; padding-bottom: 8px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-        .grid-caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 15px; width: 100%; max-width: 500px; padding-bottom: 60px; margin-top: 15px; z-index: 10; }
-        .cap-btn-dinamico { border: 1px solid #ff66b2; color: white; background: rgba(255, 102, 178, 0.15); text-align: center; padding: 20px 0; border-radius: 15px; font-weight: bold; transition: 0.4s ease; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .cap-btn-dinamico:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); background: rgba(255, 102, 178, 0.3); }
-        #lector { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fondo-rose, #000); z-index: 100; overflow-y: scroll; }
-        #contenido-imagenes img { width: 100%; display: block; margin-bottom: -1px; }
-        .nav-lector { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; background: var(--panel-rose, rgba(0, 0, 0, 0.96)); padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; backdrop-filter: blur(12px); z-index: 102; box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); }
-        .grupo-flechas { display: flex; gap: 8px; }
-        .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        .nav-btn:disabled { background: #333; opacity: 0.4; }
-        .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
-        .btn-votar-pink { position: relative; background: rgba(255, 102, 178, 0.2); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .thumb-icon { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
-        .popover-stats { display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2; padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110; box-shadow: 0 0 25px rgba(255, 102, 178, 0.7); }
-        .popover-stats.active { display: flex; animation: slideUp 0.3s ease-out; }
-        .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid white; cursor: pointer; }
-        .stat-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-        .stat-item:hover { transform: scale(1.2); }
-        .emoji { font-size: 1.5rem; }
-        .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
-        .count { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
-    </style>
 </head>
 <body>
 
-    <div id="barra-progreso-rose"></div>
-
-    <div class="contenedor-regreso">
-        <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
-    </div>
-
     <div class="contenedor-manga">
         <div class="portada-box">
-            <img src="leopardo.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';">
+            <img id="portada-dinamica" src="leopardo.jpg" alt="Portada">
         </div>
         <h1 id="titulo-proyecto" class="titulo-manga">La pequeña leopardo de las nieves</h1>
-        <p class="sinopsis-texto" id="sinopsis-dinamica">✨ Cargando detalles... ✨</p>
+        <p id="sinopsis-dinamica" class="sinopsis-texto">Cargando...</p>
         <div class="seccion-titulo">Capítulos Disponibles</div>
-        <div class="grid-caps" id="grid"></div>
+        <div id="grid" class="grid-caps"></div>
     </div>
 
-    <div id="lector">
-        <div class="nav-lector">
-            <div style="position: relative; display: flex; align-items: center; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px;">
-                <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">🎨</button>
-                <div id="sub-menu-colores-lector" class="sub-menu-colores">
-                    <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
-                    <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
-                    <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
-                </div>
-            </div>
-            <div class="grupo-flechas">
-                <button id="btn-ant" class="nav-btn">← Ant.</button>
-                <button id="btn-sig" class="nav-btn">Sig. →</button>
-            </div>
-            <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
-            <div class="btn-votar-pink" onclick="toggleStats(event)">
-                <span class="thumb-icon">👍</span>
-                <div class="popover-stats" id="stats-menu">
-                    <div class="stat-item" onclick="votar('loves', event)"><span class="emoji pink-fx">❤️</span><span id="txt-loves" class="count">0</span></div>
-                    <div class="stat-item" onclick="votar('likes', event)"><span class="emoji pink-fx">👍</span><span id="txt-likes" class="count">0</span></div>
-                    <div class="stat-item" onclick="votar('haha', event)"><span class="emoji">😂</span><span id="txt-haha" class="count">0</span></div>
-                </div>
-            </div>
-        </div>
-        <div id="contenido-imagenes"></div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script src="funciones-rose.js"></script>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const firebaseConfig = { /* Tus datos */ };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const historiaID = "leopardo"; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        };
 
-    // Función arregla-links integrada
-    window.arreglarLink = function(url) {
-        if (!url) return "";
-        if (url.includes('drive.google.com')) {
-            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://docs.google.com/uc?export=view&id=${id}`;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // --- AQUÍ ESTÁ EL ERROR QUE TENÍAS ---
+        // Aseguramos que la historiaID sea exactamente "leopardo"
+        const historiaID = "leopardo"; 
+
+        async function cargarDatos() {
+            try {
+                // Cargar Sinopsis
+                const infoRef = doc(db, historiaID, "informacion_proyecto");
+                const infoSnap = await getDoc(infoRef);
+                if (infoSnap.exists()) {
+                    const data = infoSnap.data();
+                    document.getElementById('sinopsis-dinamica').innerText = data.sinopsis || "Sin sinopsis.";
+                    if(data.portadaUrl) document.getElementById('portada-dinamica').src = data.portadaUrl;
+                }
+
+                // Cargar Capítulos
+                const querySnapshot = await getDocs(collection(db, historiaID));
+                const grid = document.getElementById('grid');
+                grid.innerHTML = "";
+                
+                let capitulos = [];
+                querySnapshot.forEach((docSnap) => {
+                    if (docSnap.id.startsWith("capitulo_")) {
+                        capitulos.push(docSnap.id);
+                    }
+                });
+
+                capitulos.sort().forEach(idCap => {
+                    const btn = document.createElement('div');
+                    btn.className = 'cap-btn-dinamico';
+                    btn.innerText = idCap.replace("capitulo_", "");
+                    btn.onclick = () => window.location.href = `lector.html?id=${idCap}`;
+                    grid.appendChild(btn);
+                });
+            } catch (e) {
+                console.error("Error crítico:", e);
+            }
         }
-        return url;
-    };
-
-    // Lógica principal
-    if (window.conectarAdminConManga) window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica");
-    
-    // ...resto de la lógica original...
-    // (Asegúrate de copiar el resto de las funciones de carga desde tu archivo original)
-</script>
+        cargarDatos();
+    </script>
 </body>
 </html>
