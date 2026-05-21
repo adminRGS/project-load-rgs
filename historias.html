@@ -197,7 +197,6 @@
     }
     const dbInstancia = firebase.firestore();
 
-    // Traductor auxiliar para títulos si Firebase no envía un nombre explícito
     function obtenerNombreBonito(id, nombreFirebase) {
         if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
         switch(id) {
@@ -216,29 +215,37 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Conecta con Firestore para reordenar o crear tarjetas dinámicas
-        dbInstancia.collection("estados_historias").get().then((querySnapshot) => {
+        // CORRECCIÓN CLAVE: Ahora lee de 'proyectos_lista', que es la colección que maneja tu panel
+        dbInstancia.collection("proyectos_lista").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const idHistoria = doc.id; 
                 const datos = doc.data();
-                const nuevoEstado = datos.estado; // emision, hiatus, finalizado
+                
+                // Si el proyecto no tiene estado guardado aún, por defecto lo dejamos en emisión
+                let estadoFirebase = datos.estado || "🔴 En Emisión"; 
+                
+                // Traducimos el estado con emojis del panel al ID del contenedor de esta pantalla
+                let contenedorId = "emision";
+                if (estadoFirebase.includes("Hiatus")) contenedorId = "hiatus";
+                if (estadoFirebase.includes("Finalizado")) contenedorId = "finalizado";
+
                 const nuevaPortada = datos.portadaUrl || (idHistoria + ".jpg");
                 const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
 
-                let destinoGrid = document.getElementById("grid-" + nuevoEstado);
-                if (!destinoGrid) return; // Si el estado está mal escrito en la DB, lo ignora
+                let destinoGrid = document.getElementById("grid-" + contenedorId);
+                if (!destinoGrid) return; 
 
                 let tarjeta = document.getElementById("card-" + idHistoria);
 
                 if (tarjeta) {
-                    // SI YA EXISTE LA TARJETA EN TU HTML: La actualizamos y movemos de sección
+                    // Si la tarjeta ya existe, actualiza la portada si se cambió en el panel y la mueve de sección en vivo
                     const imgElemento = document.getElementById("img-" + idHistoria);
                     if (imgElemento && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
                         imgElemento.src = datos.portadaUrl;
                     }
                     destinoGrid.appendChild(tarjeta);
                 } else {
-                    // SI ES UNA HISTORIA NUEVA CREADA EN FIREBASE: ¡El script la fabrica por ti!
+                    // Si creas una historia COMPLETAMENTE NUEVA en el panel, se creará sola aquí sin tocar el HTML
                     tarjeta = document.createElement("a");
                     tarjeta.href = idHistoria + ".html";
                     tarjeta.className = "card";
@@ -252,16 +259,16 @@
                     destinoGrid.appendChild(tarjeta);
                 }
 
-                // Ajusta los cartelitos dinámicos según el estado definitivo
+                // Aplica los estilos correctos a los tags dependiendo de la sección donde cayó
                 const tag = tarjeta.querySelector(".estado-tag");
                 if (tag) {
                     tag.className = "estado-tag"; 
-                    if (nuevoEstado === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
-                    else if (nuevoEstado === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
-                    else if (nuevoEstado === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
+                    if (contenedorId === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
+                    else if (contenedorId === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
+                    else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
                 }
             });
-        }).catch((error) => console.log("Error al actualizar catálogo desde Firebase:", error));
+        }).catch((error) => console.log("Error al sincronizar con el panel administrativo:", error));
     });
 </script>
 </body>
