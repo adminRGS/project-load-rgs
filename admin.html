@@ -135,7 +135,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // TUS PROYECTOS REALES ASOCIADOS Y FIJOS
+        // TUS 10 PROYECTOS REALES ASOCIADOS Y FIJOS
         let MAPA_PROYECTOS = [
             {id: "amigos", nombre: "Los amigos no hacen esto"},
             {id: "confesion", nombre: "Confesión"},
@@ -149,7 +149,6 @@
             {id: "salvada", nombre: "Salvada por la pequeña dama sin poderes"}
         ];
 
-        // BLINDAJE DE DRIVE SEGURO
         function blindarEnlaceDrive(url) {
             let texto = url.trim();
             if (texto.includes("drive.google.com")) {
@@ -242,16 +241,24 @@
             .catch(e => alert("Error al subir capítulo: " + e));
         }
 
+        // CONTROLADOR DE ESTATUS COMPATIBLE CON HISTORIAS.HTML
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
             if(!id) { alert("Selecciona un proyecto."); return; }
             
+            // 1. Actualiza el documento interno del proyecto
             db.collection(id).doc("informacion_proyecto").set({
                 estado: nuevoEstado
             }, { merge: true })
             .then(() => {
-                alert("Estatus actualizado correctamente.");
+                // 2. Sincroniza con la lista global que lee historias.html
+                return db.collection("proyectos_lista").doc(id).set({
+                    estado: nuevoEstado
+                }, { merge: true });
+            })
+            .then(() => {
+                alert("Estatus actualizado y acomodado para historias.html con éxito.");
                 mostrarEstatusActual();
             })
             .catch(e => alert("Error al actualizar estatus: " + e));
@@ -267,13 +274,21 @@
 
             portada = blindarEnlaceDrive(portada);
 
+            // 1. Crea la info del proyecto
             db.collection(id).doc("informacion_proyecto").set({
                 nombre: titulo,
                 portadaUrl: portada,
                 sinopsis: sinopsis,
                 estado: "🔴 En Emisión"
             }).then(() => {
-                alert("¡Proyecto '" + titulo + "' creado con éxito!");
+                // 2. Lo mete al índice maestro con su estado inicial para historias.html
+                return db.collection("proyectos_lista").doc(id).set({
+                    nombre: titulo,
+                    estado: "🔴 En Emisión",
+                    portadaUrl: portada
+                });
+            }).then(() => {
+                alert("¡Proyecto '" + titulo + "' creado y registrado en historias.html!");
                 
                 MAPA_PROYECTOS.push({ id: id, nombre: titulo });
                 cargarProyectosEnSelects();
@@ -291,11 +306,17 @@
 
             let portadaEditada = document.getElementById("editar-portada").value.trim();
             portadaEditada = blindarEnlaceDrive(portadaEditada);
+            const sinopsisEditada = document.getElementById("editar-sinopsis").value.trim();
 
             db.collection(id).doc("informacion_proyecto").set({
                 portadaUrl: portadaEditada,
-                sinopsis: document.getElementById("editar-sinopsis").value.trim()
+                sinopsis: sinopsisEditada
             }, { merge: true }).then(() => {
+                // Sincroniza la portada también en la lista general por si historias.html la lee de ahí
+                return db.collection("proyectos_lista").doc(id).set({
+                    portadaUrl: portadaEditada
+                }, { merge: true });
+            }).then(() => {
                 alert("Cambios de portada y sinopsis guardados correctamente.");
             }).catch(e => alert("Error al guardar edición: " + e));
         }
