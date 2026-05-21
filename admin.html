@@ -46,6 +46,7 @@
             <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
 
+        <!-- 1. CARGAR CAPÍTULO (Sube directo a la colección del ID) -->
         <div id="opcion-cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
@@ -57,12 +58,13 @@
                 <input type="number" id="num-capitulo" step="any">
             </div>
             <div class="grupo-control">
-                <label>Enlaces de Imágenes</label>
-                <textarea id="enlaces-imagenes" rows="8"></textarea>
+                <label>Enlaces de Imágenes (Cualquier link de Drive)</label>
+                <textarea id="enlaces-imagenes" rows="8" placeholder="Pega tus enlaces de Drive aquí, uno por línea..."></textarea>
             </div>
             <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
         </div>
 
+        <!-- 5. ACTUALIZAR ESTATUS (Muestra estatus actual y opciones abajo para guardar) -->
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
             <div class="grupo-control">
@@ -71,19 +73,20 @@
             </div>
             <div class="grupo-control">
                 <label>Estatus Actual</label>
-                <input type="text" id="estatus-actual-pantalla" readonly>
+                <input type="text" id="estatus-actual-pantalla" readonly style="background-color: #f0f0f0 !important; font-weight: bold;">
             </div>
             <div class="grupo-control">
-                <label>Nuevo Estatus</label>
+                <label>Cambiar Estatus Opciones</label>
                 <select id="nuevo-estado-valor">
-                    <option value="emision">🔴 En Emisión</option>
-                    <option value="hiatus">🟡 En Hiatus</option>
-                    <option value="finalizado">💖 Finalizado</option>
+                    <option value="🔴 En Emisión">🔴 En Emisión</option>
+                    <option value="🟡 En Hiatus">🟡 En Hiatus</option>
+                    <option value="💖 Finalizado">💖 Finalizado</option>
                 </select>
             </div>
-            <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Actualizar Estado</button>
+            <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Guardar Nuevo Estatus</button>
         </div>
 
+        <!-- 3 & 4. CREAR Y EDITAR PROYECTO (Con sinopsis, portada y actualización automática) -->
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
             <h3>➕ CREAR NUEVO</h3>
@@ -92,11 +95,11 @@
                 <input type="text" id="nuevo-id">
             </div>
             <div class="grupo-control">
-                <label>Nombre Completo</label>
+                <label>Nombre Completo (Largo)</label>
                 <input type="text" id="nuevo-titulo">
             </div>
             <div class="grupo-control">
-                <label>Link Portada</label>
+                <label>Link Portada (Drive o Directo)</label>
                 <input type="text" id="nuevo-portada">
             </div>
             <div class="grupo-control">
@@ -108,7 +111,7 @@
             <div class="divisor"></div>
             <h3>✏️ EDITAR EXISTENTE</h3>
             <div class="grupo-control">
-                <label>Seleccionar Proyecto</label>
+                <label>Seleccionar Proyecto (Nombres Largos)</label>
                 <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()"><option value="">Cargando...</option></select>
             </div>
             <div class="grupo-control">
@@ -119,7 +122,7 @@
                 <label>Cambiar Sinopsis</label>
                 <textarea id="editar-sinopsis" rows="3"></textarea>
             </div>
-            <button class="btn-guardar" style="background: #2575fc !important;" onclick="guardarEdicionProyecto()">Guardar Cambios</button>
+            <button class="btn-guardar" style="background: #2575fc !important;" onclick="guardarEdicionProyecto()">Guardar Cambios de Edición</button>
         </div>
     </div>
 
@@ -135,8 +138,8 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Mapeo fijo para asegurar que el ID coincida con tu lista
-        const MAPA_PROYECTOS = [
+        // Nombres largos y bien escritos
+        let MAPA_PROYECTOS = [
             {id: "amigos", nombre: "Los amigos no hacen esto"},
             {id: "confesion", nombre: "Confesión de amor"},
             {id: "embarazada", nombre: "Embarazada por accidente"},
@@ -144,6 +147,18 @@
             {id: "hermana", nombre: "Mi querida hermana"},
             {id: "leopardo", nombre: "La pequeña bebé leopardo"}
         ];
+
+        // BLINDAJE DE DRIVE: Esta función limpia el link de compartir y extrae el ID real para que se vea siempre bien
+        function blindarEnlaceDrive(url) {
+            let texto = url.trim();
+            if (texto.includes("drive.google.com")) {
+                let idMatch = texto.match(/\/d\/([^/]+)/) || texto.match(/id=([^&]+)/);
+                if (idMatch && idMatch[1]) {
+                    return "https://lh3.googleusercontent.com/u/0/d/" + idMatch[1];
+                }
+            }
+            return texto;
+        }
 
         function verificarClave() {
             if (document.getElementById("clave-input").value === "Rose2026") {
@@ -164,7 +179,7 @@
             const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
             selects.forEach(s => {
                 const el = document.getElementById(s);
-                el.innerHTML = '<option value="">-- Selecciona --</option>';
+                el.innerHTML = '<option value="">-- Selecciona Proyecto --</option>';
                 MAPA_PROYECTOS.forEach(p => {
                     let opc = document.createElement("option");
                     opc.value = p.id;
@@ -176,58 +191,118 @@
 
         function mostrarEstatusActual() {
             const id = document.getElementById("select-proyecto-estatus").value;
-            if(!id) return;
-            db.collection("estados_historias").doc(id).get().then(doc => {
-                document.getElementById("estatus-actual-pantalla").value = doc.exists ? (doc.data().estado || "emision") : "emision";
+            if(!id) {
+                document.getElementById("estatus-actual-pantalla").value = "";
+                return;
+            }
+            db.collection(id).doc("informacion_proyecto").get().then(doc => {
+                document.getElementById("estatus-actual-pantalla").value = doc.exists ? (doc.data().estado || "🔴 En Emisión") : "🔴 En Emisión";
+            }).catch(e => {
+                document.getElementById("estatus-actual-pantalla").value = "🔴 En Emisión";
             });
         }
 
         function cargarDatosParaEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if(!id) return;
-            db.collection("estados_historias").doc(id).get().then(doc => {
+            db.collection(id).doc("informacion_proyecto").get().then(doc => {
                 if(doc.exists) {
                     document.getElementById("editar-portada").value = doc.data().portadaUrl || "";
                     document.getElementById("editar-sinopsis").value = doc.data().sinopsis || "";
+                } else {
+                    document.getElementById("editar-portada").value = "";
+                    document.getElementById("editar-sinopsis").value = "";
                 }
             });
         }
 
+        // 1. SUBIR CAPÍTULO (Ignora estados_historias y procesa links blindados uno por uno)
         function subirCapitulo() {
             const id = document.getElementById("select-proyecto-capitulo").value;
             const num = document.getElementById("num-capitulo").value;
-            const imgs = document.getElementById("enlaces-imagenes").value.split("\n").filter(l => l.trim() !== "");
-            if(!id || !num || imgs.length === 0) { alert("Llena todos los campos"); return; }
+            if(!id || !num) { alert("Selecciona proyecto y número de capítulo."); return; }
+
+            const lineas = document.getElementById("enlaces-imagenes").value.split("\n");
+            let imgs = [];
+            
+            lineas.forEach(linea => {
+                if (linea.trim() !== "") {
+                    imgs.push(blindarEnlaceDrive(linea)); // Aplica blindaje al vuelo
+                }
+            });
+
+            if(imgs.length === 0) { alert("Agrega al menos un enlace."); return; }
+            
             db.collection(id).doc("capitulo_" + num).set({ imagenes: imgs })
-            .then(() => alert("¡Capítulo publicado en " + id + "!"))
-            .catch(e => alert("Error: " + e));
+            .then(() => {
+                alert("¡Capítulo " + num + " publicado con éxito!");
+                document.getElementById("num-capitulo").value = "";
+                document.getElementById("enlaces-imagenes").value = "";
+            })
+            .catch(e => alert("Error al subir capítulo: " + e));
         }
 
+        // 5. ACTUALIZAR ESTATUS (Guarda el estado actual directamente)
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
-            const estado = document.getElementById("nuevo-estado-valor").value;
-            if(!id) return;
-            db.collection("estados_historias").doc(id).update({ estado: estado })
-            .then(() => alert("Estatus actualizado"));
+            const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
+            if(!id) { alert("Selecciona un proyecto."); return; }
+            
+            db.collection(id).doc("informacion_proyecto").set({
+                estado: nuevoEstado
+            }, { merge: true })
+            .then(() => {
+                alert("Estatus actualizado correctamente.");
+                mostrarEstatusActual();
+            })
+            .catch(e => alert("Error al actualizar estatus: " + e));
         }
 
+        // 4. CREAR PROYECTO EN AUTOMÁTICO PARA LAS DEMÁS OPCIONES
         function crearNuevoProyecto() {
             const id = document.getElementById("nuevo-id").value.trim();
             const titulo = document.getElementById("nuevo-titulo").value.trim();
-            db.collection("estados_historias").doc(id).set({
+            let portada = document.getElementById("nuevo-portada").value.trim();
+            const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
+
+            if(!id || !titulo) { alert("El ID y el Nombre Largo son obligatorios."); return; }
+
+            portada = blindarEnlaceDrive(portada); // Blindaje de portada por si es link de Drive
+
+            db.collection(id).doc("informacion_proyecto").set({
                 nombre: titulo,
-                portadaUrl: document.getElementById("nuevo-portada").value,
-                sinopsis: document.getElementById("nuevo-sinopsis").value,
-                estado: "emision"
-            }).then(() => alert("Proyecto creado"));
+                portadaUrl: portada,
+                sinopsis: sinopsis,
+                estado: "🔴 En Emisión"
+            }).then(() => {
+                alert("¡Proyecto '" + titulo + "' creado con éxito!");
+                
+                // Inyección automática al mapa local para actualizar los selects sin recargar
+                MAPA_PROYECTOS.push({ id: id, nombre: titulo });
+                cargarProyectosEnSelects();
+
+                // Limpiar entradas
+                document.getElementById("nuevo-id").value = "";
+                document.getElementById("nuevo-titulo").value = "";
+                document.getElementById("nuevo-portada").value = "";
+                document.getElementById("nuevo-sinopsis").value = "";
+            }).catch(e => alert("Error al crear proyecto: " + e));
         }
 
+        // 3. EDITAR SINOPSIS Y PORTADA (No se quitan las opciones)
         function guardarEdicionProyecto() {
             const id = document.getElementById("select-proyecto-editar").value;
-            db.collection("estados_historias").doc(id).update({
-                portadaUrl: document.getElementById("editar-portada").value,
-                sinopsis: document.getElementById("editar-sinopsis").value
-            }).then(() => alert("Cambios guardados."));
+            if(!id) { alert("Selecciona un proyecto para editar."); return; }
+
+            let portadaEditada = document.getElementById("editar-portada").value.trim();
+            portadaEditada = blindarEnlaceDrive(portadaEditada); // Blindaje al editar portada
+
+            db.collection(id).doc("informacion_proyecto").set({
+                portadaUrl: portadaEditada,
+                sinopsis: document.getElementById("editar-sinopsis").value.trim()
+            }, { merge: true }).then(() => {
+                alert("Cambios de portada y sinopsis guardados correctamente.");
+            }).catch(e => alert("Error al guardar edición: " + e));
         }
     </script>
 </body>
