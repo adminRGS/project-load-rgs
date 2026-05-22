@@ -2,99 +2,488 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Rose Garden - Sistema Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Rose Garden Scan</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
-        body { font-family: sans-serif; background: #ffeef4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #login-screen, #admin-panel { background: white; padding: 20px; border-radius: 15px; border: 2px solid #ec407a; width: 320px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        #admin-panel { display: none; }
-        h1 { color: #880e4f; font-size: 1.2rem; margin-bottom: 15px; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; background: #f8bbd0; color: #880e4f; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
-        .tab-btn.active { background: #ec407a; color: white; }
-        .section { display: none; text-align: left; }
-        .section.active { display: block; }
-        label { display: block; font-size: 0.65rem; font-weight: bold; color: #880e4f; margin-top: 10px; text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 8px; margin: 3px 0; border: 1px solid #f48fb1; border-radius: 5px; background: #fff5f8; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; margin-top: 10px; background: #d81b60; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+        /* Bloquea el modo oscuro forzado de Android para mantener el diseño rosa original */
+        :root {
+            color-scheme: light !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffeef4 !important; /* Rosa pastel original */
+            color: #4a1525 !important;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #d81b60 !important;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        #bloque-login {
+            background: #ffffff !important;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15);
+            border: 2px solid #f48fb1 !important;
+            text-align: center;
+            max-width: 340px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 40px;
+        }
+
+        #contenido-panel {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-administracion {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .btn-menu {
+            width: 100%;
+            padding: 16px;
+            background: #ffffff !important;
+            border: 2px solid #f48fb1 !important;
+            color: #d81b60 !important;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .btn-menu:hover, .btn-menu.activo {
+            background: #f48fb1 !important;
+            color: white !important;
+            box-shadow: 0 5px 15px rgba(244, 139, 177, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .seccion-admin {
+            display: none;
+            width: 100%;
+            background: #ffffff !important;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(216, 27, 96, 0.1);
+            border: 2px solid #f48fb1 !important;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+
+        .seccion-admin.activa {
+            display: block;
+        }
+
+        .seccion-admin h2 {
+            color: #d81b60 !important;
+            margin-top: 0;
+            font-size: 1.4rem;
+            border-bottom: 2px dashed #fde4ec;
+            padding-bottom: 10px;
+        }
+
+        .grupo-control {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #ad1457 !important;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            padding: 14px;
+            background: #fff5f8 !important;
+            border: 2px solid #fbc4b6 !important;
+            color: #4a1525 !important;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #d81b60 !important;
+            background: #ffffff !important;
+        }
+
+        .btn-guardar {
+            background: #ec407a !important;
+            color: white !important;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-guardar:hover {
+            background: #d81b60 !important;
+        }
+
+        .divisor {
+            height: 2px;
+            background: #fde4ec;
+            margin: 25px 0;
+        }
     </style>
 </head>
 <body>
-<div id="login-screen">
-    <h1>🌸 Rose Garden 🌸</h1>
-    <input type="password" id="passInput" placeholder="Contraseña">
-    <button onclick="verificarClave()">Entrar</button>
-</div>
-<div id="admin-panel">
-    <h1>🌸 Panel Administrativo 🌸</h1>
-    <div class="tabs">
-        <button class="tab-btn active" onclick="show('cargar', this)">Cargar</button>
-        <button class="tab-btn" onclick="show('estatus', this)">Estatus</button>
-        <button class="tab-btn" onclick="show('info', this)">Info</button>
+
+    <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
+
+    <div id="bloque-login">
+        <h2 style="color: #d81b60; margin-top: 0;">🌸 Acceso Administrativo</h2>
+        <div class="grupo-control">
+            <label>Contraseña</label>
+            <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center;">
+        </div>
+        <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
     </div>
-    <div id="cargar" class="section active">
-        <label>Historia</label>
-        <select id="historiaID" class="lista"></select>
-        <label>Capítulo</label>
-        <input type="number" id="capNum" step="any" placeholder="Ej: 14.5">
-        <label>Links Imágenes</label>
-        <textarea id="linksRaw" rows="4" placeholder="Pega los links aquí..."></textarea>
-        <button onclick="guardarCapitulo()">Guardar Capítulo</button>
+
+    <div id="contenido-panel">
+        
+        <div class="menu-administracion">
+            <button class="btn-menu" id="btn-cargar" onclick="abrirSeccion(event, 'opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" id="btn-estatus" onclick="abrirSeccion(event, 'opcion-estatus')">🔄 Actualizar Estatus</button>
+            <button class="btn-menu" id="btn-nuevo" onclick="abrirSeccion(event, 'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
+        </div>
+
+        <div id="opcion-cargar" class="seccion-admin">
+            <h2>📂 Cargar Capítulo</h2>
+            <div class="grupo-control">
+                <label>Seleccionar el Proyecto</label>
+                <select id="select-proyecto-capitulo">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Número del Capítulo</label>
+                <input type="number" id="num-capitulo" placeholder="Ej: 12">
+            </div>
+            <div class="grupo-control">
+                <label>Enlaces de las Imágenes (Uno por línea - ¡Acepta links de Drive directos!)</label>
+                <textarea id="enlaces-imagenes" rows="8" placeholder="https://drive.google.com/file/d/.../view&#10;https://enlace2.com/imagen.jpg"></textarea>
+            </div>
+            <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
+        </div>
+
+        <div id="opcion-estatus" class="seccion-admin">
+            <h2>🔄 Actualizar Estatus</h2>
+            <div class="grupo-control">
+                <label>Seleccionar Proyecto</label>
+                <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Estatus Actual del Proyecto</label>
+                <input type="text" id="estatus-actual-pantalla" readonly style="background: #fff0f3 !important; border-color: #fbc4b6 !important; color: #d81b60 !important; font-weight: bold;">
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar a Nuevo Estatus</label>
+                <select id="nuevo-estado-valor">
+                    <option value="emision">🔴 En Emisión</option>
+                    <option value="hiatus">🟡 En Hiatus</option>
+                    <option value="finalizado">💖 Finalizado</option>
+                </select>
+            </div>
+            <button class="btn-guardar" onclick="actualizarEstadoFirebase()">Actualizar Estado</button>
+        </div>
+                <div id="opcion-nuevo" class="seccion-admin">
+            <h2>✨ Crear / Editar Proyecto</h2>
+            
+            <h3 style="color: #ad1457; margin-bottom: 10px; font-size: 1rem;">➕ CREAR NUEVO PROYECTO</h3>
+            <div class="grupo-control">
+                <label>ID del Proyecto (Firebase - Sin espacios ni mayúsculas)</label>
+                <input type="text" id="nuevo-id" placeholder="ej: de-fans-para-fans">
+            </div>
+            <div class="grupo-control">
+                <label>Nombre Completo del Proyecto (Nombre Largo)</label>
+                <input type="text" id="nuevo-titulo" placeholder="Ej: Nombre real del Manhwa">
+            </div>
+            <div class="grupo-control">
+                <label>Link de la Portada</label>
+                <input type="text" id="nuevo-portada" placeholder="https://enlace.com/portada.jpg">
+            </div>
+            <div class="grupo-control">
+                <label>Sinopsis / Descripción</label>
+                <textarea id="nuevo-sinopsis" rows="3" placeholder="Escribe la sinopsis aquí..."></textarea>
+            </div>
+            <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo Proyecto</button>
+
+            <div class="divisor"></div>
+
+            <h3 style="color: #ad1457; margin-bottom: 10px; font-size: 1rem;">✏️ EDITAR PROYECTO EXISTENTE</h3>
+            <div class="grupo-control">
+                <label>Seleccionar Proyecto a Editar</label>
+                <select id="select-proyecto-editar" onchange="cargarDatosParaEditar()">
+                    <option value="">Cargando historias...</option>
+                </select>
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar Link de la Portada (¡Acepta Drive directo!)</label>
+                <input type="text" id="editar-portada" placeholder="https://drive.google.com/file/d/.../view">
+            </div>
+            <div class="grupo-control">
+                <label>Cambiar Sinopsis</label>
+                <textarea id="editar-sinopsis" rows="3" placeholder="Modificar la sinopsis del proyecto..."></textarea>
+            </div>
+            <button class="btn-guardar" style="background: #2575fc !important;" onclick="guardarEdicionProyecto()">Guardar Cambios del Proyecto</button>
+        </div>
+
     </div>
-    <div id="estatus" class="section">
-        <label>Historia</label>
-        <select id="estatusID" class="lista" onchange="loadEstadoActual()"></select>
-        <label>Estado Actual</label>
-        <input type="text" id="actualEstatus" readonly>
-        <label>Nuevo Estado</label>
-        <select id="nuevoEstatus">
-            <option value="En Emisión">En Emisión</option>
-            <option value="Hiatus">Hiatus</option>
-            <option value="Finalizado">Finalizado</option>
-        </select>
-        <button onclick="updateEst()">Actualizar Estado</button>
-    </div>
-    <div id="info" class="section">
-        <label>Historia</label>
-        <select id="infoID" class="lista" onchange="loadInfo()"></select>
-        <input type="text" id="portadaURL" placeholder="Link Portada (lh3)">
-        <textarea id="sinopsis" rows="3" placeholder="Sinopsis"></textarea>
-        <button onclick="updateInf()">Guardar Cambios</button>
-    </div>
-</div>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const db = getFirestore(initializeApp({apiKey:"AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",projectId:"prgs-f2ef8",storageBucket:"prgs-f2ef8.firebasestorage.app"}));
-    
-    const historias = [
-        {id:"guarderia", nombre:"La guardería de la villana"},{id:"confesion", nombre:"Confesión"},
-        {id:"embarazada", nombre:"Fingí estar embarazada..."},{id:"salvada", nombre:"Salvada por la pequeña dama..."},
-        {id:"leopardo", nombre:"La pequeña leopardo de las nieves..."},{id:"lobo", nombre:"Soy un lobo pero no te lastimaré"},
-        {id:"princesa", nombre:"No solo encanté a la princesa"},{id:"matrimonio", nombre:"Matrimonio de conveniencia..."},
-        {id:"amigos", nombre:"Los amigos no hacen esto"},{id:"hermana", nombre:"Mi hermana era mi enemiga ahora me ama"}
-    ];
-    document.querySelectorAll('.lista').forEach(s => historias.forEach(h => { let o = document.createElement('option'); o.value=h.id; o.innerText=h.nombre; s.appendChild(o); }));
-    
-    const toLh3 = (l) => { const m = l.match(/[-\w]{25,}/); return m ? `https://lh3.googleusercontent.com/d/$${m[0]}=s1600` : l; };
-    
-    window.verificarClave = () => { if(document.getElementById('passInput').value === "Rose2026") { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-panel').style.display='block'; } else alert("Clave mal"); }
-    window.show = (id, b) => { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); };
-    
-    window.guardarCapitulo = async () => { 
-        const id = document.getElementById('historiaID').value; 
-        const num = document.getElementById('capNum').value; 
-        const links = document.getElementById('linksRaw').value.split('\n').filter(l=>l.trim()).map(toLh3); 
-        await setDoc(doc(db, id, "capitulo_"+num), {imagenes: links}); 
-        document.getElementById('capNum').value = ""; 
-        document.getElementById('linksRaw').value = ""; 
-        alert("Guardado"); 
-    };
-    
-    window.loadEstadoActual = async () => { const snap = await getDoc(doc(db, "estados_historias", document.getElementById('estatusID').value)); if(snap.exists()) document.getElementById('actualEstatus').value = snap.data().estado || "---"; };
-    window.updateEst = async () => { await updateDoc(doc(db, "estados_historias", document.getElementById('estatusID').value), {estado: document.getElementById('nuevoEstatus').value}); alert("Actualizado"); };
-    
-    window.loadInfo = async () => { const snap = await getDoc(doc(db, "estados_historias", document.getElementById('infoID').value)); if(snap.exists()) { document.getElementById('portadaURL').value = snap.data().portadaUrl || ""; document.getElementById('sinopsis').value = snap.data().sinopsis || ""; } };
-    window.updateInf = async () => { await updateDoc(doc(db, "estados_historias", document.getElementById('infoID').value), {sinopsis: document.getElementById('sinopsis').value, portadaUrl: toLh3(document.getElementById('portadaURL').value)}); alert("Guardado"); };
-</script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let listaProyectosGlobal = {};
+
+        function blindarEnlaceDrive(url) {
+            const enlaceLimpio = url.trim();
+            if (enlaceLimpio.includes("drive.google.com")) {
+                let idMatch = enlaceLimpio.match(/\/d\/([a-zA-Z0-9-_]+)/) || enlaceLimpio.match(/id=([a-zA-Z0-9-_]+)/);
+                if (idMatch && idMatch[1]) {
+                    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+                }
+            }
+            return enlaceLimpio;
+        }
+
+        function verificarClave() {
+            const entrada = document.getElementById("clave-input").value;
+            if (entrada === "Rose2026") {
+                document.getElementById("bloque-login").style.display = "none";
+                document.getElementById("contenido-panel").style.display = "flex";
+                cargarProyectosEnSelects(); 
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function abrirSeccion(evento, idSeccion) {
+            document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa'));
+            document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('activo'));
+            
+            document.getElementById(idSeccion).classList.add('activa');
+            evento.target.classList.add('activo');
+        }
+
+        function cargarProyectosEnSelects() {
+            const selectCap = document.getElementById("select-proyecto-capitulo");
+            const selectEst = document.getElementById("select-proyecto-estatus");
+            const selectEdi = document.getElementById("select-proyecto-editar");
+            
+            const misIds = ["amigos", "confesion", "embarazada", "guarderia", "hermana", "leopardo", "lobo", "matrimonio", "princesa", "salvada"];
+            
+            selectCap.innerHTML = '<option value="">-- Selecciona una historia --</option>';
+            selectEst.innerHTML = '<option value="">-- Selecciona una historia --</option>';
+            selectEdi.innerHTML = '<option value="">-- Selecciona una historia --</option>';
+            listaProyectosGlobal = {}; 
+            
+            misIds.forEach((id) => {
+                let nombreFinal = "";
+                
+                switch(id) {
+                    case "amigos": nombreFinal = "Los amigos no hacen esto"; break;
+                    case "confesion": nombreFinal = "Confesión"; break;
+                    case "embarazada": nombreFinal = "Finge estar embarazada pero mi esposo regresó"; break;
+                    case "guarderia": nombreFinal = "La guardería de la villana"; break;
+                    case "hermana": nombreFinal = "Mi hermana que era mi enemiga ahora me ama"; break;
+                    case "leopardo": nombreFinal = "La pequeña bebé leopardo de las nieves de la familia de panteras negras"; break;
+                    case "lobo": nombreFinal = "Soy un lobo pero no te lastimaré"; break;
+                    case "matrimonio": nombreFinal = "Matrimonio conveniencia a una obsesión"; break;
+                    case "princesa": nombreFinal = "No solo encante a la princesa"; break;
+                    case "salvada": nombreFinal = "Salvada por la pequeña dama sin poderes"; break;
+                    default: nombreFinal = id;
+                }
+
+                db.collection(id).doc("datos_proyecto").get().then((docSnapshot) => {
+                    if(docSnapshot.exists) {
+                        listaProyectosGlobal[id] = docSnapshot.data();
+                    } else {
+                        listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
+                    }
+                }).catch(() => {
+                    listaProyectosGlobal[id] = { nombre: nombreFinal, portadaUrl: "", sinopsis: "" };
+                });
+                
+                let opc1 = document.createElement("option"); opc1.value = id; opc1.text = nombreFinal; selectCap.appendChild(opc1);
+                let opc2 = document.createElement("option"); opc2.value = id; opc2.text = nombreFinal; selectEst.appendChild(opc2);
+                let opc3 = document.createElement("option"); opc3.value = id; opc3.text = nombreFinal; selectEdi.appendChild(opc3);
+            });
+        }
+
+        function mostrarEstatusActual() {
+            const id = document.getElementById("select-proyecto-estatus").value;
+            const campo = document.getElementById("estatus-actual-pantalla");
+            
+            if(id) {
+                db.collection("estados_historias").doc(id).get().then((doc) => {
+                    if (doc.exists) {
+                        const est = doc.data().estado;
+                        campo.value = est === "emision" ? "🔴 En Emisión" : est === "hiatus" ? "🟡 En Hiatus" : "💖 Finalizado";
+                    } else {
+                        campo.value = "🔴 En Emisión";
+                    }
+                });
+            } else {
+                campo.value = "";
+            }
+        }
+
+        function cargarDatosParaEditar() {
+            const id = document.getElementById("select-proyecto-editar").value;
+            if(id && listaProyectosGlobal[id]) {
+                document.getElementById("editar-portada").value = listaProyectosGlobal[id].portadaUrl || "";
+                document.getElementById("editar-sinopsis").value = listaProyectosGlobal[id].sinopsis || "";
+            } else {
+                document.getElementById("editar-portada").value = "";
+                document.getElementById("editar-sinopsis").value = "";
+            }
+        }
+
+        function subirCapitulo() {
+            const idProyecto = document.getElementById("select-proyecto-capitulo").value;
+            const numCap = document.getElementById("num-capitulo").value;
+            const textoEnlaces = document.getElementById("enlaces-imagenes").value;
+            
+            const arrayImagenes = textoEnlaces.split("\n")
+                .map(linea => blindarEnlaceDrive(linea))
+                .filter(linea => linea !== "");
+
+            if(!idProyecto) { alert("Por favor, selecciona un proyecto."); return; }
+            if(!numCap || arrayImagenes.length === 0) { alert("Completa el número de capítulo y agrega imágenes."); return; }
+
+            // MODIFICACIÓN: Guarda directamente en la ruta del proyecto (sin subcarpetas)
+            db.collection(idProyecto).doc("capitulo_" + numCap).set({
+                imagenes: arrayImagenes
+            })
+            .then(() => {
+                alert(`¡Capítulo ${numCap} publicado con éxito en ${idProyecto}!`);
+                document.getElementById("num-capitulo").value = "";
+                document.getElementById("enlaces-imagenes").value = "";
+            })
+            .catch(error => alert("Error: " + error));
+        }
+
+        function actualizarEstadoFirebase() {
+            const idSubido = document.getElementById("select-proyecto-estatus").value;
+            const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
+
+            if(!idSubido) { alert("Selecciona un proyecto primero."); return; }
+
+            db.collection("estados_historias").doc(idSubido).set({
+                estado: nuevoEstado
+            }, { merge: true })
+            .then(() => alert("¡Estatus actualizado correctamente!"))
+            .catch(error => alert("Error: " + error));
+        }
+
+        function crearNuevoProyecto() {
+            const id = document.getElementById("nuevo-id").value.trim().toLowerCase();
+            const titulo = document.getElementById("nuevo-titulo").value.trim();
+            const portadaRaw = document.getElementById("nuevo-portada").value.trim();
+            const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
+
+            const portada = blindarEnlaceDrive(portadaRaw);
+
+            if(!id || !titulo) { alert("Rellena el ID y el Nombre del proyecto."); return; }
+
+            db.collection(id).doc("datos_proyecto").set({
+                nombre: titulo,
+                portadaUrl: portada,
+                sinopsis: sinopsis
+            }, { merge: true })
+            .then(() => {
+                return db.collection("estados_historias").doc(id).set({
+                    estado: "emision"
+                }, { merge: true });
+            })
+            .then(() => {
+                alert(`¡Proyecto "${titulo}" creado con éxito!`);
+                document.getElementById("nuevo-id").value = "";
+                document.getElementById("nuevo-titulo").value = "";
+                document.getElementById("nuevo-portada").value = "";
+                document.getElementById("nuevo-sinopsis").value = "";
+                cargarProyectosEnSelects();
+            })
+            .catch(error => alert("Error: " + error));
+        }
+
+        function guardarEdicionProyecto() {
+            const id = document.getElementById("select-proyecto-editar").value;
+            const nuevaPortadaRaw = document.getElementById("editar-portada").value.trim();
+            const nuevaSinopsis = document.getElementById("editar-sinopsis").value.trim();
+
+            if(!id) { alert("Selecciona qué proyecto quieres editar."); return; }
+
+            const nuevaPortada = blindarEnlaceDrive(nuevaPortadaRaw);
+
+            db.collection(id).doc("datos_proyecto").set({
+                portadaUrl: nuevaPortada,
+                sinopsis: nuevaSinopsis
+            }, { merge: true })
+            .then(() => {
+                alert("¡Proyecto editado con éxito!");
+                if(!listaProyectosGlobal[id]) listaProyectosGlobal[id] = {};
+                listaProyectosGlobal[id].portadaUrl = nuevaPortada;
+                listaProyectosGlobal[id].sinopsis = nuevaSinopsis;
+                
+                document.getElementById("editar-portada").value = "";
+                document.getElementById("editar-sinopsis").value = "";
+            })
+            .catch(error => alert("Error: " + error));
+        }
+    </script>
 </body>
-</html>
+                    </html>
