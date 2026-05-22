@@ -311,7 +311,7 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── BLINDAR DRIVE (CORREGIDO CON TEMPLATE LITERALS) ───────
+        // ── BLINDAR DRIVE CORREGIDO CON PROTOCOLO HTTPS ───────────
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
@@ -331,12 +331,11 @@
                 }
             }
 
-            // Si se encontró un ID de Drive, se devuelve transformado correctamente usando comillas invertidas
+            // Agregado el "https://" explícito para que el lector cargue la imagen correctamente
             if (id) {
-                return `lh3.googleusercontent.com/d/${id}`;
+                return `https://lh3.googleusercontent.com/d/${id}`;
             }
 
-            // Si ya es un enlace directo lh3 o no coincide con Drive, se deja igual
             return link;
         }
 
@@ -385,13 +384,11 @@
 
             db.collection("estado_historias").doc(id).get()
                 .then(doc => {
-                    let estado = "emision"; // valor por defecto
+                    let estado = "emision";
                     if (doc.exists && doc.data().estado) {
                         estado = doc.data().estado;
                     }
                     mostrarBadgeEstado(caja, estado);
-
-                    // Preselecciona el select de "Cambiar a" con el estado actual
                     document.getElementById("nuevo-estado-valor").value = estado;
                 })
                 .catch(() => {
@@ -420,10 +417,7 @@
                 .set({ estado: nuevoEstado }, { merge: true })
                 .then(() => {
                     alert("¡Estatus actualizado!");
-                    mostrarBadgeEstado(
-                        document.getElementById("caja-estado-actual"),
-                        nuevoEstado
-                    );
+                    mostrarBadgeEstado(document.getElementById("caja-estado-actual"), nuevoEstado);
                 })
                 .catch(error => alert("Error: " + error));
         }
