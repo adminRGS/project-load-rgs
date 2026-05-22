@@ -311,7 +311,7 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── BLINDAR DRIVE (CORREGIDO) ─────────────────────────────
+        // ── BLINDAR DRIVE (CORREGIDO CON TEMPLATE LITERALS) ───────
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
@@ -331,9 +331,9 @@
                 }
             }
 
-            // Si se encontró un ID de Drive, se devuelve transformado al formato lh3 que sí funciona
+            // Si se encontró un ID de Drive, se devuelve transformado correctamente usando comillas invertidas
             if (id) {
-                return `https://lh3.googleusercontent.com/d/${id}`;
+                return `lh3.googleusercontent.com/d/${id}`;
             }
 
             // Si ya es un enlace directo lh3 o no coincide con Drive, se deja igual
@@ -496,5 +496,4 @@
 
     </script>
 </body>
-    </html>
-    
+</html>
