@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Rose Garden - Final</title>
+    <title>Rose Garden - Admin</title>
     <style>
         body { font-family: sans-serif; background: #ffeef4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         #login-screen, #admin-panel { background: white; padding: 20px; border-radius: 15px; border: 2px solid #ec407a; width: 320px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -36,7 +36,7 @@
         <select id="historiaID" class="lista"></select>
         <label>Capítulo (Permite decimales)</label>
         <input type="number" id="capNum" step="any" placeholder="Ej: 14.5">
-        <label>Links Imágenes (lh3)</label>
+        <label>Links Imágenes (Copia tal cual de Drive)</label>
         <textarea id="linksRaw" rows="4"></textarea>
         <button onclick="guardarCapitulo()">Guardar Capítulo</button>
     </div>
@@ -54,9 +54,9 @@
         <button onclick="actualizarEstatus()">Actualizar Estatus</button>
     </div>
     <div id="info" class="section">
-        <label>-- MODIFICAR --</label>
+        <label>Historia</label>
         <select id="infoID" class="lista" onchange="cargarInfo()"></select>
-        <input type="text" id="portadaURL" placeholder="Link Portada (lh3)">
+        <input type="text" id="portadaURL" placeholder="Link Portada (Drive)">
         <textarea id="sinopsis" rows="3" placeholder="Sinopsis"></textarea>
         <button onclick="actualizarInfo()">Guardar Cambios</button>
     </div>
@@ -75,20 +75,20 @@
     ];
     document.querySelectorAll('.lista').forEach(s => historias.forEach(h => { let o = document.createElement('option'); o.value=h.id; o.innerText=h.nombre; s.appendChild(o); }));
     
-    const conv = (l) => { const m = l.match(/[-\w]{25,}/); return m ? `https://lh3.googleusercontent.com/d/$${m[0]}` : l; };
+    // Función correcta de conversión a LH3
+    const conv = (l) => { const m = l.match(/[-\w]{25,}/); return m ? `https://lh3.googleusercontent.com/d/${m[0]}=s1600` : l; };
     
     window.verificarClave = () => { if(document.getElementById('passInput').value === "Rose2026") { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-panel').style.display='block'; } else alert("Clave mal"); }
     window.show = (id, b) => { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); };
     
-    // GUARDAR CON LIMPIEZA AUTOMÁTICA Y DECIMALES
     window.guardarCapitulo = async () => { 
         const id = document.getElementById('historiaID').value; 
         const num = document.getElementById('capNum').value; 
         const links = document.getElementById('linksRaw').value.split('\n').filter(l=>l.trim()).map(conv); 
         await setDoc(doc(db, id, "capitulo_"+num), {imagenes: links}); 
-        document.getElementById('capNum').value = ""; // Limpia capítulo
-        document.getElementById('linksRaw').value = ""; // Limpia links
-        alert("Guardado"); 
+        document.getElementById('capNum').value = ""; 
+        document.getElementById('linksRaw').value = ""; 
+        alert("Guardado exitosamente"); 
     };
     
     window.cargarEstatus = async () => { const s = await getDoc(doc(db, "estados_historias", document.getElementById('estatusID').value)); if(s.exists()) document.getElementById('statusActual').value = s.data().estado || "---"; };
