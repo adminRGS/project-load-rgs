@@ -23,11 +23,40 @@
             min-height: 100vh; 
             transition: background 0.3s ease, color 0.3s ease;
         }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            z-index: -1;
+        }
         
-        header { padding: 60px 20px 20px 20px; text-align: center; position: relative; width: 100%; max-width: 1000px; }
+        header {
+            padding: 60px 20px 20px 20px;
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+        }
         
-        .btn-inicio { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #ff66b2; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border: 1px solid #ff66b2; padding: 8px 15px; border-radius: 20px; transition: 0.3s; z-index: 10; background: transparent; }
+        .btn-inicio {
+            position: absolute;
+            top: 20px; left: 20px;
+            text-decoration: none;
+            color: #ff66b2;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border: 1px solid #ff66b2;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            z-index: 10;
+            background: transparent;
+        }
         .btn-inicio:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
 
         .frase-biblioteca { 
@@ -43,9 +72,27 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        .seccion-titulo { width: 90%; max-width: 1000px; margin: 30px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .seccion-titulo {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px 0 15px 0;
+            font-size: 1.2rem;
+            border-left: 4px solid #ff66b2;
+            padding-left: 15px;
+            color: #ff66b2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
 
-        .grid-historias { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 95%; max-width: 1000px; padding: 10px 10px 40px 10px; }
+        .grid-historias {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            width: 95%;
+            max-width: 1000px;
+            padding: 10px 10px 40px 10px;
+        }
         
         .card { 
             background: var(--panel-rose, #161616); 
@@ -63,10 +110,20 @@
         }
         .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); }
         
-        .estado-tag { position: absolute; top: 8px; left: 8px; padding: 3px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; z-index: 2; letter-spacing: 1px; }
-        .tag-emision { background: #4caf50; color: white; } 
+        .estado-tag {
+            position: absolute;
+            top: 8px; left: 8px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+            letter-spacing: 1px;
+        }
+        .tag-emision    { background: #4caf50; color: white; } 
         .tag-finalizado { background: #ff66b2; color: white; }
-        .tag-hiatus { background: #ffd700; color: black; }
+        .tag-hiatus     { background: #ffd700; color: black; }
 
         .portada { width: 100%; height: 240px; object-fit: cover; background: #222; }
         
@@ -86,8 +143,7 @@
         .sub-menu-colores {
             display: none;
             position: absolute;
-            bottom: 60px;
-            right: 0;
+            bottom: 60px; right: 0;
             background: rgba(0, 0, 0, 0.95);
             border: 1px solid #ff66b2;
             padding: 10px;
@@ -96,9 +152,7 @@
             gap: 10px;
             box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
         }
-        .sub-menu-colores.visible-rose {
-            display: flex;
-        }
+        .sub-menu-colores.visible-rose { display: flex; }
     </style>
 </head>
 <body>
@@ -108,6 +162,7 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
+<!-- Las 3 secciones fijas. El JS moverá las tarjetas según Firebase. -->
 <div class="seccion-titulo">En Emisión</div>
 <div class="grid-historias" id="grid-emision">
     <a href="confesion.html" class="card" id="card-confesion">
@@ -170,20 +225,22 @@
     </a>
 </div>
 
+<!-- Botón de temas -->
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
         🎨
     </button>
     <div class="sub-menu-colores" id="sub-menu-colores">
-        <div onclick="cambiarTemaRose('dark')" style="width: 22px; height: 22px; background: #000; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Oscuro"></div>
-        <div onclick="cambiarTemaRose('gris')" style="width: 22px; height: 22px; background: #2c2c2c; border-radius: 50%; border: 1.5px solid white; cursor: pointer;" title="Modo Gris"></div>
-        <div onclick="cambiarTemaRose('malva')" style="width: 22px; height: 22px; background: #dfd3e3; border-radius: 50%; border: 1.5px solid #4a3b4e; cursor: pointer;" title="Modo Malva Suave"></div>
+        <div onclick="cambiarTemaRose('dark')"  style="width:22px;height:22px;background:#000;border-radius:50%;border:1.5px solid white;cursor:pointer;" title="Modo Oscuro"></div>
+        <div onclick="cambiarTemaRose('gris')"  style="width:22px;height:22px;background:#2c2c2c;border-radius:50%;border:1.5px solid white;cursor:pointer;" title="Modo Gris"></div>
+        <div onclick="cambiarTemaRose('malva')" style="width:22px;height:22px;background:#dfd3e3;border-radius:50%;border:1.5px solid #4a3b4e;cursor:pointer;" title="Modo Malva Suave"></div>
     </div>
 </div>
 
 <script src="funciones-rose.js"></script>
 
 <script>
+    // ── FIREBASE ──────────────────────────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -197,78 +254,52 @@
     }
     const dbInstancia = firebase.firestore();
 
-    function obtenerNombreBonito(id, nombreFirebase) {
-        if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
-        switch(id) {
-            case "amigos": return "Los amigos no hacen esto";
-            case "confesion": return "Confesión";
-            case "embarazada": return "Fingí estar embarazada pero mi marido regresó";
-            case "guarderia": return "La guardería de la villana";
-            case "hermana": return "Mi hermana que era mi enemiga ahora me ama";
-            case "leopardo": return "La pequeña leopardo de las nieves de la familia de panteras negras";
-            case "lobo": return "Soy un lobo pero no te lastimaré";
-            case "matrimonio": return "Matrimonio de conveniencia a una obsesión";
-            case "princesa": return "¡No, solo encanté a la princesa!";
-            case "salvada": return "Salvada por la pequeña dama sin poderes";
-            default: return id;
-        }
+    // ── MAPA DE IDs a sección CSS ─────────────────────────────────
+    // Los valores guardados por el panel son: "emision", "hiatus", "finalizado"
+    function estadoAContenedor(estado) {
+        if (estado === "hiatus")     return "hiatus";
+        if (estado === "finalizado") return "finalizado";
+        return "emision"; // valor por defecto si es "emision" o cualquier otro
     }
 
+    // ── SINCRONIZAR ESTADOS DESDE FIREBASE ───────────────────────
     document.addEventListener("DOMContentLoaded", () => {
-        // CORRECCIÓN CLAVE: Ahora lee de 'proyectos_lista', que es la colección que maneja tu panel
-        dbInstancia.collection("proyectos_lista").get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                const idHistoria = doc.id; 
-                const datos = doc.data();
-                
-                // Si el proyecto no tiene estado guardado aún, por defecto lo dejamos en emisión
-                let estadoFirebase = datos.estado || "🔴 En Emisión"; 
-                
-                // Traducimos el estado con emojis del panel al ID del contenedor de esta pantalla
-                let contenedorId = "emision";
-                if (estadoFirebase.includes("Hiatus")) contenedorId = "hiatus";
-                if (estadoFirebase.includes("Finalizado")) contenedorId = "finalizado";
 
-                const nuevaPortada = datos.portadaUrl || (idHistoria + ".jpg");
-                const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
+        // Lee la colección "estado_historias" (con guion bajo, igual que el panel)
+        dbInstancia.collection("estado_historias").get()
+            .then(querySnapshot => {
 
-                let destinoGrid = document.getElementById("grid-" + contenedorId);
-                if (!destinoGrid) return; 
+                querySnapshot.forEach(doc => {
+                    const idHistoria  = doc.id;
+                    const datos       = doc.data();
+                    const estado      = datos.estado || "emision";
+                    const contenedor  = estadoAContenedor(estado);
 
-                let tarjeta = document.getElementById("card-" + idHistoria);
+                    const tarjeta = document.getElementById("card-" + idHistoria);
+                    if (!tarjeta) return; // historia no definida en este HTML
 
-                if (tarjeta) {
-                    // Si la tarjeta ya existe, actualiza la portada si se cambió en el panel y la mueve de sección en vivo
-                    const imgElemento = document.getElementById("img-" + idHistoria);
-                    if (imgElemento && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
-                        imgElemento.src = datos.portadaUrl;
+                    // Mover tarjeta a la sección correcta
+                    const destinoGrid = document.getElementById("grid-" + contenedor);
+                    if (destinoGrid) destinoGrid.appendChild(tarjeta);
+
+                    // Actualizar badge de estado
+                    const tag = tarjeta.querySelector(".estado-tag");
+                    if (tag) {
+                        tag.className = "estado-tag";
+                        if (contenedor === "emision") {
+                            tag.classList.add("tag-emision");
+                            tag.innerText = "Emisión";
+                        } else if (contenedor === "hiatus") {
+                            tag.classList.add("tag-hiatus");
+                            tag.innerText = "Hiatus";
+                        } else if (contenedor === "finalizado") {
+                            tag.classList.add("tag-finalizado");
+                            tag.innerText = "Finalizado";
+                        }
                     }
-                    destinoGrid.appendChild(tarjeta);
-                } else {
-                    // Si creas una historia COMPLETAMENTE NUEVA en el panel, se creará sola aquí sin tocar el HTML
-                    tarjeta = document.createElement("a");
-                    tarjeta.href = idHistoria + ".html";
-                    tarjeta.className = "card";
-                    tarjeta.id = "card-" + idHistoria;
-                    
-                    tarjeta.innerHTML = `
-                        <span class="estado-tag"></span>
-                        <img src="${nuevaPortada}" class="portada" id="img-${idHistoria}">
-                        <div class="info">${nombreProyecto}</div>
-                    `;
-                    destinoGrid.appendChild(tarjeta);
-                }
-
-                // Aplica los estilos correctos a los tags dependiendo de la sección donde cayó
-                const tag = tarjeta.querySelector(".estado-tag");
-                if (tag) {
-                    tag.className = "estado-tag"; 
-                    if (contenedorId === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
-                    else if (contenedorId === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
-                    else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
-                }
-            });
-        }).catch((error) => console.log("Error al sincronizar con el panel administrativo:", error));
+                });
+            })
+            .catch(error => console.error("Error al leer estados desde Firebase:", error));
     });
 </script>
 </body>
