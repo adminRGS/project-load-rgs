@@ -178,7 +178,6 @@
 
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
 
-    <!-- LOGIN -->
     <div id="bloque-login">
         <h2 style="color:#d81b60;">🌸 Acceso Administrativo</h2>
         <div class="grupo-control">
@@ -188,7 +187,6 @@
         <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
     </div>
 
-    <!-- PANEL -->
     <div id="contenido-panel">
 
         <div class="menu-administracion">
@@ -197,7 +195,6 @@
             <button class="btn-menu" onclick="abrirSeccion(event,'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
 
-        <!-- CARGAR -->
         <div id="opcion-cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
@@ -206,7 +203,7 @@
             </div>
             <div class="grupo-control">
                 <label>Número Capítulo</label>
-                <input type="number" id="num-capitulo">
+                <input type="number" id="num-capitulo" step="any">
             </div>
             <div class="grupo-control">
                 <label>Imágenes (un link por línea)</label>
@@ -215,7 +212,6 @@
             <button class="btn-guardar" onclick="subirCapitulo()">Publicar Capítulo</button>
         </div>
 
-        <!-- ESTATUS -->
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
 
@@ -224,7 +220,6 @@
                 <select id="select-proyecto-estatus" onchange="cargarEstadoActual()"></select>
             </div>
 
-            <!-- Estado actual leído desde Firebase -->
             <div class="grupo-control">
                 <label>Estado actual</label>
                 <div id="caja-estado-actual">
@@ -232,7 +227,6 @@
                 </div>
             </div>
 
-            <!-- Nuevo estado -->
             <div class="grupo-control">
                 <label>Cambiar a</label>
                 <select id="nuevo-estado-valor">
@@ -245,7 +239,6 @@
             <button class="btn-guardar" onclick="actualizarEstadoFirebase()">💾 Guardar Estado</button>
         </div>
 
-        <!-- CREAR / EDITAR -->
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
 
@@ -319,38 +312,31 @@
         }
 
         // ── BLINDAR DRIVE (CORREGIDO) ─────────────────────────────
-        // Convierte CUALQUIER tipo de link de Drive a formato que carga sin bloqueos,
-        // incluyendo links lh3.googleusercontent.com
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
 
-            // 1. Link de descarga directa con ID ya en la URL → extraer ID y rehacer
+            let id = "";
+
+            // 1. Extraer ID si viene en formato con parámetro "id="
             const matchUc = link.match(/[?&]id=([\w-]+)/);
             if (matchUc && matchUc[1]) {
-                return `https://drive.google.com/uc?export=view&id=${matchUc[1]}`;
+                id = matchUc[1];
+            } 
+            // 2. Extraer ID si viene en formato de ruta "/d/ID/"
+            else {
+                const matchD = link.match(/\/d\/([\w-]+)/);
+                if (matchD && matchD[1]) {
+                    id = matchD[1];
+                }
             }
 
-            // 2. Link tipo /d/ID/ (compartir archivo)
-            const matchD = link.match(/\/d\/([\w-]+)/);
-            if (matchD && matchD[1]) {
-                return `https://drive.google.com/uc?export=view&id=${matchD[1]}`;
+            // Si se encontró un ID de Drive, se devuelve transformado al formato lh3 que sí funciona
+            if (id) {
+                return `https://lh3.googleusercontent.com/d/${id}`;
             }
 
-            // 3. Link lh3.googleusercontent.com → convertir a thumbnail de Drive
-            //    Formato: https://lh3.googleusercontent.com/d/ID
-            const matchLh3 = link.match(/googleusercontent\.com\/d\/([\w-]+)/);
-            if (matchLh3 && matchLh3[1]) {
-                return `https://drive.google.com/uc?export=view&id=${matchLh3[1]}`;
-            }
-
-            // 4. Cualquier otro link lh3 que no siga el patrón anterior → devolver tal cual
-            //    (son imágenes públicas de Google Photos, no de Drive)
-            if (link.includes("lh3.googleusercontent.com") || link.includes("googleusercontent.com")) {
-                return link;
-            }
-
-            // 5. Link que no es de Drive → devolver sin cambios
+            // Si ya es un enlace directo lh3 o no coincide con Drive, se deja igual
             return link;
         }
 
@@ -397,7 +383,6 @@
 
             caja.innerHTML = '<span style="color:#aaa; font-weight:normal;">Cargando...</span>';
 
-            // ── Lee de "estado_historias" (con guion bajo, como está en tu Firebase) ──
             db.collection("estado_historias").doc(id).get()
                 .then(doc => {
                     let estado = "emision"; // valor por defecto
@@ -425,8 +410,6 @@
         }
 
         // ── GUARDAR ESTADO ────────────────────────────────────────
-        // IMPORTANTE: guarda en "estado_historias" (con guion bajo) para que
-        // historias.html lo pueda leer correctamente.
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
@@ -437,7 +420,6 @@
                 .set({ estado: nuevoEstado }, { merge: true })
                 .then(() => {
                     alert("¡Estatus actualizado!");
-                    // Refresca el badge con el nuevo valor
                     mostrarBadgeEstado(
                         document.getElementById("caja-estado-actual"),
                         nuevoEstado
@@ -508,10 +490,11 @@
         }
 
         // ── INICIO ────────────────────────────────────────────────
-window.onload = function () {
+        window.onload = function () {
             cargarProyectosEnSelects();
         };
 
     </script>
 </body>
-</html>
+    </html>
+    
