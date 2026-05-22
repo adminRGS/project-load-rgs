@@ -201,19 +201,16 @@
 
             <div class="grupo-control">
                 <label>Proyecto</label>
-
                 <select id="select-proyecto-capitulo"></select>
             </div>
 
             <div class="grupo-control">
                 <label>Número Capítulo</label>
-
                 <input type="number" id="num-capitulo">
             </div>
 
             <div class="grupo-control">
                 <label>Imágenes</label>
-
                 <textarea id="enlaces-imagenes" rows="8"></textarea>
             </div>
 
@@ -230,13 +227,11 @@
 
             <div class="grupo-control">
                 <label>Proyecto</label>
-
                 <select id="select-proyecto-estatus"></select>
             </div>
 
             <div class="grupo-control">
                 <label>Nuevo Estatus</label>
-
                 <select id="nuevo-estado-valor">
                     <option value="emision">🔴 En Emisión</option>
                     <option value="hiatus">🟡 En Hiatus</option>
@@ -251,7 +246,7 @@
 
         </div>
 
-        <!-- EDITAR -->
+        <!-- CREAR / EDITAR -->
         <div id="opcion-nuevo" class="seccion-admin">
 
             <h2>✨ Crear / Editar Proyecto</h2>
@@ -285,7 +280,6 @@
 
             <div class="grupo-control">
                 <label>Editar Proyecto</label>
-
                 <select id="select-proyecto-editar"></select>
             </div>
 
@@ -309,302 +303,225 @@
     </div>
 
     <script>
+
         // FIREBASE
-const firebaseConfig = {
-    apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-    authDomain: "prgs-f2ef8.firebaseapp.com",
-    projectId: "prgs-f2ef8",
-    storageBucket: "prgs-f2ef8.firebasestorage.app",
-    messagingSenderId: "639472415083",
-    appId: "1:639472415083:web:2940245a8a70ed6c88dc2e",
-    measurementId: "G-Z2PMBL3X8V"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+            authDomain: "prgs-f2ef8.firebaseapp.com",
+            projectId: "prgs-f2ef8",
+            storageBucket: "prgs-f2ef8.firebasestorage.app",
+            messagingSenderId: "639472415083",
+            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e",
+            measurementId: "G-Z2PMBL3X8V"
+        };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-// LOGIN
-function verificarClave() {
+        // LOGIN
+        function verificarClave() {
 
-    const clave = document.getElementById("clave-input").value;
+            const clave = document.getElementById("clave-input").value;
 
-    if (clave === "Rose2026") {
+            if (clave === "Rose2026") {
 
-        document.getElementById("bloque-login").style.display = "none";
-        document.getElementById("contenido-panel").style.display = "flex";
+                document.getElementById("bloque-login").style.display = "none";
+                document.getElementById("contenido-panel").style.display = "flex";
 
-    } else {
+            } else {
 
-        alert("Contraseña incorrecta");
-    }
-}
+                alert("Contraseña incorrecta");
+            }
+        }
 
-// SECCIONES
-function abrirSeccion(event, id) {
+        // SECCIONES
+        function abrirSeccion(event, id) {
 
-    document.querySelectorAll('.seccion-admin').forEach(sec => {
-        sec.classList.remove('activa');
-    });
+            document.querySelectorAll('.seccion-admin').forEach(sec => {
+                sec.classList.remove('activa');
+            });
 
-    document.getElementById(id).classList.add('activa');
-}
+            document.getElementById(id).classList.add('activa');
+        }
 
-// BLINDAR DRIVE
-function blindarEnlaceDrive(link) {
-function blindarEnlaceDrive(link) {
+        // BLINDAR DRIVE
+        function blindarEnlaceDrive(link) {
 
-    if (!link) return "";
+            if (!link) return "";
 
-    // SI YA ES LH3 NO MODIFICAR
-    if (
-        link.includes("lh3.googleusercontent.com") ||
-        link.includes("googleusercontent.com")
-    ) {
-        return link;
-    }
+            if (
+                link.includes("lh3.googleusercontent.com") ||
+                link.includes("googleusercontent.com")
+            ) {
+                return link;
+            }
 
-    // CONVERTIR LINKS DE DRIVE
-    const match = link.match(/\/d\/(.*?)\//);
+            const match = link.match(/\/d\/(.*?)\//);
 
-    if (match && match[1]) {
+            if (match && match[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
 
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-    }
+            return link;
+        }
 
-    // SI NO ES DRIVE NI LH3 DEVOLVER NORMAL
-    return link;
-}
-// PROYECTOS
-const proyectos = [
+        // PROYECTOS
+        const proyectos = [
+            { id: "leopardo", nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras" },
+            { id: "amigos", nombre: "Los amigos no hacen esto" },
+            { id: "hermana", nombre: "Mi hermana que era mi enemiga ahora me ama" },
+            { id: "salvada", nombre: "Salvada por la pequeña dama sin poderes" },
+            { id: "confesion", nombre: "Confesión" },
+            { id: "embarazada", nombre: "Fingí estar embarazada pero mi marido regresó" },
+            { id: "lobo", nombre: "Soy un lobo pero no le lastimaré" },
+            { id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión" },
+            { id: "guarderia", nombre: "La guardería de la villana" },
+            { id: "princesa", nombre: "No solo encante a la princesa!" }
+        ];
 
-    {
-        id: "leopardo",
-        nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras"
-    },
+        // CARGAR SELECTS
+        function cargarProyectosEnSelects() {
 
-    {
-        id: "amigos",
-        nombre: "Los amigos no hacen esto"
-    },
+            const selects = [
+                document.getElementById("select-proyecto-capitulo"),
+                document.getElementById("select-proyecto-estatus"),
+                document.getElementById("select-proyecto-editar")
+            ];
 
-    {
-        id: "hermana",
-        nombre: "Mi hermana que era mi enemiga ahora me ama"
-    },
+            selects.forEach(select => {
 
-    {
-        id: "salvada",
-        nombre: "Salvada por la pequeña dama sin poderes"
-    },
+                select.innerHTML = "";
 
-    {
-        id: "confesion",
-        nombre: "Confesión"
-    },
+                proyectos.forEach(proyecto => {
 
-    {
-        id: "embarazada",
-        nombre: "Fingí estar embarazada pero mi marido regresó"
-    },
+                    const option = document.createElement("option");
+                    option.value = proyecto.id;
+                    option.textContent = proyecto.nombre;
+                    select.appendChild(option);
+                });
+            });
+        }
 
-    {
-        id: "lobo",
-        nombre: "Soy un lobo pero no le lastimaré"
-    },
+        // SUBIR CAPÍTULO
+        function subirCapitulo() {
 
-    {
-        id: "matrimonio",
-        nombre: "Matrimonio de conveniencia a una obsesión"
-    },
+            const proyecto =
+                document.getElementById("select-proyecto-capitulo").value;
 
-    {
-        id: "guarderia",
-        nombre: "La guardería de la villana"
-    },
+            const numero =
+                document.getElementById("num-capitulo").value;
 
-    {
-        id: "princesa",
-        nombre: "No solo encante a la princesa!"
-    }
-];
+            const enlaces = document.getElementById("enlaces-imagenes")
+                .value
+                .split("\n")
+                .filter(link => link.trim() !== "")
+                .map(link => blindarEnlaceDrive(link.trim()));
 
-// CARGAR SELECTS
-function cargarProyectosEnSelects() {
+            if (!proyecto || !numero || enlaces.length === 0) {
+                alert("Completa todos los campos.");
+                return;
+            }
 
-    const selects = [
-        document.getElementById("select-proyecto-capitulo"),
-        document.getElementById("select-proyecto-estatus"),
-        document.getElementById("select-proyecto-editar")
-    ];
-
-    selects.forEach(select => {
-
-        select.innerHTML = "";
-
-        proyectos.forEach(proyecto => {
-
-            const option = document.createElement("option");
-
-            option.value = proyecto.id;
-            option.textContent = proyecto.nombre;
-
-            select.appendChild(option);
-        });
-    });
-}
-
-// SUBIR CAPÍTULO
-function subirCapitulo() {
-
-    const proyecto =
-        document.getElementById("select-proyecto-capitulo").value;
-
-    const numero =
-        document.getElementById("num-capitulo").value;
-
-    const enlaces = document.getElementById("enlaces-imagenes")
-        .value
-        .split("\n")
-        .filter(link => link.trim() !== "")
-        .map(link => blindarEnlaceDrive(link.trim()));
-
-    if (!proyecto || !numero || enlaces.length === 0) {
-
-        alert("Completa todos los campos.");
-        return;
-    }
-
-    db.collection(proyecto)
-        .doc("capitulo_" + numero)
-        .set({
-            numero: numero,
-            imagenes: enlaces,
-            fecha: new Date()
-        })
-
-        .then(() => {
-
-            alert("¡Capítulo publicado!");
-
-            document.getElementById("num-capitulo").value = "";
-            document.getElementById("enlaces-imagenes").value = "";
-            document.getElementById("select-proyecto-capitulo").value = "";
-        })
-
-        .catch(error => alert("Error: " + error));
-}
-
-// ESTATUS
-function actualizarEstadoFirebase() {
-
-    const idSubido =
-        document.getElementById("select-proyecto-estatus").value;
-
-    const nuevoEstado =
-        document.getElementById("nuevo-estado-valor").value;
-
-    db.collection("estados_historias")
-        .doc(idSubido)
-        .set({
-            estado: nuevoEstado
-        }, { merge: true })
-
-        .then(() => alert("¡Estatus actualizado!"))
-
-        .catch(error => alert(error));
-}
-
-// CREAR
-function crearNuevoProyecto() {
-
-    const id =
-        document.getElementById("nuevo-id").value.trim();
-
-    const titulo =
-        document.getElementById("nuevo-titulo").value.trim();
-
-    const portadaRaw =
-        document.getElementById("nuevo-portada").value.trim();
-
-    const sinopsis =
-        document.getElementById("nuevo-sinopsis").value.trim();
-
-    const portada = blindarEnlaceDrive(portadaRaw);
-
-    db.collection(id)
-        .doc("datos_proyecto")
-        .set({
-            nombre: titulo,
-            portadaUrl: portada,
-            sinopsis: sinopsis
-        }, { merge: true })
-
-        .then(() =>
-            db.collection("estados_historias")
-                .doc(id)
+            db.collection(proyecto)
+                .doc("capitulo_" + numero)
                 .set({
-                    estado: "emision"
+                    numero: numero,
+                    imagenes: enlaces,
+                    fecha: new Date()
+                })
+                .then(() => {
+                    alert("¡Capítulo publicado!");
+                    document.getElementById("num-capitulo").value = "";
+                    document.getElementById("enlaces-imagenes").value = "";
+                    document.getElementById("select-proyecto-capitulo").value = "";
+                })
+                .catch(error => alert("Error: " + error));
+        }
+
+        // ESTATUS
+        function actualizarEstadoFirebase() {
+
+            const idSubido =
+                document.getElementById("select-proyecto-estatus").value;
+
+            const nuevoEstado =
+                document.getElementById("nuevo-estado-valor").value;
+
+            db.collection("estados_historias")
+                .doc(idSubido)
+                .set({ estado: nuevoEstado }, { merge: true })
+                .then(() => alert("¡Estatus actualizado!"))
+                .catch(error => alert(error));
+        }
+
+        // CREAR
+        function crearNuevoProyecto() {
+
+            const id =
+                document.getElementById("nuevo-id").value.trim();
+
+            const titulo =
+                document.getElementById("nuevo-titulo").value.trim();
+
+            const portadaRaw =
+                document.getElementById("nuevo-portada").value.trim();
+
+            const sinopsis =
+                document.getElementById("nuevo-sinopsis").value.trim();
+
+            const portada = blindarEnlaceDrive(portadaRaw);
+
+            db.collection(id)
+                .doc("datos_proyecto")
+                .set({
+                    nombre: titulo,
+                    portadaUrl: portada,
+                    sinopsis: sinopsis
                 }, { merge: true })
-        )
+                .then(() =>
+                    db.collection("estados_historias")
+                        .doc(id)
+                        .set({ estado: "emision" }, { merge: true })
+                )
+                .then(() => {
+                    alert("¡Proyecto creado!");
+                    document.getElementById("nuevo-id").value = "";
+                    document.getElementById("nuevo-titulo").value = "";
+                    document.getElementById("nuevo-portada").value = "";
+                    document.getElementById("nuevo-sinopsis").value = "";
+                });
+        }
 
-        .then(() => {
+        // EDITAR
+        function guardarEdicionProyecto() {
 
-            alert("¡Proyecto creado!");
+            const id =
+                document.getElementById("select-proyecto-editar").value;
 
-            document.getElementById("nuevo-id").value = "";
-            document.getElementById("nuevo-titulo").value = "";
-            document.getElementById("nuevo-portada").value = "";
-            document.getElementById("nuevo-sinopsis").value = "";
-        });
-}
+            const portada =
+                blindarEnlaceDrive(
+                    document.getElementById("editar-portada").value.trim()
+                );
 
-// EDITAR
-function guardarEdicionProyecto() {
+            const sinopsis =
+                document.getElementById("editar-sinopsis").value.trim();
 
-    const id =
-        document.getElementById("select-proyecto-editar").value;
+            db.collection(id)
+                .doc("datos_proyecto")
+                .set({
+                    portadaUrl: portada,
+                    sinopsis: sinopsis
+                }, { merge: true })
+                .then(() => alert("¡Cambios guardados!"));
+        }
 
-    const portada =
-        blindarEnlaceDrive(
-            document.getElementById("editar-portada").value.trim()
-        );
+        // INICIO
+        window.onload = function () {
+            if (typeof cargarProyectosEnSelects === "function") {
+                cargarProyectosEnSelects();
+            }
+        };
 
-    const sinopsis =
-        document.getElementById("editar-sinopsis").value.trim();
-
-    db.collection(id)
-        .doc("datos_proyecto")
-        .set({
-            portadaUrl: portada,
-            sinopsis: sinopsis
-        }, { merge: true })
-
-        .then(() => alert("¡Cambios guardados!"));
-}
-
-// INICIO
-window.onload = function () {
-
-    if (typeof cargarProyectosEnSelects === "function") {
-        cargarProyectosEnSelects();
-    }
-
-};
-
-function verificarClave() {
-
-    const clave = document.getElementById("clave-input").value;
-
-    if (clave === "Rose2026") {
-
-        document.getElementById("bloque-login").style.display = "none";
-        document.getElementById("contenido-panel").style.display = "flex";
-
-    } else {
-
-        alert("Contraseña incorrecta");
-    }
-}
-</script>
+    </script>
 </body>
 </html>
