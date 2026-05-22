@@ -311,7 +311,7 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── BLINDAR DRIVE CORREGIDO CON PROTOCOLO HTTPS ───────────
+        // ── BLINDAR DRIVE CORREGIDO CON FORMATO LH3 Y VARIABLE DE ID ──
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
@@ -331,7 +331,7 @@
                 }
             }
 
-            // Agregado el "https://" explícito para que el lector cargue la imagen correctamente
+            // Mapeo corregido al formato directo estable con protocolo https incorporado
             if (id) {
                 return `https://lh3.googleusercontent.com/d/${id}`;
             }
