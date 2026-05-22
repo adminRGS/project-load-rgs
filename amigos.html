@@ -351,9 +351,19 @@ function abrirSeccion(event, id) {
 
 // BLINDAR DRIVE
 function blindarEnlaceDrive(link) {
+function blindarEnlaceDrive(link) {
 
     if (!link) return "";
 
+    // SI YA ES LH3 NO MODIFICAR
+    if (
+        link.includes("lh3.googleusercontent.com") ||
+        link.includes("googleusercontent.com")
+    ) {
+        return link;
+    }
+
+    // CONVERTIR LINKS DE DRIVE
     const match = link.match(/\/d\/(.*?)\//);
 
     if (match && match[1]) {
@@ -361,9 +371,9 @@ function blindarEnlaceDrive(link) {
         return `https://drive.google.com/uc?export=view&id=${match[1]}`;
     }
 
+    // SI NO ES DRIVE NI LH3 DEVOLVER NORMAL
     return link;
 }
-
 // PROYECTOS
 const proyectos = [
 
