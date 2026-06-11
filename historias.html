@@ -162,6 +162,7 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
+<!-- Las 3 secciones fijas. El JS moverá las tarjetas según Firebase. -->
 <div class="seccion-titulo">En Emisión</div>
 <div class="grid-historias" id="grid-emision">
     <a href="confesion.html" class="card" id="card-confesion">
@@ -224,6 +225,7 @@
     </a>
 </div>
 
+<!-- Botón de temas -->
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
         🎨
@@ -302,22 +304,22 @@
                         }
                     }
 
-                    // ── ¡NUEVO BÚSQUEDA INTELIGENTE DE PORTADAS EN AMBAS CARPETAS! ──
-                    // Intento 1: Buscar en 'datos_proyecto'
-                    dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
-                        .then(docProyecto => {
+                    // ── NUEVO PLAN SEGURO: BUSCAR PRIMERO EN INFORMACION_PROYECTO ──
+                    dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
+                        .then(docInfo => {
                             let urlEncontrada = "";
 
-                            if (docProyecto.exists && docProyecto.data().portadaUrl && docProyecto.data().portadaUrl.length > 30) {
-                                urlEncontrada = docProyecto.data().portadaUrl;
+                            // Si existe informacion_proyecto y tiene link largo y sano, lo tomamos
+                            if (docInfo.exists && docInfo.data().portadaUrl && docInfo.data().portadaUrl.length > 30) {
+                                urlEncontrada = docInfo.data().portadaUrl;
                             }
 
-                            // Si no sirvió o estaba mocho, Intento 2: Buscar en 'informacion_proyecto'
+                            // Si no existía o no sirvió, miramos en datos_proyecto
                             if (!urlEncontrada) {
-                                return dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
-                                    .then(docInfo => {
-                                        if (docInfo.exists && docInfo.data().portadaUrl) {
-                                            urlEncontrada = docInfo.data().portadaUrl;
+                                return dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
+                                    .then(docProyecto => {
+                                        if (docProyecto.exists && docProyecto.data().portadaUrl) {
+                                            urlEncontrada = docProyecto.data().portadaUrl;
                                         }
                                         return urlEncontrada;
                                     });
@@ -332,7 +334,7 @@
                                 }
                             }
                         })
-                        .catch(err => console.error("Error cargando portadas encadenadas de " + idHistoria, err));
+                        .catch(err => console.error("Error cargando portadas de " + idHistoria, err));
                 });
             })
             .catch(error => console.error("Error al leer estados desde Firebase:", error));
