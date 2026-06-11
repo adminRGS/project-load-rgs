@@ -297,10 +297,25 @@
                             tag.innerText = "Finalizado";
                         }
                     }
+
+                    // ── ¡AGREGADO!: SINCRONIZAR LA PORTADA DESDE FIREBASE ──
+                    dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
+                        .then(docProyecto => {
+                            if (docProyecto.exists) {
+                                const datosProyecto = docProyecto.data();
+                                if (datosProyecto.portadaUrl) {
+                                    const imgEtiqueta = document.getElementById("img-" + idHistoria);
+                                    if (imgEtiqueta) {
+                                        imgEtiqueta.src = datosProyecto.portadaUrl;
+                                    }
+                                }
+                            }
+                        })
+                        .catch(err => console.error("Error al cargar portada de " + idHistoria, err));
                 });
             })
             .catch(error => console.error("Error al leer estados desde Firebase:", error));
     });
 </script>
 </body>
-</html>
+            </html>
