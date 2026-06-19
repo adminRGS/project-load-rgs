@@ -162,15 +162,70 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
+<!-- Las 3 secciones fijas. El JS moverá las tarjetas según Firebase. -->
 <div class="seccion-titulo">En Emisión</div>
-<div class="grid-historias" id="grid-emision"></div>
+<div class="grid-historias" id="grid-emision">
+    <a href="confesion.html" class="card" id="card-confesion">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="confesion.jpg" class="portada" id="img-confesion">
+        <div class="info">Confesión</div>
+    </a>
+    <a href="embarazada.html" class="card" id="card-embarazada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="embarazada.jpg" class="portada" id="img-embarazada">
+        <div class="info">Fingí estar embarazada pero mi marido regresó</div>
+    </a>
+    <a href="salvada.html" class="card" id="card-salvada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="salvada.jpg" class="portada" id="img-salvada">
+        <div class="info">Salvada por la pequeña dama sin poderes</div>
+    </a>
+    <a href="leopardo.html" class="card" id="card-leopardo">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="leopardo.jpg" class="portada" id="img-leopardo">
+        <div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div>
+    </a>
+</div>
 
 <div class="seccion-titulo">En Hiatus</div>
-<div class="grid-historias" id="grid-hiatus"></div>
+<div class="grid-historias" id="grid-hiatus">
+    <a href="guarderia.html" class="card" id="card-guarderia">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="guarderia.jpg" class="portada" id="img-guarderia">
+        <div class="info">La guardería de la villana</div>
+    </a>
+    <a href="hermana.html" class="card" id="card-hermana">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="hermana.jpg" class="portada" id="img-hermana">
+        <div class="info">Mi hermana que era mi enemiga ahora me ama</div>
+    </a>
+    <a href="amigos.html" class="card" id="card-amigos">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="amigos.jpg" class="portada" id="img-amigos">
+        <div class="info">Los amigos no hacen esto</div>
+    </a>
+</div>
 
 <div class="seccion-titulo">Finalizados</div>
-<div class="grid-historias" id="grid-finalizado"></div>
+<div class="grid-historias" id="grid-finalizado">
+    <a href="matrimonio.html" class="card" id="card-matrimonio">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="matrimonio.jpg" class="portada" id="img-matrimonio">
+        <div class="info">Matrimonio de conveniencia a una obsesión</div>
+    </a>
+    <a href="princesa.html" class="card" id="card-princesa">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="princesa.jpg" class="portada" id="img-princesa">
+        <div class="info">¡No, solo encanté a la princesa!</div>
+    </a>
+    <a href="lobo.html" class="card" id="card-lobo">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="lobo.jpg" class="portada" id="img-lobo">
+        <div class="info">Soy un lobo pero no te lastimaré</div>
+    </a>
+</div>
 
+<!-- Botón de temas -->
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
         🎨
@@ -185,6 +240,7 @@
 <script src="funciones-rose.js"></script>
 
 <script>
+    // ── FIREBASE ──────────────────────────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -198,12 +254,14 @@
     }
     const dbInstancia = firebase.firestore();
 
+    // ── MAPA DE IDs a sección CSS ─────────────────────────────────
     function estadoAContenedor(estado) {
         if (estado === "hiatus")     return "hiatus";
         if (estado === "finalizado") return "finalizado";
         return "emision";
     }
 
+    // ── FUNCIÓN COMPLEMENTARIA PARA ENLACES DE DRIVE ──────────────
     function templatesDrive(url) {
         if (!url) return "";
         if (url.includes('drive.google.com')) {
@@ -213,82 +271,73 @@
         return url;
     }
 
-    function formatearTituloProvisional(id) {
-        return id.replace(/-/g, ' ').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-
+    // ── SINCRONIZAR ESTADOS Y PORTADAS DESDE FIREBASE ──────────────
     document.addEventListener("DOMContentLoaded", () => {
-        
-        dbInstancia.collection("estado_historias").onSnapshot(querySnapshot => {
-            
-            document.getElementById("grid-emision").innerHTML = "";
-            document.getElementById("grid-hiatus").innerHTML = "";
-            document.getElementById("grid-finalizado").innerHTML = "";
 
-            querySnapshot.forEach(docSnap => {
-                const idHistoria = docSnap.id;
-                const datos = docSnap.data();
-                const estado = datos.estado || "emision";
-                const contenedor = estadoAContenedor(estado);
-                
-                const tituloMostrado = datos.nombre || formatearTituloProvisional(idHistoria);
+        dbInstancia.collection("estado_historias").get()
+            .then(querySnapshot => {
 
-                // Creación de la tarjeta
-                const tarjeta = document.createElement("a");
-                tarjeta.className = "card";
-                tarjeta.id = "card-" + idHistoria;
-                tarjeta.href = `proyecto.html?id=${idHistoria}`;
+                querySnapshot.forEach(doc => {
+                    const idHistoria  = doc.id;
+                    const datos       = doc.data();
+                    const estado      = datos.estado || "emision";
+                    const contenedor  = estadoAContenedor(estado);
 
-                const tag = document.createElement("span");
-                tag.className = `estado-tag tag-${contenedor}`;
-                tag.innerText = contenedor === "emision" ? "Emisión" : contenedor === "hiatus" ? "Hiatus" : "Finalizado";
-                
-                const img = document.createElement("img");
-                img.className = "portada";
-                img.id = "img-" + idHistoria;
-                img.src = "portada-defecto.jpg"; 
-                img.onerror = function() { this.src = 'portada-defecto.jpg'; };
+                    const tarjeta = document.getElementById("card-" + idHistoria);
+                    if (!tarjeta) return;
 
-                const infoDiv = document.createElement("div");
-                infoDiv.className = "info";
-                infoDiv.innerText = tituloMostrado;
+                    const destinoGrid = document.getElementById("grid-" + contenedor);
+                    if (destinoGrid) destinoGrid.appendChild(tarjeta);
 
-                tarjeta.appendChild(tag);
-                tarjeta.appendChild(img);
-                tarjeta.appendChild(infoDiv);
-
-                const destinoGrid = document.getElementById("grid-" + contenedor);
-                if (destinoGrid) {
-                    destinoGrid.appendChild(tarjeta);
-                }
-
-                // 🌟 SOLUCIÓN DIRECTA: Buscamos la URL e infectamos directamente el nodo de la imagen 'img' que acabamos de crear
-                dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
-                    .then(docInfo => {
-                        let urlEncontrada = "";
-                        if (docInfo.exists && docInfo.data().portadaUrl && docInfo.data().portadaUrl.length > 30) {
-                            urlEncontrada = docInfo.data().portadaUrl;
+                    const tag = tarjeta.querySelector(".estado-tag");
+                    if (tag) {
+                        tag.className = "estado-tag";
+                        if (contenedor === "emision") {
+                            tag.classList.add("tag-emision");
+                            tag.innerText = "Emisión";
+                        } else if (contenedor === "hiatus") {
+                            tag.classList.add("tag-hiatus");
+                            tag.innerText = "Hiatus";
+                        } else if (contenedor === "finalizado") {
+                            tag.classList.add("tag-finalizado");
+                            tag.innerText = "Finalizado";
                         }
-                        if (!urlEncontrada) {
-                            return dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
-                                .then(docProyecto => {
-                                    if (docProyecto.exists && docProyecto.data().portadaUrl) {
-                                        urlEncontrada = docProyecto.data().portadaUrl;
-                                    }
-                                    return urlEncontrada;
-                                });
-                        }
-                        return urlEncontrada;
-                    })
-                    .then(urlFinal => {
-                        if (urlFinal) {
-                            // Asignación directa y segura sin depender del DOM lento
-                            img.src = templatesDrive(urlFinal.trim());
-                        }
-                    })
-                    .catch(err => console.error("Error cargando portadas de " + idHistoria, err));
-            });
-        }, error => console.error("Error en tiempo real de estados:", error));
+                    }
+
+                    // ── NUEVO PLAN SEGURO: BUSCAR PRIMERO EN INFORMACION_PROYECTO ──
+                    dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
+                        .then(docInfo => {
+                            let urlEncontrada = "";
+
+                            // Si existe informacion_proyecto y tiene link largo y sano, lo tomamos
+                            if (docInfo.exists && docInfo.data().portadaUrl && docInfo.data().portadaUrl.length > 30) {
+                                urlEncontrada = docInfo.data().portadaUrl;
+                            }
+
+                            // Si no existía o no sirvió, miramos en datos_proyecto
+                            if (!urlEncontrada) {
+                                return dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
+                                    .then(docProyecto => {
+                                        if (docProyecto.exists && docProyecto.data().portadaUrl) {
+                                            urlEncontrada = docProyecto.data().portadaUrl;
+                                        }
+                                        return urlEncontrada;
+                                    });
+                            }
+                            return urlEncontrada;
+                        })
+                        .then(urlFinal => {
+                            if (urlFinal) {
+                                const imgEtiqueta = document.getElementById("img-" + idHistoria);
+                                if (imgEtiqueta) {
+                                    imgEtiqueta.src = templatesDrive(urlFinal.trim());
+                                }
+                            }
+                        })
+                        .catch(err => console.error("Error cargando portadas de " + idHistoria, err));
+                });
+            })
+            .catch(error => console.error("Error al leer estados desde Firebase:", error));
     });
 </script>
 </body>
