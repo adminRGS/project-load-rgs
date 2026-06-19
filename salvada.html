@@ -155,7 +155,7 @@
 
         <h1 id="titulo-proyecto" class="titulo-manga">Salvada por la pequeña dama sin poderes</h1>
         
-        <p class="sinopsis-texto" id="sinopsis-completa-salvada">La protagonista, Riersha, es despised por su familia por no tener poderes, pero tras morir y regresar al pasado siendo una niña de cuatro años, descubre que sí posee habilidades especiales y debe salvar a su familia.</p>
+        <p class="sinopsis-texto" id="sinopsis-completa-salvada">Preparando la sinopsis mística desde el servidor...</p>
 
         <div class="seccion-titulo">Capítulos Disponibles</div>
         
@@ -207,7 +207,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -225,8 +225,9 @@
     let capsOrdenados = [];
     let idCapActual = "";
 
+    // CORRECCIÓN AQUÍ: Ahora pasamos "onSnapshot" al final para la sincronización inmediata
     if (window.conectarAdminConManga) {
-        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-grande-salvada", "sinopsis-completa-salvada");
+        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-grande-salvada", "sinopsis-completa-salvada", onSnapshot);
     }
 
     function arreglarLink(url) {
@@ -240,7 +241,7 @@
 
     async function cargarProyectoDesdeFirebase() {
         const grid = document.getElementById('grid');
-        grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Cargando capítulos...</p>";
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>✨ Descubriendo capítulos... ✨</p>";
         
         try {
             const querySnapshot = await getDocs(collection(db, historiaID));
@@ -282,7 +283,7 @@
         const contenedor = document.getElementById('contenido-imagenes');
         lector.style.display = 'block'; 
         lector.scrollTop = 0;
-        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px;'>Abriendo capítulo " + idCap + "...</p>";
+        contenedor.innerHTML = "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Abriendo capítulo " + idCap + "... ✨</p>";
 
         const index = capsOrdenados.indexOf(idCap.toString());
         document.getElementById('btn-ant').onclick = () => abrirLector(capsOrdenados[index - 1]);
@@ -300,7 +301,7 @@
                 document.getElementById('txt-haha').innerText = data.haha || 0;
                 
                 contenedor.innerHTML = "";
-                let imgs = Array.isArray(data.imagenes) ? data.imagenes : [data.link];
+                let imgs = Array.isArray(data.imagenes) ? data.imagenes : (data.link ? [data.link] : []);
                 imgs.forEach(url => {
                     if (url && url.trim() !== "") {
                         const img = document.createElement('img');
@@ -326,6 +327,7 @@
     }
 
     window.cerrarLector = () => { document.getElementById('lector').style.display = 'none'; };
+    document.addEventListener('click', () => document.getElementById('stats-menu').classList.remove('active'));
 </script>
 </body>
 </html>
