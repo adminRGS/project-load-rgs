@@ -70,20 +70,20 @@ body.tema-malva {
 /* --- NUEVO: AJUSTE IMÁGENES DEL LECTOR --- */
 /* ========================================== */
 
-/* Esto controla el contenedor principal donde pones las imágenes del capítulo */
-.contenedor-capitulo, #contenedor-capitulo, .lector-imagenes {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra las imágenes horizontalmente */
-    margin: 0 auto;
+/* Forzamos al contenedor de tus capítulos a centrar todo el contenido */
+#contenido-imagenes {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important; /* Centra horizontalmente en PC */
+    margin: 0 auto !important;
 }
 
-/* Esto asegura que las imágenes no se estiren infinitamente en pantallas grandes */
-.contenedor-capitulo img, #contenedor-capitulo img, .lector-imagenes img {
-    width: 100%;            /* Ocupa todo el ancho en celulares */
-    max-width: 420px;       /* Ajustado a un tamaño más angosto para excelente nitidez en PC */
-    height: auto;           /* Mantiene la proporción original de la imagen */
-    display: block;
-    margin: 0 auto;         /* Refuerza el centrado */
+/* Forzamos a las imágenes a ser angostas en PC e ignorar el estilo interno del HTML */
+#contenido-imagenes img {
+    width: 100% !important;            /* Ocupa todo el ancho en celulares */
+    max-width: 420px !important;       /* Evita que pase de 420px en pantallas de PC */
+    height: auto !important;           /* Mantiene la proporción original de la imagen */
+    display: block !important;
+    margin: 0 auto !important;         /* Asegura el centrado absoluto */
 }
