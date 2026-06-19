@@ -264,7 +264,7 @@
 
             <div class="grupo-control">
                 <label>Editar Proyecto</label>
-                <select id="select-proyecto-editar"></select>
+                <select id="select-proyecto-editar" onchange="cargarPortadaActualEditar()"></select>
             </div>
             <div class="grupo-control">
                 <label>Editar Portada (link Drive)</label>
@@ -311,32 +311,30 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── BLINDAR DRIVE CORREGIDO CON FORMATO LH3 Y VARIABLE DE ID ──
+        // ── LIMPIADOR DE ENLACES DE DRIVE REPARADO ──
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
 
-            let id = "";
-
-            // 1. Extraer ID si viene en formato con parámetro "id="
-            const matchUc = link.match(/[?&]id=([\w-]+)/);
-            if (matchUc && matchUc[1]) {
-                id = matchUc[1];
-            } 
-            // 2. Extraer ID si viene en formato de ruta "/d/ID/"
-            else {
-                const matchD = link.match(/\/d\/([\w-]+)/);
-                if (matchD && matchD[1]) {
-                    id = matchD[1];
+            // Si es un link de Google Drive, extraemos el ID limpio
+            if (link.includes('drive.google.com')) {
+                let id = "";
+                const matchUc = link.match(/[?&]id=([\w-]+)/);
+                if (matchUc && matchUc[1]) {
+                    id = matchUc[1];
+                } else {
+                    const matchD = link.match(/\/d\/([\w-]+)/);
+                    if (matchD && matchD[1]) {
+                        id = matchD[1];
+                    }
+                }
+                
+                if (id) {
+                    return `https://docs.google.com/uc?export=view&id=${id}`;
                 }
             }
 
-            // Mapeo corregido al formato directo estable con protocolo https incorporado
-            if (id) {
-                return `https://lh3.googleusercontent.com/d/${id}`;
-            }
-
-            return link;
+            return link; // Si no es Drive, lo guarda tal cual
         }
 
         // ── PROYECTOS ─────────────────────────────────────────────
@@ -406,6 +404,23 @@
             caja.innerHTML = `<span class="badge ${info.clase}">${info.texto}</span>`;
         }
 
+        // Cargar datos en los inputs al cambiar el select de edición
+        function cargarPortadaActualEditar() {
+            const id = document.getElementById("select-proyecto-editar").value;
+            if(!id) return;
+            
+            db.collection("estado_historias").doc(id).get().then(doc => {
+                if(doc.exists) {
+                    const d = doc.data();
+                    document.getElementById("editar-portada").value = d.portadaUrl || "";
+                    document.getElementById("editar-sinopsis").value = d.sinopsis || "";
+                } else {
+                    document.getElementById("editar-portada").value = "";
+                    document.getElementById("editar-sinopsis").value = "";
+                }
+            });
+        }
+
         // ── GUARDAR ESTADO ────────────────────────────────────────
         function actualizarEstadoFirebase() {
             const id = document.getElementById("select-proyecto-estatus").value;
@@ -455,22 +470,20 @@
 
             if (!id || !titulo) { alert("ID y Nombre son obligatorios."); return; }
 
-            db.collection(id).doc("datos_proyecto")
-                .set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
-                .then(() =>
-                    db.collection("estado_historias").doc(id)
-                        .set({ estado: "emision" }, { merge: true })
-                )
+            // Guardamos todo directo en 'estado_historias' para que se sincronice con historias.html al instante
+            db.collection("estado_historias").doc(id)
+                .set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis, estado: "emision" }, { merge: true })
                 .then(() => {
-                    alert("¡Proyecto creado!");
+                    alert("¡Proyecto creado con éxito!");
                     document.getElementById("nuevo-id").value      = "";
                     document.getElementById("nuevo-titulo").value   = "";
                     document.getElementById("nuevo-portada").value  = "";
                     document.getElementById("nuevo-sinopsis").value = "";
-                });
+                })
+                .catch(error => alert("Error: " + error));
         }
 
-        // ── EDITAR PROYECTO ───────────────────────────────────────
+        // ── EDITAR PROYECTO CORREGIDO ──
         function guardarEdicionProyecto() {
             const id       = document.getElementById("select-proyecto-editar").value;
             const portada  = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim());
@@ -478,9 +491,10 @@
 
             if (!id) { alert("Selecciona un proyecto."); return; }
 
-            db.collection(id).doc("datos_proyecto")
+            // Se guarda en 'estado_historias' para actualizar la portada automática
+            db.collection("estado_historias").doc(id)
                 .set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
-                .then(() => alert("¡Cambios guardados!"));
+                .then(() => alert("¡Portada y cambios actualizados en Firebase con éxito!"));
         }
 
         // ── INICIO ────────────────────────────────────────────────
@@ -490,4 +504,4 @@
 
     </script>
 </body>
-</html>
+                    </html>
