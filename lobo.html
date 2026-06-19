@@ -207,7 +207,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
@@ -226,7 +226,7 @@
     let idCapActual = "";
 
     if (window.conectarAdminConManga) {
-        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica");
+        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica", onSnapshot);
     }
 
     function arreglarLink(url) {
@@ -329,4 +329,4 @@
     document.addEventListener('click', () => document.getElementById('stats-menu').classList.remove('active'));
 </script>
 </body>
-</html>
+    </html>
