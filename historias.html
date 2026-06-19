@@ -162,7 +162,6 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
-<!-- Las 3 secciones fijas intactas con tus nombres largos originales -->
 <div class="seccion-titulo">En Emisión</div>
 <div class="grid-historias" id="grid-emision">
     <a href="proyecto.html?id=confesion" class="card" id="card-confesion">
@@ -225,7 +224,6 @@
     </a>
 </div>
 
-<!-- Botón de temas -->
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
         🎨
@@ -240,7 +238,6 @@
 <script src="funciones-rose.js"></script>
 
 <script>
-    // ── FIREBASE ──────────────────────────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -255,38 +252,34 @@
     const dbInstancia = firebase.firestore();
 
     function estadoAContenedor(estado) {
-        if (estado === "hiatus")     return "hiatus";
-        if (estado === "finalizado") return "finalizado";
+        if (!estado) return "emision";
+        const est = estado.toLowerCase().trim();
+        if (est === "hiatus")     return "hiatus";
+        if (est === "finalizado") return "finalizado";
         return "emision";
     }
 
-    function templatesDrive(url) {
-        if (!url) return "";
-        if (url.includes('drive.google.com')) {
-            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://docs.google.com/uc?export=view&id=${id}`;
-        }
-        return url;
-    }
-
-    // ── SINCRONIZAR EN TIEMPO REAL SIN CONFLICTOS ──
     document.addEventListener("DOMContentLoaded", () => {
+        // Seleccionamos tus tarjetas manuales
+        const tarjetasFijas = document.querySelectorAll('.grid-historias .card');
 
-        dbInstancia.collection("estado_historias").onSnapshot(querySnapshot => {
+        tarjetasFijas.forEach(tarjeta => {
+            const idHistoria = tarjeta.id.replace('card-', ''); 
 
-            querySnapshot.forEach(doc => {
-                const idHistoria  = doc.id;
-                const datos       = doc.data();
-                const estado      = datos.estado || "emision";
-                const contenedor  = estadoAContenedor(estado);
-
-                const tarjeta = document.getElementById("card-" + idHistoria);
-                
-                // SI LA TARJETA YA EXISTE EN EL HTML (Tus tarjetas manuales limpias)
-                if (tarjeta) {
+            // Lee la colección global o de estado que controla la reubicación automática
+            dbInstancia.collection("estado_historias").doc(idHistoria).onSnapshot(docState => {
+                if (docState.exists) {
+                    const datos = docState.data();
+                    const estado = datos.estado || "emision";
+                    const contenedor = estadoAContenedor(estado);
+                    
+                    // 1. Mueve automáticamente la tarjeta al contenedor correspondiente en tiempo real
                     const destinoGrid = document.getElementById("grid-" + contenedor);
-                    if (destinoGrid) destinoGrid.appendChild(tarjeta);
+                    if (destinoGrid && tarjeta.parentElement !== destinoGrid) {
+                        destinoGrid.appendChild(tarjeta);
+                    }
 
+                    // 2. Modifica el texto y clase del Tag visual de estado
                     const tag = tarjeta.querySelector(".estado-tag");
                     if (tag) {
                         tag.className = "estado-tag";
@@ -301,98 +294,9 @@
                             tag.innerText = "Finalizado";
                         }
                     }
-
-                    // Carga directa de la portada desde los documentos sin tocar nada más
-                    dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
-                        .then(docInfo => {
-                            let urlEncontrada = "";
-                            if (docInfo.exists && docInfo.data().portadaUrl && docInfo.data().portadaUrl.length > 30) {
-                                urlEncontrada = docInfo.data().portadaUrl;
-                            }
-                            if (!urlEncontrada) {
-                                return dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
-                                    .then(docProyecto => {
-                                        if (docProyecto.exists && docProyecto.data().portadaUrl) {
-                                            urlEncontrada = docProyecto.data().portadaUrl;
-                                        }
-                                        return urlEncontrada;
-                                    });
-                            }
-                            return urlEncontrada;
-                        })
-                        .then(urlFinal => {
-                            if (urlFinal) {
-                                const imgEtiqueta = document.getElementById("img-" + idHistoria);
-                                if (imgEtiqueta) {
-                                    imgEtiqueta.src = templatesDrive(urlFinal.trim());
-                                }
-                            }
-                        })
-                        .catch(err => console.error("Error cargando portadas de " + idHistoria, err));
-                } 
-                
-                // SI LA HISTORIA ES TOTALMENTE NUEVA (Inyector automático real)
-                else {
-                    const destinoGrid = document.getElementById("grid-" + contenedor);
-                    if (destinoGrid) {
-                        const nuevaTarjeta = document.createElement("a");
-                        nuevaTarjeta.className = "card";
-                        nuevaTarjeta.id = "card-" + idHistoria;
-                        nuevaTarjeta.href = `proyecto.html?id=${idHistoria}`;
-
-                        const nuevoTag = document.createElement("span");
-                        nuevoTag.className = `estado-tag tag-${contenedor}`;
-                        nuevoTag.innerText = contenedor === "emision" ? "Emisión" : contenedor === "hiatus" ? "Hiatus" : "Finalizado";
-
-                        const nuevaImg = document.createElement("img");
-                        nuevaImg.className = "portada";
-                        nuevaImg.id = "img-" + idHistoria;
-                        nuevaImg.src = "portada-defecto.jpg";
-                        nuevaImg.onerror = function() { this.src = 'portada-defecto.jpg'; };
-
-                        const nuevaInfo = document.createElement("div");
-                        nuevaInfo.className = "info";
-                        nuevaInfo.id = "info-" + idHistoria;
-                        nuevaInfo.innerText = datos.nombre || idHistoria.replace(/-/g, ' ');
-
-                        nuevaTarjeta.appendChild(nuevoTag);
-                        nuevaTarjeta.appendChild(nuevaImg);
-                        nuevaTarjeta.appendChild(nuevaInfo);
-                        destinoGrid.appendChild(nuevaTarjeta);
-
-                        // Cargar asíncronamente los datos de la nueva historia sin interrumpir a las anteriores
-                        dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
-                            .then(docInfo => {
-                                let url = "";
-                                let nombreLargo = "";
-                                if (docInfo.exists) {
-                                    const d = docInfo.data();
-                                    if (d.portadaUrl && d.portadaUrl.length > 30) url = d.portadaUrl;
-                                    if (d.nombre) nombreLargo = d.nombre;
-                                }
-                                if (!url || !nombreLargo) {
-                                    return dbInstancia.collection(idHistoria).doc("datos_proyecto").get()
-                                        .then(docProj => {
-                                            if (docProj.exists) {
-                                                const dp = docProj.data();
-                                                if (!url && dp.portadaUrl) url = dp.portadaUrl;
-                                                if (!nombreLargo && dp.nombre) nombreLargo = dp.nombre;
-                                            }
-                                            return { url, nombreLargo };
-                                        });
-                                }
-                                return { url, nombreLargo };
-                            })
-                            .then(res => {
-                                if (res.url) nuevaImg.src = templatesDrive(res.url.trim());
-                                if (res.nombreLargo) nuevaInfo.innerText = res.nombreLargo;
-                            })
-                            .catch(err => console.error("Error al inyectar historia nueva:", err));
-                    }
                 }
-            });
-
-        }, error => console.error("Error en tiempo real:", error));
+            }, err => console.error("Error actualizando estado automático de: " + idHistoria, err));
+        });
     });
 </script>
 </body>
