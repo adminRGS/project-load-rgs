@@ -82,7 +82,7 @@ body.tema-malva {
 /* Forzamos a las imágenes a ser angostas en PC e ignorar el estilo interno del HTML */
 #contenido-imagenes img {
     width: 100% !important;            /* Ocupa todo el ancho en celulares */
-    max-width: 420px !important;       /* Evita que pase de 420px en pantallas de PC */
+    max-width: 460px !important;       /* <-- MODIFICADO: Una pizca más grande para el balance perfecto */
     height: auto !important;           /* Mantiene la proporción original de la imagen */
     display: block !important;
     margin: 0 auto !important;         /* Asegura el centrado absoluto */
