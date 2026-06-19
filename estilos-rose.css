@@ -82,7 +82,7 @@ body.tema-malva {
 /* Esto asegura que las imágenes no se estiren infinitamente en pantallas grandes */
 .contenedor-capitulo img, #contenedor-capitulo img, .lector-imagenes img {
     width: 100%;            /* Ocupa todo el ancho en celulares */
-    max-width: 700px;       /* En PC se detiene en 700px para no perder calidad */
+    max-width: 420px;       /* Ajustado a un tamaño más angosto para excelente nitidez en PC */
     height: auto;           /* Mantiene la proporción original de la imagen */
     display: block;
     margin: 0 auto;         /* Refuerza el centrado */
