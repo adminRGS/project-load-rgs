@@ -185,7 +185,6 @@
 <script src="funciones-rose.js"></script>
 
 <script>
-    // ── FIREBASE ──────────────────────────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
         authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -214,18 +213,14 @@
         return url;
     }
 
-    // Formatear el ID de Firebase para mostrar un título estético provisional si no se define uno
     function formatearTituloProvisional(id) {
         return id.replace(/-/g, ' ').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    // ── CARGA 100% DINÁMICA DESDE FIREBASE ─────────────────────────
     document.addEventListener("DOMContentLoaded", () => {
         
-        // Usamos onSnapshot para que si agregas un manga en el admin, aparezca al instante sin recargar la página
         dbInstancia.collection("estado_historias").onSnapshot(querySnapshot => {
             
-            // Limpiamos los contenedores para evitar que se dupliquen las tarjetas al actualizar
             document.getElementById("grid-emision").innerHTML = "";
             document.getElementById("grid-hiatus").innerHTML = "";
             document.getElementById("grid-finalizado").innerHTML = "";
@@ -236,46 +231,38 @@
                 const estado = datos.estado || "emision";
                 const contenedor = estadoAContenedor(estado);
                 
-                // Intentar sacar un nombre bonito desde los datos de la colección estado_historias si existe
                 const tituloMostrado = datos.nombre || formatearTituloProvisional(idHistoria);
 
-                // 🌟 CREACIÓN DINÁMICA DE LA TARJETA
+                // Creación de la tarjeta
                 const tarjeta = document.createElement("a");
                 tarjeta.className = "card";
                 tarjeta.id = "card-" + idHistoria;
-                
-                // ¡AQUÍ ESTÁ LA MAGIA! Apunta al lector único universal pasando su ID
                 tarjeta.href = `proyecto.html?id=${idHistoria}`;
 
-                // Creamos el tag de estado
                 const tag = document.createElement("span");
                 tag.className = `estado-tag tag-${contenedor}`;
                 tag.innerText = contenedor === "emision" ? "Emisión" : contenedor === "hiatus" ? "Hiatus" : "Finalizado";
                 
-                // Creamos la etiqueta de imagen provisional
                 const img = document.createElement("img");
                 img.className = "portada";
                 img.id = "img-" + idHistoria;
-                img.src = "portada-defecto.jpg"; // Portada base mientras descarga la real
+                img.src = "portada-defecto.jpg"; 
                 img.onerror = function() { this.src = 'portada-defecto.jpg'; };
 
-                // Creamos el contenedor de información (Título)
                 const infoDiv = document.createElement("div");
                 infoDiv.className = "info";
                 infoDiv.innerText = tituloMostrado;
 
-                // Armamos la estructura de la tarjeta
                 tarjeta.appendChild(tag);
                 tarjeta.appendChild(img);
                 tarjeta.appendChild(infoDiv);
 
-                // Inyectamos la tarjeta en su sección correspondiente de la biblioteca
                 const destinoGrid = document.getElementById("grid-" + contenedor);
                 if (destinoGrid) {
                     destinoGrid.appendChild(tarjeta);
                 }
 
-                // ── SEGUIR BUSCANDO LA PORTADA EN TIEMPO REAL ──
+                // 🌟 SOLUCIÓN DIRECTA: Buscamos la URL e infectamos directamente el nodo de la imagen 'img' que acabamos de crear
                 dbInstancia.collection(idHistoria).doc("informacion_proyecto").get()
                     .then(docInfo => {
                         let urlEncontrada = "";
@@ -295,10 +282,8 @@
                     })
                     .then(urlFinal => {
                         if (urlFinal) {
-                            const imgEtiqueta = document.getElementById("img-" + idHistoria);
-                            if (imgEtiqueta) {
-                                imgEtiqueta.src = templatesDrive(urlFinal.trim());
-                            }
+                            // Asignación directa y segura sin depender del DOM lento
+                            img.src = templatesDrive(urlFinal.trim());
                         }
                     })
                     .catch(err => console.error("Error cargando portadas de " + idHistoria, err));
