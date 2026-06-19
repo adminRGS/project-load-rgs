@@ -64,3 +64,26 @@ body.tema-malva {
 }
 
 .dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 1px solid white; }
+
+
+/* ========================================== */
+/* --- NUEVO: AJUSTE IMÁGENES DEL LECTOR --- */
+/* ========================================== */
+
+/* Esto controla el contenedor principal donde pones las imágenes del capítulo */
+.contenedor-capitulo, #contenedor-capitulo, .lector-imagenes {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra las imágenes horizontalmente */
+    margin: 0 auto;
+}
+
+/* Esto asegura que las imágenes no se estiren infinitamente en pantallas grandes */
+.contenedor-capitulo img, #contenedor-capitulo img, .lector-imagenes img {
+    width: 100%;            /* Ocupa todo el ancho en celulares */
+    max-width: 700px;       /* En PC se detiene en 700px para no perder calidad */
+    height: auto;           /* Mantiene la proporción original de la imagen */
+    display: block;
+    margin: 0 auto;         /* Refuerza el centrado */
+}
