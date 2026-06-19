@@ -259,6 +259,16 @@
         return "emision";
     }
 
+    // Convierte links de Drive para que carguen directo en la web sin fallar
+    function transformarLinkDrive(url) {
+        if (!url) return "";
+        if (url.includes('drive.google.com')) {
+            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
+            return `https://docs.google.com/uc?export=view&id=${id}`;
+        }
+        return url;
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const tarjetasFijas = document.querySelectorAll('.grid-historias .card');
 
@@ -266,40 +276,20 @@
             const idHistoria = tarjeta.id.replace('card-', ''); 
             const imgEtiqueta = document.getElementById("img-" + idHistoria);
 
-            // Guardamos el nombre original de tu archivo local (.jpg) antes de que Firebase haga nada
-            const portadaOriginal = idHistoria + ".jpg";
-
-            // Forzar a la imagen a quedarse con tu archivo local pase lo que pase en otros scripts externos
-            if (imgEtiqueta) {
-                imgEtiqueta.src = portadaOriginal;
-                
-                // Si algo intenta cambiar la imagen o falla, se vuelve a poner tu archivo local a la fuerza
-                imgEtiqueta.addEventListener('DOMAttrModified', function(e) {
-                    if (e.attrName === 'src' && imgEtiqueta.getAttribute('src') !== portadaOriginal) {
-                        imgEtiqueta.src = portadaOriginal;
-                    }
-                });
-                
-                // Blindaje extra por si el navegador detecta una carga rota de otro script
-                imgEtiqueta.onerror = function() {
-                    this.src = portadaOriginal;
-                };
-            }
-
-            // Escuchar la base de datos UNICAMENTE para mover las tarjetas de sección
+            // Escuchar Firebase en tiempo real para cada documento en la colección 'estado_historias'
             dbInstancia.collection("estado_historias").doc(idHistoria).onSnapshot(docState => {
                 if (docState.exists) {
                     const datos = docState.data();
+                    
+                    // 1. AUTOMATIZACIÓN DE ESTADO Y UBICACIÓN
                     const estado = datos.estado || "emision";
                     const contenedor = estadoAContenedor(estado);
                     
-                    // Mueve la tarjeta de grupo (Emisión, Hiatus o Finalizados)
                     const destinoGrid = document.getElementById("grid-" + contenedor);
                     if (destinoGrid && tarjeta.parentElement !== destinoGrid) {
                         destinoGrid.appendChild(tarjeta);
                     }
 
-                    // Actualiza el texto de la etiqueta verde, amarilla o rosa
                     const tag = tarjeta.querySelector(".estado-tag");
                     if (tag) {
                         tag.className = "estado-tag";
@@ -315,14 +305,20 @@
                         }
                     }
 
-                    // Asegurar una vez más que la portada NO cambió por culpa de Firebase
-                    if (imgEtiqueta && imgEtiqueta.getAttribute('src') !== portadaOriginal) {
-                        imgEtiqueta.src = portadaOriginal;
+                    // 2. AUTOMATIZACIÓN DE PORTADA DESDE EL ADMINISTRADOR
+                    // Si Brígida mete un link en el campo 'portadaUrl' de ese documento, se cambia solo.
+                    // Si el campo está vacío, la página usa tu archivo local .jpg automáticamente.
+                    if (imgEtiqueta) {
+                        if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                            imgEtiqueta.src = transformarLinkDrive(datos.portadaUrl.trim());
+                        } else {
+                            imgEtiqueta.src = idHistoria + ".jpg";
+                        }
                     }
                 }
-            }, err => console.error("Error en tiempo real con " + idHistoria, err));
+            }, err => console.error("Error conectando con Firebase para: " + idHistoria, err));
         });
     });
 </script>
 </body>
-    </html>
+</html>
