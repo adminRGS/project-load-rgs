@@ -259,7 +259,6 @@
         return "emision";
     }
 
-    // Convierte links de Drive para que carguen directo en la web sin fallar
     function transformarLinkDrive(url) {
         if (!url) return "";
         if (url.includes('drive.google.com')) {
@@ -276,12 +275,10 @@
             const idHistoria = tarjeta.id.replace('card-', ''); 
             const imgEtiqueta = document.getElementById("img-" + idHistoria);
 
-            // Escuchar Firebase en tiempo real para cada documento en la colección 'estado_historias'
             dbInstancia.collection("estado_historias").doc(idHistoria).onSnapshot(docState => {
                 if (docState.exists) {
                     const datos = docState.data();
                     
-                    // 1. AUTOMATIZACIÓN DE ESTADO Y UBICACIÓN
                     const estado = datos.estado || "emision";
                     const contenedor = estadoAContenedor(estado);
                     
@@ -305,9 +302,6 @@
                         }
                     }
 
-                    // 2. AUTOMATIZACIÓN DE PORTADA DESDE EL ADMINISTRADOR
-                    // Si Brígida mete un link en el campo 'portadaUrl' de ese documento, se cambia solo.
-                    // Si el campo está vacío, la página usa tu archivo local .jpg automáticamente.
                     if (imgEtiqueta) {
                         if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
                             imgEtiqueta.src = transformarLinkDrive(datos.portadaUrl.trim());
