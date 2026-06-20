@@ -92,6 +92,7 @@
             width: 95%;
             max-width: 1000px;
             padding: 10px 10px 40px 10px;
+            min-height: 20px;
         }
         
         .card { 
@@ -159,6 +160,15 @@
             box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
         }
         .sub-menu-colores.visible-rose { display: flex; }
+
+        .msg-vacio {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: rgba(255,102,178,0.5);
+            font-style: italic;
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -168,67 +178,15 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
-<div class="seccion-titulo">En Emisión</div>
-<div class="grid-historias" id="grid-emision">
-    <a href="proyecto.html?id=confesion" class="card" id="card-confesion">
-        <span class="estado-tag tag-emision">Emisión</span>
-        <img src="confesion.jpg" class="portada" id="img-confesion" onerror="this.src='confesion.jpg';">
-        <div class="info">Confesión</div>
-    </a>
-    <a href="proyecto.html?id=embarazada" class="card" id="card-embarazada">
-        <span class="estado-tag tag-emision">Emisión</span>
-        <img src="embarazada.jpg" class="portada" id="img-embarazada" onerror="this.src='embarazada.jpg';">
-        <div class="info">Fingí estar embarazada pero mi marido regresó</div>
-    </a>
-    <a href="proyecto.html?id=salvada" class="card" id="card-salvada">
-        <span class="estado-tag tag-emision">Emisión</span>
-        <img src="salvada.jpg" class="portada" id="img-salvada" onerror="this.src='salvada.jpg';">
-        <div class="info">Salvada por la pequeña dama sin poderes</div>
-    </a>
-    <a href="proyecto.html?id=leopardo" class="card" id="card-leopardo">
-        <span class="estado-tag tag-emision">Emisión</span>
-        <img src="leopardo.jpg" class="portada" id="img-leopardo" onerror="this.src='leopardo.jpg';">
-        <div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div>
-    </a>
-</div>
+<!-- Las secciones siempre visibles; se ocultan solo si están vacías -->
+<div class="seccion-titulo" id="titulo-emision">En Emisión</div>
+<div class="grid-historias" id="grid-emision"></div>
 
-<div class="seccion-titulo">En Hiatus</div>
-<div class="grid-historias" id="grid-hiatus">
-    <a href="proyecto.html?id=guarderia" class="card" id="card-guarderia">
-        <span class="estado-tag tag-hiatus">Hiatus</span>
-        <img src="guarderia.jpg" class="portada" id="img-guarderia" onerror="this.src='guarderia.jpg';">
-        <div class="info">La guardería de la villana</div>
-    </a>
-    <a href="proyecto.html?id=hermana" class="card" id="card-hermana">
-        <span class="estado-tag tag-hiatus">Hiatus</span>
-        <img src="hermana.jpg" class="portada" id="img-hermana" onerror="this.src='hermana.jpg';">
-        <div class="info">Mi hermana que era mi enemiga ahora me ama</div>
-    </a>
-    <a href="proyecto.html?id=amigos" class="card" id="card-amigos">
-        <span class="estado-tag tag-hiatus">Hiatus</span>
-        <img src="amigos.jpg" class="portada" id="img-amigos" onerror="this.src='amigos.jpg';">
-        <div class="info">Los amigos no hacen esto</div>
-    </a>
-</div>
+<div class="seccion-titulo" id="titulo-hiatus">En Hiatus</div>
+<div class="grid-historias" id="grid-hiatus"></div>
 
-<div class="seccion-titulo">Finalizados</div>
-<div class="grid-historias" id="grid-finalizado">
-    <a href="proyecto.html?id=matrimonio" class="card" id="card-matrimonio">
-        <span class="estado-tag tag-finalizado">Finalizado</span>
-        <img src="matrimonio.jpg" class="portada" id="img-matrimonio" onerror="this.src='matrimonio.jpg';">
-        <div class="info">Matrimonio de conveniencia a una obsesión</div>
-    </a>
-    <a href="proyecto.html?id=princesa" class="card" id="card-princesa">
-        <span class="estado-tag tag-finalizado">Finalizado</span>
-        <img src="princesa.jpg" class="portada" id="img-princesa" onerror="this.src='princesa.jpg';">
-        <div class="info">¡No, solo encanté a la princesa!</div>
-    </a>
-    <a href="proyecto.html?id=lobo" class="card" id="card-lobo">
-        <span class="estado-tag tag-finalizado">Finalizado</span>
-        <img src="lobo.jpg" class="portada" id="img-lobo" onerror="this.src='lobo.jpg';">
-        <div class="info">Soy un lobo pero no te lastimaré</div>
-    </a>
-</div>
+<div class="seccion-titulo" id="titulo-finalizado">Finalizados</div>
+<div class="grid-historias" id="grid-finalizado"></div>
 
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
@@ -257,14 +215,6 @@
     }
     const dbInstancia = firebase.firestore();
 
-    function estadoAContenedor(estado) {
-        if (!estado) return "emision";
-        const est = estado.toLowerCase().trim();
-        if (est === "hiatus")     return "hiatus";
-        if (est === "finalizado") return "finalizado";
-        return "emision";
-    }
-
     function transformarLinkDrive(url) {
         if (!url) return "";
         if (url.includes('drive.google.com')) {
@@ -274,50 +224,71 @@
         return url;
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const tarjetasFijas = document.querySelectorAll('.grid-historias .card');
+    function estadoAContenedor(estado) {
+        if (!estado) return "emision";
+        const est = estado.toLowerCase().trim();
+        if (est === "hiatus")     return "hiatus";
+        if (est === "finalizado") return "finalizado";
+        return "emision";
+    }
 
-        tarjetasFijas.forEach(tarjeta => {
-            const idHistoria = tarjeta.id.replace('card-', ''); 
-            const imgEtiqueta = document.getElementById("img-" + idHistoria);
+    function crearCard(id, datos) {
+        const contenedor = estadoAContenedor(datos.estado);
+        const tagClase   = contenedor === "emision" ? "tag-emision" : contenedor === "hiatus" ? "tag-hiatus" : "tag-finalizado";
+        const tagTexto   = contenedor === "emision" ? "Emisión"     : contenedor === "hiatus" ? "Hiatus"     : "Finalizado";
+        const nombre     = datos.nombre || id;
 
-            dbInstancia.collection("estado_historias").doc(idHistoria).onSnapshot(docState => {
-                if (docState.exists) {
-                    const datos = docState.data();
-                    
-                    const estado = datos.estado || "emision";
-                    const contenedor = estadoAContenedor(estado);
-                    
-                    const destinoGrid = document.getElementById("grid-" + contenedor);
-                    if (destinoGrid && tarjeta.parentElement !== destinoGrid) {
-                        destinoGrid.appendChild(tarjeta);
-                    }
+        // Portada: prioridad a portadaUrl de Firebase, si no hay usa el .jpg local
+        let srcPortada = id.toLowerCase().trim() + '.jpg';
+        if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+            srcPortada = transformarLinkDrive(datos.portadaUrl.trim());
+        }
 
-                    const tag = tarjeta.querySelector(".estado-tag");
-                    if (tag) {
-                        tag.className = "estado-tag";
-                        if (contenedor === "emision") {
-                            tag.classList.add("tag-emision");
-                            tag.innerText = "Emisión";
-                        } else if (contenedor === "hiatus") {
-                            tag.classList.add("tag-hiatus");
-                            tag.innerText = "Hiatus";
-                        } else if (contenedor === "finalizado") {
-                            tag.classList.add("tag-finalizado");
-                            tag.innerText = "Finalizado";
-                        }
-                    }
+        const card = document.createElement('a');
+        card.href      = `proyecto.html?id=${id}`;
+        card.className = 'card';
+        card.id        = 'card-' + id;
+        card.innerHTML = `
+            <span class="estado-tag ${tagClase}">${tagTexto}</span>
+            <img src="${srcPortada}" class="portada" 
+                 onerror="this.src='${id.toLowerCase().trim()}.jpg'">
+            <div class="info">${nombre}</div>
+        `;
+        return { card, contenedor };
+    }
 
-                    if (imgEtiqueta) {
-                        if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
-                            imgEtiqueta.src = transformarLinkDrive(datos.portadaUrl.trim());
-                        } else {
-                            imgEtiqueta.src = idHistoria + ".jpg";
-                        }
-                    }
-                }
-            }, err => console.error("Error conectando con Firebase para: " + idHistoria, err));
+    function actualizarSeccionesVisibles() {
+        ['emision','hiatus','finalizado'].forEach(tipo => {
+            const grid   = document.getElementById('grid-' + tipo);
+            const titulo = document.getElementById('titulo-' + tipo);
+            const tieneCards = grid && grid.querySelector('.card');
+            if (titulo) titulo.style.display = tieneCards ? '' : 'none';
+            if (grid)   grid.style.display   = tieneCards ? '' : 'none';
         });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // Escucha en tiempo real toda la colección estado_historias
+        dbInstancia.collection("estado_historias").onSnapshot(snapshot => {
+
+            snapshot.docChanges().forEach(change => {
+                const id    = change.doc.id;
+                const datos = change.doc.data();
+
+                // Eliminar card previa si existe (para reposicionarla si cambió de estado)
+                const cardExistente = document.getElementById('card-' + id);
+                if (cardExistente) cardExistente.remove();
+
+                if (change.type !== "removed") {
+                    const { card, contenedor } = crearCard(id, datos);
+                    const grid = document.getElementById('grid-' + contenedor);
+                    if (grid) grid.appendChild(card);
+                }
+            });
+
+            actualizarSeccionesVisibles();
+        }, err => console.error("Error Firebase:", err));
     });
 </script>
 </body>
