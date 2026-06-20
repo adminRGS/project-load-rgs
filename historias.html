@@ -12,28 +12,23 @@
     
     <style>
         body { 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
             background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
             color: var(--texto-rose, white); 
             font-family: 'serif'; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            display: flex; flex-direction: column; align-items: center; 
             min-height: 100vh; 
             transition: background 0.3s ease, color 0.3s ease;
         }
         body::before {
             content: "";
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(white 1px, transparent 1px);
             background-size: 50px 50px;
             opacity: 0.1;
             z-index: -1;
         }
-        
         header {
             padding: 60px 20px 20px 20px;
             text-align: center;
@@ -41,134 +36,60 @@
             width: 100%;
             max-width: 1000px;
         }
-        
         .btn-inicio {
-            position: absolute;
-            top: 20px; left: 20px;
-            text-decoration: none;
-            color: #ff66b2;
-            font-weight: bold;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border: 1px solid #ff66b2;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: 0.3s;
-            z-index: 10;
-            background: transparent;
+            position: absolute; top: 20px; left: 20px;
+            text-decoration: none; color: #ff66b2;
+            font-weight: bold; font-size: 0.8rem; text-transform: uppercase;
+            border: 1px solid #ff66b2; padding: 8px 15px; border-radius: 20px;
+            transition: 0.3s; z-index: 10; background: transparent;
         }
         .btn-inicio:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
-
         .frase-biblioteca { 
-            font-style: italic;
-            font-size: 1.8rem;
+            font-style: italic; font-size: 1.8rem;
             background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            color: transparent;
-            animation: shine 3s linear infinite;
-            margin: 20px 0;
-            font-family: 'Georgia', serif;
+            background-size: 200% auto; -webkit-background-clip: text; color: transparent;
+            animation: shine 3s linear infinite; margin: 20px 0; font-family: 'Georgia', serif;
         }
         @keyframes shine { to { background-position: 200% center; } }
-
         .seccion-titulo {
-            width: 90%;
-            max-width: 1000px;
-            margin: 30px 0 15px 0;
-            font-size: 1.2rem;
-            border-left: 4px solid #ff66b2;
-            padding-left: 15px;
-            color: #ff66b2;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
+            width: 90%; max-width: 1000px; margin: 30px 0 15px 0; font-size: 1.2rem;
+            border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2;
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
         }
-
         .grid-historias {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-            width: 95%;
-            max-width: 1000px;
-            padding: 10px 10px 40px 10px;
-            min-height: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px; width: 95%; max-width: 1000px; padding: 10px 10px 40px 10px;
         }
-        
         .card { 
-            background: var(--panel-rose, #161616); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            transition: 0.3s; 
-            text-decoration: none; 
-            color: inherit; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
+            background: var(--panel-rose, #161616); border-radius: 10px; overflow: hidden; 
+            transition: 0.3s; text-decoration: none; color: inherit; text-align: center; 
+            display: flex; flex-direction: column; position: relative; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
             border: 1px solid var(--borde-tarjeta, rgba(255, 102, 178, 0.2));
         }
         .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); }
-        
         .estado-tag {
-            position: absolute;
-            top: 8px; left: 8px;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            z-index: 2;
-            letter-spacing: 1px;
+            position: absolute; top: 8px; left: 8px; padding: 3px 10px;
+            border-radius: 4px; font-size: 0.65rem; font-weight: bold;
+            text-transform: uppercase; z-index: 2; letter-spacing: 1px;
         }
         .tag-emision    { background: #4caf50; color: white; } 
         .tag-finalizado { background: #ff66b2; color: white; }
         .tag-hiatus     { background: #ffd700; color: black; }
-
-        .portada { 
-            width: 100%; 
-            height: 240px; 
-            object-fit: cover; 
-            background: #222; 
-            display: block;
-        }
-        
+        .portada { width: 100%; height: 240px; object-fit: cover; background: #222; display: block; }
         .info { 
-            padding: 15px 8px; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-            flex-grow: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            line-height: 1.3; 
+            padding: 15px 8px; font-size: 0.85rem; font-weight: bold; flex-grow: 1; 
+            display: flex; align-items: center; justify-content: center; line-height: 1.3; 
             background: var(--fondo-info, transparent); 
             border-top: 1px solid var(--linea-caja, rgba(255, 255, 255, 0.05));
         }
-
         .sub-menu-colores {
-            display: none;
-            position: absolute;
-            bottom: 60px; right: 0;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid #ff66b2;
-            padding: 10px;
-            border-radius: 20px;
-            flex-direction: column;
-            gap: 10px;
+            display: none; position: absolute; bottom: 60px; right: 0;
+            background: rgba(0, 0, 0, 0.95); border: 1px solid #ff66b2;
+            padding: 10px; border-radius: 20px; flex-direction: column; gap: 10px;
             box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
         }
         .sub-menu-colores.visible-rose { display: flex; }
-
-        .msg-vacio {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: rgba(255,102,178,0.5);
-            font-style: italic;
-            padding: 10px 0;
-            font-size: 0.9rem;
-        }
     </style>
 </head>
 <body>
@@ -178,15 +99,72 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
-<!-- Las secciones siempre visibles; se ocultan solo si están vacías -->
-<div class="seccion-titulo" id="titulo-emision">En Emisión</div>
-<div class="grid-historias" id="grid-emision"></div>
+<div class="seccion-titulo">En Emisión</div>
+<div class="grid-historias" id="grid-emision">
+    <!-- HISTORIAS FIJAS -->
+    <a href="proyecto.html?id=confesion" class="card" id="card-confesion">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="confesion.jpg" class="portada" id="img-confesion">
+        <div class="info">Confesión</div>
+    </a>
+    <a href="proyecto.html?id=embarazada" class="card" id="card-embarazada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="embarazada.jpg" class="portada" id="img-embarazada">
+        <div class="info">Fingí estar embarazada pero mi marido regresó</div>
+    </a>
+    <a href="proyecto.html?id=salvada" class="card" id="card-salvada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="salvada.jpg" class="portada" id="img-salvada">
+        <div class="info">Salvada por la pequeña dama sin poderes</div>
+    </a>
+    <a href="proyecto.html?id=leopardo" class="card" id="card-leopardo">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="leopardo.jpg" class="portada" id="img-leopardo">
+        <div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div>
+    </a>
+</div>
 
-<div class="seccion-titulo" id="titulo-hiatus">En Hiatus</div>
-<div class="grid-historias" id="grid-hiatus"></div>
+<div class="seccion-titulo">En Hiatus</div>
+<div class="grid-historias" id="grid-hiatus">
+    <a href="proyecto.html?id=guarderia" class="card" id="card-guarderia">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="guarderia.jpg" class="portada" id="img-guarderia">
+        <div class="info">La guardería de la villana</div>
+    </a>
+    <a href="proyecto.html?id=hermana" class="card" id="card-hermana">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="hermana.jpg" class="portada" id="img-hermana">
+        <div class="info">Mi hermana que era mi enemiga ahora me ama</div>
+    </a>
+    <a href="proyecto.html?id=amigos" class="card" id="card-amigos">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="amigos.jpg" class="portada" id="img-amigos">
+        <div class="info">Los amigos no hacen esto</div>
+    </a>
+</div>
 
-<div class="seccion-titulo" id="titulo-finalizado">Finalizados</div>
-<div class="grid-historias" id="grid-finalizado"></div>
+<div class="seccion-titulo">Finalizados</div>
+<div class="grid-historias" id="grid-finalizado">
+    <a href="proyecto.html?id=matrimonio" class="card" id="card-matrimonio">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="matrimonio.jpg" class="portada" id="img-matrimonio">
+        <div class="info">Matrimonio de conveniencia a una obsesión</div>
+    </a>
+    <a href="proyecto.html?id=princesa" class="card" id="card-princesa">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="princesa.jpg" class="portada" id="img-princesa">
+        <div class="info">¡No, solo encanté a la princesa!</div>
+    </a>
+    <a href="proyecto.html?id=lobo" class="card" id="card-lobo">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="lobo.jpg" class="portada" id="img-lobo">
+        <div class="info">Soy un lobo pero no te lastimaré</div>
+    </a>
+</div>
+
+<!-- NUEVAS HISTORIAS DESDE ADMIN SE AGREGAN AQUÍ AUTOMÁTICAMENTE -->
+<div class="seccion-titulo" id="titulo-nuevas" style="display:none;">Nuevas Historias</div>
+<div class="grid-historias" id="grid-nuevas"></div>
 
 <div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
     <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
@@ -210,10 +188,11 @@
         messagingSenderId: "639472415083",
         appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
     };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const dbInstancia = firebase.firestore();
+
+    // IDs de las historias fijas en el HTML
+    const IDS_FIJOS = ["confesion","embarazada","salvada","leopardo","guarderia","hermana","amigos","matrimonio","princesa","lobo"];
 
     function transformarLinkDrive(url) {
         if (!url) return "";
@@ -232,62 +211,91 @@
         return "emision";
     }
 
-    function crearCard(id, datos) {
-        const contenedor = estadoAContenedor(datos.estado);
-        const tagClase   = contenedor === "emision" ? "tag-emision" : contenedor === "hiatus" ? "tag-hiatus" : "tag-finalizado";
-        const tagTexto   = contenedor === "emision" ? "Emisión"     : contenedor === "hiatus" ? "Hiatus"     : "Finalizado";
-        const nombre     = datos.nombre || id;
-
-        // Portada: prioridad a portadaUrl de Firebase, si no hay usa el .jpg local
-        let srcPortada = id.toLowerCase().trim() + '.jpg';
-        if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
-            srcPortada = transformarLinkDrive(datos.portadaUrl.trim());
+    function aplicarTagEstado(tag, contenedor) {
+        tag.className = "estado-tag";
+        if (contenedor === "emision") {
+            tag.classList.add("tag-emision");
+            tag.innerText = "Emisión";
+        } else if (contenedor === "hiatus") {
+            tag.classList.add("tag-hiatus");
+            tag.innerText = "Hiatus";
+        } else {
+            tag.classList.add("tag-finalizado");
+            tag.innerText = "Finalizado";
         }
-
-        const card = document.createElement('a');
-        card.href      = `proyecto.html?id=${id}`;
-        card.className = 'card';
-        card.id        = 'card-' + id;
-        card.innerHTML = `
-            <span class="estado-tag ${tagClase}">${tagTexto}</span>
-            <img src="${srcPortada}" class="portada" 
-                 onerror="this.src='${id.toLowerCase().trim()}.jpg'">
-            <div class="info">${nombre}</div>
-        `;
-        return { card, contenedor };
-    }
-
-    function actualizarSeccionesVisibles() {
-        ['emision','hiatus','finalizado'].forEach(tipo => {
-            const grid   = document.getElementById('grid-' + tipo);
-            const titulo = document.getElementById('titulo-' + tipo);
-            const tieneCards = grid && grid.querySelector('.card');
-            if (titulo) titulo.style.display = tieneCards ? '' : 'none';
-            if (grid)   grid.style.display   = tieneCards ? '' : 'none';
-        });
     }
 
     document.addEventListener("DOMContentLoaded", () => {
 
-        // Escucha en tiempo real toda la colección estado_historias
+        // Escucha toda la colección en tiempo real
         dbInstancia.collection("estado_historias").onSnapshot(snapshot => {
 
             snapshot.docChanges().forEach(change => {
                 const id    = change.doc.id;
-                const datos = change.doc.data();
+                const datos = change.doc.exists ? change.doc.data() : null;
 
-                // Eliminar card previa si existe (para reposicionarla si cambió de estado)
-                const cardExistente = document.getElementById('card-' + id);
-                if (cardExistente) cardExistente.remove();
+                if (IDS_FIJOS.includes(id)) {
+                    // ── HISTORIA FIJA: solo actualiza portada, tag y reposiciona ──
+                    const card = document.getElementById("card-" + id);
+                    const img  = document.getElementById("img-" + id);
+                    if (!card || !datos) return;
 
-                if (change.type !== "removed") {
-                    const { card, contenedor } = crearCard(id, datos);
-                    const grid = document.getElementById('grid-' + contenedor);
-                    if (grid) grid.appendChild(card);
+                    // Actualizar portada
+                    if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                        img.src = transformarLinkDrive(datos.portadaUrl.trim());
+                    }
+                    // Siempre fallback al jpg local si falla
+                    img.onerror = () => { img.src = id + '.jpg'; };
+
+                    // Actualizar tag y mover a la sección correcta
+                    const contenedor = estadoAContenedor(datos.estado);
+                    const tag = card.querySelector(".estado-tag");
+                    if (tag) aplicarTagEstado(tag, contenedor);
+
+                    const gridDestino = document.getElementById("grid-" + contenedor);
+                    if (gridDestino && card.parentElement !== gridDestino) {
+                        gridDestino.appendChild(card);
+                    }
+
+                } else {
+                    // ── HISTORIA NUEVA (creada desde admin) ──
+                    const cardExistente = document.getElementById("card-" + id);
+
+                    if (change.type === "removed") {
+                        if (cardExistente) cardExistente.remove();
+                        return;
+                    }
+
+                    if (cardExistente) cardExistente.remove();
+
+                    const contenedor = estadoAContenedor(datos.estado);
+                    const tagClase   = contenedor === "emision" ? "tag-emision" : contenedor === "hiatus" ? "tag-hiatus" : "tag-finalizado";
+                    const tagTexto   = contenedor === "emision" ? "Emisión"     : contenedor === "hiatus" ? "Hiatus"     : "Finalizado";
+                    const nombre     = datos.nombre || id.replace(/-/g, ' ');
+                    let   srcPortada = id.toLowerCase() + '.jpg';
+                    if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                        srcPortada = transformarLinkDrive(datos.portadaUrl.trim());
+                    }
+
+                    const card = document.createElement('a');
+                    card.href      = `proyecto.html?id=${id}`;
+                    card.className = 'card';
+                    card.id        = 'card-' + id;
+                    card.innerHTML = `
+                        <span class="estado-tag ${tagClase}">${tagTexto}</span>
+                        <img src="${srcPortada}" class="portada" id="img-${id}" onerror="this.src='${id}.jpg'">
+                        <div class="info">${nombre}</div>
+                    `;
+
+                    // Las nuevas van a su sección correspondiente
+                    const gridDestino = document.getElementById("grid-" + contenedor);
+                    if (gridDestino) gridDestino.appendChild(card);
+
+                    // Mostrar sección "Nuevas" solo si hay alguna que no sea fija
+                    // (las nuevas que sean de emision/hiatus/finalizado van a esos grids directamente)
                 }
             });
 
-            actualizarSeccionesVisibles();
         }, err => console.error("Error Firebase:", err));
     });
 </script>
