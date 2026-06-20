@@ -150,15 +150,8 @@
 
     <div class="contenedor-manga">
         <div class="portada-box">
-            <img src="portada-defecto.jpg" id="portada-dinamica" onerror="
-                const urlParams = new URLSearchParams(window.location.search);
-                const historiaID = urlParams.get('id');
-                if (historiaID) {
-                    this.src = historiaID.toLowerCase().trim() + '.jpg';
-                } else {
-                    this.src = 'portada-defecto.jpg';
-                }
-            ">
+            <!-- Forzamos a que use el archivo local .jpg correspondiente al ID de la URL -->
+            <img src="portada-defecto.jpg" id="portada-dinamica">
         </div>
 
         <h1 id="titulo-proyecto" class="titulo-manga">Cargando Título...</h1>
@@ -236,6 +229,11 @@
         document.getElementById('sinopsis-dinamica').innerText = "Error: No se especificó ninguna historia en la URL.";
     }
 
+    // Forzar la carga de la imagen local fija que coincide con el ID para evitar el cruce de portadas de Firebase
+    if (historiaID) {
+        document.getElementById('portada-dinamica').src = historiaID.toLowerCase().trim() + '.jpg';
+    }
+
     const diccionarioNombres = {
         "confesion": "Confesión",
         "embarazada": "Fingí estar embarazada pero mi marido regresó",
@@ -253,7 +251,8 @@
     let idCapActual = "";
 
     if (window.conectarAdminConManga && historiaID) {
-        window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica", onSnapshot);
+        // Conectamos para la sinopsis y título, pero ignoramos el cambio de imagen de Firebase para mantener la local fija
+        window.conectarAdminConManga(db, getDoc, doc, historiaID, "PORTADA_IGNORADA", "sinopsis-dinamica", onSnapshot);
         
         const nombreLargoOficial = diccionarioNombres[historiaID.toLowerCase().trim()] || historiaID.replace(/-/g, ' ');
         
