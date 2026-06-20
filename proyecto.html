@@ -221,7 +221,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // 🧠 DETECTOR AUTOMÁTICO DE HISTORIA POR URL (?id=lo-que-sea)
     const urlParams = new URLSearchParams(window.location.search);
     const historiaID = urlParams.get('id');
 
@@ -229,17 +228,31 @@
         document.getElementById('sinopsis-dinamica').innerText = "Error: No se especificó ninguna historia en la URL.";
     }
 
+    // 📋 TRADUCTOR MAESTRO: Mapea los IDs cortos de Firebase a tus nombres largos exactos
+    const diccionarioNombres = {
+        "confesion": "Confesión",
+        "embarazada": "Fingí estar embarazada pero mi marido regresó",
+        "salvada": "Salvada por la pequeña dama sin poderes",
+        "leopardo": "La pequeña leopardo de las nieves de la familia de panteras negras",
+        "guarderia": "La guardería de la villana",
+        "hermana": "Mi hermana que era mi enemiga ahora me ama",
+        "amigos": "Los amigos no hacen esto",
+        "matrimonio": "Matrimonio de conveniencia a una obsesión",
+        "princesa": "¡No, solo encanté a la princesa!",
+        "lobo": "Soy un lobo pero no te lastimaré"
+    };
+
     let capsOrdenados = [];
     let idCapActual = "";
 
-    // Sincronización en tiempo real automática para portada y sinopsis
     if (window.conectarAdminConManga && historiaID) {
         window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica", onSnapshot);
         
-        // También cambiamos el título visible de forma limpia usando el ID formateado provisionalmente
-        const tituloLimpio = historiaID.replace(/-/g, ' ');
-        document.getElementById('titulo-proyecto').innerText = tituloLimpio;
-        document.title = `${tituloLimpio.toUpperCase()} - Rose Garden Scan`;
+        // CORRECCIÓN AQUÍ: En lugar de romper guiones, busca el nombre largo oficial en el diccionario
+        const nombreLargoOficial = diccionarioNombres[historiaID.toLowerCase().trim()] || historiaID.replace(/-/g, ' ');
+        
+        document.getElementById('titulo-proyecto').innerText = nombreLargoOficial;
+        document.title = `${nombreLargoOficial.toUpperCase()} - Rose Garden Scan`;
     }
 
     function arreglarLink(url) {
@@ -345,4 +358,4 @@
     document.addEventListener('click', () => document.getElementById('stats-menu').classList.remove('active'));
 </script>
 </body>
-          </html>
+</html>
