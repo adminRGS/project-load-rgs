@@ -150,7 +150,6 @@
 
     <div class="contenedor-manga">
         <div class="portada-box">
-            <!-- Forzamos a que use el archivo local .jpg correspondiente al ID de la URL -->
             <img src="portada-defecto.jpg" id="portada-dinamica">
         </div>
 
@@ -229,35 +228,51 @@
         document.getElementById('sinopsis-dinamica').innerText = "Error: No se especificó ninguna historia en la URL.";
     }
 
-    // Forzar la carga de la imagen local fija que coincide con el ID para evitar el cruce de portadas de Firebase
-    if (historiaID) {
-        document.getElementById('portada-dinamica').src = historiaID.toLowerCase().trim() + '.jpg';
-    }
+    // ── CARGAR TÍTULO, SINOPSIS Y PORTADA DESDE FIREBASE ─────────────────
+    async function cargarMetadatosDesdeFirebase() {
+        if (!historiaID) return;
 
-    const diccionarioNombres = {
-        "confesion": "Confesión",
-        "embarazada": "Fingí estar embarazada pero mi marido regresó",
-        "salvada": "Salvada por la pequeña dama sin poderes",
-        "leopardo": "La pequeña leopardo de las nieves de la familia de panteras negras",
-        "guarderia": "La guardería de la villana",
-        "hermana": "Mi hermana que era mi enemiga ahora me ama",
-        "amigos": "Los amigos no hacen esto",
-        "matrimonio": "Matrimonio de conveniencia a una obsesión",
-        "princesa": "¡No, solo encanté a la princesa!",
-        "lobo": "Soy un lobo pero no te lastimaré"
-    };
+        try {
+            // Lee desde estado_historias (donde admin guarda todo)
+            const metaRef  = doc(db, "estado_historias", historiaID);
+            const metaSnap = await getDoc(metaRef);
 
-    let capsOrdenados = [];
-    let idCapActual = "";
+            if (metaSnap.exists()) {
+                const datos = metaSnap.data();
 
-    if (window.conectarAdminConManga && historiaID) {
-        // Conectamos para la sinopsis y título, pero ignoramos el cambio de imagen de Firebase para mantener la local fija
-        window.conectarAdminConManga(db, getDoc, doc, historiaID, "PORTADA_IGNORADA", "sinopsis-dinamica", onSnapshot);
-        
-        const nombreLargoOficial = diccionarioNombres[historiaID.toLowerCase().trim()] || historiaID.replace(/-/g, ' ');
-        
-        document.getElementById('titulo-proyecto').innerText = nombreLargoOficial;
-        document.title = `${nombreLargoOficial.toUpperCase()} - Rose Garden Scan`;
+                // Título
+                const nombre = datos.nombre || historiaID.replace(/-/g, ' ');
+                document.getElementById('titulo-proyecto').innerText = nombre;
+                document.title = `${nombre.toUpperCase()} - Rose Garden Scan`;
+
+                // Sinopsis
+                if (datos.sinopsis && datos.sinopsis.trim() !== "") {
+                    document.getElementById('sinopsis-dinamica').innerText = datos.sinopsis;
+                } else {
+                    document.getElementById('sinopsis-dinamica').innerText = "";
+                }
+
+                // Portada: prioridad Firebase, fallback a .jpg local
+                const imgEl = document.getElementById('portada-dinamica');
+                if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                    imgEl.src = arreglarLink(datos.portadaUrl.trim());
+                } else {
+                    imgEl.src = historiaID.toLowerCase().trim() + '.jpg';
+                }
+                imgEl.onerror = () => { imgEl.src = historiaID.toLowerCase().trim() + '.jpg'; };
+
+            } else {
+                // Si no existe en Firebase, al menos muestra el ID formateado
+                const nombre = historiaID.replace(/-/g, ' ');
+                document.getElementById('titulo-proyecto').innerText = nombre;
+                document.title = `${nombre.toUpperCase()} - Rose Garden Scan`;
+                document.getElementById('sinopsis-dinamica').innerText = "";
+                document.getElementById('portada-dinamica').src = historiaID.toLowerCase().trim() + '.jpg';
+            }
+        } catch (e) {
+            console.error("Error cargando metadatos:", e);
+            document.getElementById('portada-dinamica').src = historiaID.toLowerCase().trim() + '.jpg';
+        }
     }
 
     function arreglarLink(url) {
@@ -269,6 +284,10 @@
         return url;
     }
 
+    let capsOrdenados = [];
+    let idCapActual = "";
+
+    // ── CARGAR CAPÍTULOS ──────────────────────────────────────────────────
     async function cargarProyectoDesdeFirebase() {
         if(!historiaID) return;
         const grid = document.getElementById('grid');
@@ -306,10 +325,13 @@
         }
     }
 
-    if(historiaID) {
+    // ── INICIO ────────────────────────────────────────────────────────────
+    if (historiaID) {
+        cargarMetadatosDesdeFirebase();
         cargarProyectoDesdeFirebase();
     }
 
+    // ── LECTOR ────────────────────────────────────────────────────────────
     window.abrirLector = async function(idCap) {
         idCapActual = idCap;
         const lector = document.getElementById('lector');
