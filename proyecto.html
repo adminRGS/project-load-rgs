@@ -150,7 +150,15 @@
 
     <div class="contenedor-manga">
         <div class="portada-box">
-            <img src="portada-defecto.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';">
+            <img src="portada-defecto.jpg" id="portada-dinamica" onerror="
+                const urlParams = new URLSearchParams(window.location.search);
+                const historiaID = urlParams.get('id');
+                if (historiaID) {
+                    this.src = historiaID.toLowerCase().trim() + '.jpg';
+                } else {
+                    this.src = 'portada-defecto.jpg';
+                }
+            ">
         </div>
 
         <h1 id="titulo-proyecto" class="titulo-manga">Cargando Título...</h1>
@@ -228,7 +236,6 @@
         document.getElementById('sinopsis-dinamica').innerText = "Error: No se especificó ninguna historia en la URL.";
     }
 
-    // 📋 TRADUCTOR MAESTRO: Mapea los IDs cortos de Firebase a tus nombres largos exactos
     const diccionarioNombres = {
         "confesion": "Confesión",
         "embarazada": "Fingí estar embarazada pero mi marido regresó",
@@ -248,7 +255,6 @@
     if (window.conectarAdminConManga && historiaID) {
         window.conectarAdminConManga(db, getDoc, doc, historiaID, "portada-dinamica", "sinopsis-dinamica", onSnapshot);
         
-        // CORRECCIÓN AQUÍ: En lugar de romper guiones, busca el nombre largo oficial en el diccionario
         const nombreLargoOficial = diccionarioNombres[historiaID.toLowerCase().trim()] || historiaID.replace(/-/g, ' ');
         
         document.getElementById('titulo-proyecto').innerText = nombreLargoOficial;
