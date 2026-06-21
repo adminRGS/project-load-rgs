@@ -224,7 +224,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // CORRECCIÓN INTELIGENTE: Busca en 'estado_historias' los estados y nombres, e inspecciona sus carpetas internas
+        // Tu bucle base limpio para organizar los contenedores
         dbInstancia.collection("estado_historias").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const idHistoria = doc.id; 
@@ -235,6 +235,12 @@
                 let contenedorId = "emision";
                 if (estadoFirebase.toLowerCase().includes("hiatus")) contenedorId = "hiatus";
                 if (estadoFirebase.toLowerCase().includes("finalizado")) contenedorId = "finalizado";
+
+                // Portada por defecto local si falla todo lo demás
+                let nuevaPortada = (idHistoria + ".jpg");
+                if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                    nuevaPortada = transformarLinkDrive(datos.portadaUrl);
+                }
                 
                 const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
 
@@ -243,7 +249,13 @@
 
                 let tarjeta = document.getElementById("card-" + idHistoria);
 
-                if (!tarjeta) {
+                if (tarjeta) {
+                    const imgElemento = document.getElementById("img-" + idHistoria);
+                    if (imgElemento && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                        imgElemento.src = nuevaPortada;
+                    }
+                    destinoGrid.appendChild(tarjeta);
+                } else {
                     tarjeta = document.createElement("a");
                     tarjeta.href = idHistoria + ".html";
                     tarjeta.className = "card";
@@ -251,11 +263,11 @@
                     
                     tarjeta.innerHTML = `
                         <span class="estado-tag"></span>
-                        <img src="${idHistoria}.jpg" class="portada" id="img-${idHistoria}">
+                        <img src="${nuevaPortada}" class="portada" id="img-${idHistoria}">
                         <div class="info">${nombreProyecto}</div>
                     `;
+                    destinoGrid.appendChild(tarjeta);
                 }
-                destinoGrid.appendChild(tarjeta);
 
                 const tag = tarjeta.querySelector(".estado-tag");
                 if (tag) {
@@ -265,52 +277,47 @@
                     else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
                 }
 
-                // DOBLE BÚSQUEDA INTELIGENTE: Consulta 'datos_proyecto' e 'informacion' dentro de la colección de cada historia
+                // PROCESO DE BÚSQUEDA INTERNA REAL: Entra directo a las dos subcarpetas/documentos
                 const historiaRef = dbInstancia.collection(idHistoria);
-                const rutaProyecto = historiaRef.doc("datos_proyecto").get().catch(() => null);
-                const rutaInformacion = historiaRef.doc("informacion").get().catch(() => null);
+                
+                // 1. Validar datos_proyecto
+                historiaRef.doc("datos_proyecto").get().then((docProy) => {
+                    let portadaElegida = "";
+                    let tiempoElegido = 0;
 
-                Promise.all([rutaProyecto, rutaInformacion]).then(([docProyecto, docInfo]) => {
-                    let portadaFinal = "";
-                    let fechaProyecto = 0;
-                    let fechaInfo = 0;
-
-                    if (docProyecto && docProyecto.exists) {
-                        const dProy = docProyecto.data();
-                        if (dProy.portadaUrl || dProy.portada) {
-                            portadaFinal = dProy.portadaUrl || dProy.portada;
-                            fechaProyecto = dProy.fecha_actualizacion || dProy.timestamp || 1;
-                        }
+                    if (docProy.exists) {
+                        const dataProy = docProy.data();
+                        // Captura enlaces tanto de 'portadaUrl' como de 'portada' por si cambia el nombre del campo
+                        portadaElegida = dataProy.portadaUrl || dataProy.portada || "";
+                        tiempoElegido = dataProy.fecha_actualizacion || dataProy.timestamp || 1;
                     }
 
-                    if (docInfo && docInfo.exists) {
-                        const dInfo = docInfo.data();
-                        if (dInfo.portadaUrl || dInfo.portada) {
-                            const urlInfo = dInfo.portadaUrl || dInfo.portada;
-                            fechaInfo = dInfo.fecha_actualizacion || dInfo.timestamp || 0;
+                    // 2. Validar informacion
+                    historiaRef.doc("informacion").get().then((docInfo) => {
+                        if (docInfo.exists) {
+                            const dataInfo = docInfo.data();
+                            const portadaInfo = dataInfo.portadaUrl || dataInfo.portada || "";
+                            const tiempoInfo = dataInfo.fecha_actualizacion || dataInfo.timestamp || 0;
 
-                            if (fechaInfo > fechaProyecto || !portadaFinal) {
-                                portadaFinal = urlInfo;
+                            // Compara la fecha interna si ambos tienen portada, o asigna si el anterior estaba vacío
+                            if (portadaInfo && (tiempoInfo > tiempoElegido || !portadaElegida)) {
+                                portadaElegida = portadaInfo;
                             }
                         }
-                    }
 
-                    // Si no se encuentra en las carpetas internas, usa por defecto la raíz del documento original si existiera
-                    if (!portadaFinal && datos.portadaUrl) {
-                        portadaFinal = datos.portadaUrl;
-                    }
-
-                    if (portadaFinal) {
-                        const imgElemento = document.getElementById("img-" + idHistoria);
-                        if (imgElemento) {
-                            imgElemento.src = transformarLinkDrive(portadaFinal);
+                        // 3. Modifica la imagen real en la interfaz solo si halló una portada en las subcarpetas
+                        if (portadaElegida) {
+                            const imgFinal = document.getElementById("img-" + idHistoria);
+                            if (imgFinal) {
+                                imgFinal.src = transformarLinkDrive(portadaElegida);
+                            }
                         }
-                    }
-                }).catch((err) => console.log("Error buscando portadas internas para " + idHistoria, err));
+                    }).catch((e) => console.log("Error leyendo subcarpeta informacion para " + idHistoria, e));
+                }).catch((e) => console.log("Error leyendo subcarpeta datos_proyecto para " + idHistoria, e));
 
             });
         }).catch((error) => console.log("Error al sincronizar las portadas:", error));
     });
 </script>
 </body>
-</html>
+    </html>
