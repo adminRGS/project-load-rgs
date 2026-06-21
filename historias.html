@@ -162,6 +162,7 @@
     <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
 </header>
 
+<!-- Las 3 secciones fijas. El JS moverá las tarjetas según Firebase. -->
 <div class="seccion-titulo">En Emisión</div>
 <div class="grid-historias" id="grid-emision">
     <a href="confesion.html" class="card" id="card-confesion">
@@ -253,42 +254,35 @@
     }
     const dbInstancia = firebase.firestore();
 
+    // ── MAPA DE IDs a sección CSS ─────────────────────────────────
+    // Los valores guardados por el panel son: "emision", "hiatus", "finalizado"
     function estadoAContenedor(estado) {
         if (estado === "hiatus")     return "hiatus";
         if (estado === "finalizado") return "finalizado";
-        return "emision";
+        return "emision"; // valor por defecto si es "emision" o cualquier otro
     }
 
+    // ── SINCRONIZAR ESTADOS DESDE FIREBASE ───────────────────────
     document.addEventListener("DOMContentLoaded", () => {
 
-        // 🔒 Ocultar todas las tarjetas ANTES de leer Firebase
-        document.querySelectorAll(".card").forEach(card => {
-            card.style.visibility = "hidden";
-        });
-
+        // Lee la colección "estado_historias" (con guion bajo, igual que el panel)
         dbInstancia.collection("estado_historias").get()
             .then(querySnapshot => {
 
                 querySnapshot.forEach(doc => {
-                    const idHistoria = doc.id;
-                    const datos      = doc.data();
-                    const estado     = datos.estado || "emision";
-                    const contenedor = estadoAContenedor(estado);
+                    const idHistoria  = doc.id;
+                    const datos       = doc.data();
+                    const estado      = datos.estado || "emision";
+                    const contenedor  = estadoAContenedor(estado);
 
                     const tarjeta = document.getElementById("card-" + idHistoria);
-                    if (!tarjeta) return;
+                    if (!tarjeta) return; // historia no definida en este HTML
 
-                    // 🖼️ Actualizar portada — corregido a portadaUrl (u minúscula)
-                    if (datos.portadaUrl) {
-                        const img = tarjeta.querySelector(".portada");
-                        if (img) img.src = datos.portadaUrl;
-                    }
-
-                    // 📦 Mover tarjeta a la sección correcta
+                    // Mover tarjeta a la sección correcta
                     const destinoGrid = document.getElementById("grid-" + contenedor);
                     if (destinoGrid) destinoGrid.appendChild(tarjeta);
 
-                    // 🏷️ Actualizar badge de estado
+                    // Actualizar badge de estado
                     const tag = tarjeta.querySelector(".estado-tag");
                     if (tag) {
                         tag.className = "estado-tag";
@@ -304,16 +298,9 @@
                         }
                     }
                 });
-
             })
-            .catch(error => console.error("Error al leer estados desde Firebase:", error))
-            .finally(() => {
-                // ✅ Mostrar todas las tarjetas ya en su lugar correcto
-                document.querySelectorAll(".card").forEach(card => {
-                    card.style.visibility = "visible";
-                });
-            });
+            .catch(error => console.error("Error al leer estados desde Firebase:", error));
     });
 </script>
 </body>
-</html>
+        </html>
