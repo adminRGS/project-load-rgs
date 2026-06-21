@@ -144,7 +144,6 @@
             width: 100%;
         }
 
-        /* ── ESTADO ACTUAL (panel de estatus) ── */
         #caja-estado-actual {
             background: #fff5f8;
             border: 2px solid #fbc4b6;
@@ -168,9 +167,9 @@
             text-transform: uppercase;
         }
 
-        .badge-emision   { background: #4caf50; color: white; }
-        .badge-hiatus    { background: #ffd700; color: black; }
-        .badge-finalizado{ background: #ff66b2; color: white; }
+        .badge-emision    { background: #4caf50; color: white; }
+        .badge-hiatus     { background: #ffd700; color: black; }
+        .badge-finalizado { background: #ff66b2; color: white; }
     </style>
 </head>
 
@@ -199,7 +198,9 @@
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control">
                 <label>Proyecto</label>
-                <select id="select-proyecto-capitulo"></select>
+                <select id="select-proyecto-capitulo">
+                    <option value="">Cargando proyectos...</option>
+                </select>
             </div>
             <div class="grupo-control">
                 <label>Número Capítulo</label>
@@ -214,19 +215,18 @@
 
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
-
             <div class="grupo-control">
                 <label>Selecciona la historia</label>
-                <select id="select-proyecto-estatus" onchange="cargarEstadoActual()"></select>
+                <select id="select-proyecto-estatus" onchange="cargarEstadoActual()">
+                    <option value="">Cargando proyectos...</option>
+                </select>
             </div>
-
             <div class="grupo-control">
                 <label>Estado actual</label>
                 <div id="caja-estado-actual">
                     <span style="color:#aaa; font-weight:normal;">Selecciona una historia arriba</span>
                 </div>
             </div>
-
             <div class="grupo-control">
                 <label>Cambiar a</label>
                 <select id="nuevo-estado-valor">
@@ -235,13 +235,11 @@
                     <option value="finalizado">💖 Finalizado</option>
                 </select>
             </div>
-
             <button class="btn-guardar" onclick="actualizarEstadoFirebase()">💾 Guardar Estado</button>
         </div>
 
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-
             <div class="grupo-control">
                 <label>ID</label>
                 <input type="text" id="nuevo-id">
@@ -264,7 +262,9 @@
 
             <div class="grupo-control">
                 <label>Editar Proyecto</label>
-                <select id="select-proyecto-editar" onchange="cargarPortadaActualEditar()"></select>
+                <select id="select-proyecto-editar" onchange="cargarPortadaActualEditar()">
+                    <option value="">Cargando proyectos...</option>
+                </select>
             </div>
             <div class="grupo-control">
                 <label>Editar Portada (link Drive)</label>
@@ -300,6 +300,8 @@
             if (clave === "Rose2026") {
                 document.getElementById("bloque-login").style.display = "none";
                 document.getElementById("contenido-panel").style.display = "flex";
+                // ✅ Carga los proyectos desde Firebase al entrar
+                cargarProyectosDesdeFirebase();
             } else {
                 alert("Contraseña incorrecta");
             }
@@ -311,12 +313,10 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── LIMPIADOR DE ENLACES DE DRIVE REPARADO ──
+        // ── LIMPIADOR DE ENLACES DE DRIVE ─────────────────────────
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
-
-            // Si es un link de Google Drive, extraemos el ID limpio
             if (link.includes('drive.google.com')) {
                 let id = "";
                 const matchUc = link.match(/[?&]id=([\w-]+)/);
@@ -324,53 +324,61 @@
                     id = matchUc[1];
                 } else {
                     const matchD = link.match(/\/d\/([\w-]+)/);
-                    if (matchD && matchD[1]) {
-                        id = matchD[1];
-                    }
+                    if (matchD && matchD[1]) id = matchD[1];
                 }
-                
-                if (id) {
-                    return `https://docs.google.com/uc?export=view&id=${id}`;
-                }
+                if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
             }
-
-            return link; // Si no es Drive, lo guarda tal cual
+            return link;
         }
 
-        // ── PROYECTOS ─────────────────────────────────────────────
-        const proyectos = [
-            { id: "leopardo",   nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras" },
-            { id: "amigos",     nombre: "Los amigos no hacen esto" },
-            { id: "hermana",    nombre: "Mi hermana que era mi enemiga ahora me ama" },
-            { id: "salvada",    nombre: "Salvada por la pequeña dama sin poderes" },
-            { id: "confesion",  nombre: "Confesión" },
-            { id: "embarazada", nombre: "Fingí estar embarazada pero mi marido regresó" },
-            { id: "lobo",       nombre: "Soy un lobo pero no le lastimaré" },
-            { id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión" },
-            { id: "guarderia",  nombre: "La guardería de la villana" },
-            { id: "princesa",   nombre: "No solo encante a la princesa!" }
-        ];
-
-        function cargarProyectosEnSelects() {
+        // ── CARGAR PROYECTOS DINÁMICAMENTE DESDE FIREBASE ─────────
+        // ✅ Ya no depende de una lista fija en el código.
+        //    Lee todos los documentos de "estado_historias" y los pone
+        //    en los tres selects automáticamente.
+        function cargarProyectosDesdeFirebase() {
             const selects = [
                 document.getElementById("select-proyecto-capitulo"),
                 document.getElementById("select-proyecto-estatus"),
                 document.getElementById("select-proyecto-editar")
             ];
+
+            // Poner opción vacía mientras carga
             selects.forEach(select => {
                 select.innerHTML = '<option value="">-- Selecciona --</option>';
-                proyectos.forEach(p => {
-                    const opt = document.createElement("option");
-                    opt.value = p.id;
-                    opt.textContent = p.nombre;
-                    select.appendChild(opt);
-                });
             });
+
+            db.collection("estado_historias").orderBy("nombre").get()
+                .then(querySnapshot => {
+                    if (querySnapshot.empty) {
+                        selects.forEach(select => {
+                            select.innerHTML = '<option value="">No hay proyectos aún</option>';
+                        });
+                        return;
+                    }
+
+                    querySnapshot.forEach(doc => {
+                        const id     = doc.id;
+                        const nombre = doc.data().nombre || id; // Si no tiene nombre, muestra el ID
+
+                        selects.forEach(select => {
+                            const opt = document.createElement("option");
+                            opt.value       = id;
+                            opt.textContent = nombre;
+                            select.appendChild(opt);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al cargar proyectos:", error);
+                    selects.forEach(select => {
+                        select.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+                });
         }
 
-        // ── LEER ESTADO ACTUAL DESDE FIREBASE ────────────────────
+        // ── LEER ESTADO ACTUAL DESDE FIREBASE ─────────────────────
         function cargarEstadoActual() {
-            const id = document.getElementById("select-proyecto-estatus").value;
+            const id   = document.getElementById("select-proyecto-estatus").value;
             const caja = document.getElementById("caja-estado-actual");
 
             if (!id) {
@@ -383,9 +391,7 @@
             db.collection("estado_historias").doc(id).get()
                 .then(doc => {
                     let estado = "emision";
-                    if (doc.exists && doc.data().estado) {
-                        estado = doc.data().estado;
-                    }
+                    if (doc.exists && doc.data().estado) estado = doc.data().estado;
                     mostrarBadgeEstado(caja, estado);
                     document.getElementById("nuevo-estado-valor").value = estado;
                 })
@@ -396,26 +402,27 @@
 
         function mostrarBadgeEstado(caja, estado) {
             const etiquetas = {
-                emision:    { texto: "🔴 En Emisión",  clase: "badge-emision"    },
-                hiatus:     { texto: "🟡 En Hiatus",   clase: "badge-hiatus"     },
-                finalizado: { texto: "💖 Finalizado",  clase: "badge-finalizado" }
+                emision:    { texto: "🔴 En Emisión", clase: "badge-emision"    },
+                hiatus:     { texto: "🟡 En Hiatus",  clase: "badge-hiatus"     },
+                finalizado: { texto: "💖 Finalizado", clase: "badge-finalizado" }
             };
             const info = etiquetas[estado] || { texto: estado, clase: "badge-emision" };
             caja.innerHTML = `<span class="badge ${info.clase}">${info.texto}</span>`;
         }
 
-        // Cargar datos en los inputs al cambiar el select de edición
+        // ── CARGAR PORTADA Y SINOPSIS AL EDITAR ───────────────────
         function cargarPortadaActualEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
-            if(!id) return;
-            
+            if (!id) return;
+
             db.collection("estado_historias").doc(id).get().then(doc => {
-                if(doc.exists) {
+                if (doc.exists) {
                     const d = doc.data();
-                    document.getElementById("editar-portada").value = d.portadaUrl || "";
-                    document.getElementById("editar-sinopsis").value = d.sinopsis || "";
+                    // ✅ Corregido: usa portadaUrl (igual que donde se guarda)
+                    document.getElementById("editar-portada").value  = d.portadaUrl || "";
+                    document.getElementById("editar-sinopsis").value = d.sinopsis   || "";
                 } else {
-                    document.getElementById("editar-portada").value = "";
+                    document.getElementById("editar-portada").value  = "";
                     document.getElementById("editar-sinopsis").value = "";
                 }
             });
@@ -423,7 +430,7 @@
 
         // ── GUARDAR ESTADO ────────────────────────────────────────
         function actualizarEstadoFirebase() {
-            const id = document.getElementById("select-proyecto-estatus").value;
+            const id          = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
 
             if (!id) { alert("Selecciona una historia primero."); return; }
@@ -455,7 +462,7 @@
                 .set({ numero: numero, imagenes: enlaces, fecha: new Date() })
                 .then(() => {
                     alert("¡Capítulo publicado!");
-                    document.getElementById("num-capitulo").value = "";
+                    document.getElementById("num-capitulo").value    = "";
                     document.getElementById("enlaces-imagenes").value = "";
                 })
                 .catch(error => alert("Error: " + error));
@@ -470,7 +477,6 @@
 
             if (!id || !titulo) { alert("ID y Nombre son obligatorios."); return; }
 
-            // Guardamos todo directo en 'estado_historias' para que se sincronice con historias.html al instante
             db.collection("estado_historias").doc(id)
                 .set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis, estado: "emision" }, { merge: true })
                 .then(() => {
@@ -479,11 +485,13 @@
                     document.getElementById("nuevo-titulo").value   = "";
                     document.getElementById("nuevo-portada").value  = "";
                     document.getElementById("nuevo-sinopsis").value = "";
+                    // ✅ Recarga los selects para que aparezca el nuevo proyecto
+                    cargarProyectosDesdeFirebase();
                 })
                 .catch(error => alert("Error: " + error));
         }
 
-        // ── EDITAR PROYECTO CORREGIDO ──
+        // ── EDITAR PROYECTO ───────────────────────────────────────
         function guardarEdicionProyecto() {
             const id       = document.getElementById("select-proyecto-editar").value;
             const portada  = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim());
@@ -491,17 +499,13 @@
 
             if (!id) { alert("Selecciona un proyecto."); return; }
 
-            // Se guarda en 'estado_historias' para actualizar la portada automática
+            // ✅ Guarda como portadaUrl (consistente en todo el código)
             db.collection("estado_historias").doc(id)
                 .set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
-                .then(() => alert("¡Portada y cambios actualizados en Firebase con éxito!"));
+                .then(() => alert("¡Portada y cambios actualizados con éxito!"))
+       .catch(error => alert("Error: " + error));
         }
-
-        // ── INICIO ────────────────────────────────────────────────
-        window.onload = function () {
-            cargarProyectosEnSelects();
-        };
 
     </script>
 </body>
-                    </html>
+</html>
