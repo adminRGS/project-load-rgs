@@ -206,30 +206,27 @@
         return url;
     }
 
-    // MAPA CONTROLADOR: Vincula la ID exacta de tu Firestore (izquierda) con el ID de tu tarjeta HTML (derecha)
-    const MAPA_IDS = {
-        "salvada": "salvada",
-        "confesion": "confesion",
-        "embarazada": "embarazada",
-        "leopardo": "leopardo",
-        "guarderia": "guarderia",
-        "hermana": "hermana",
-        "amigos": "amigos",
-        "matrimonio": "matrimonio",
-        "princesa": "princesa",
-        "lobo": "lobo"
-    };
+    function normalizarIdLocal(texto) {
+        if (!texto) return "";
+        return texto.trim().toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "");
+    }
 
     document.addEventListener("DOMContentLoaded", async () => {
         try {
             const querySnapshot = await dbInstancia.collection("estado_historias").get();
             
             for (const doc of querySnapshot.docs) {
-                const idFirebase = doc.id; 
+                const idOriginalFirebase = doc.id; 
                 const datos = doc.data();
                 
-                // Buscamos cuál es el id correspondiente en tu HTML estático
-                const idLocal = MAPA_IDS[idFirebase] || idFirebase;
+                let idLocalDetectada = normalizarIdLocal(idOriginalFirebase);
+                if (idLocalDetectada.includes("amigos")) idLocalDetectada = "amigos";
+                if (idLocalDetectada.includes("embarazada")) idLocalDetectada = "embarazada";
+                if (idLocalDetectada.includes("leopardo")) idLocalDetectada = "leopardo";
+                if (idLocalDetectada.includes("guarderia")) idLocalDetectada = "guarderia";
 
                 let estadoFirebase = datos.estado || "emision"; 
                 let contenedorId = "emision";
@@ -237,13 +234,11 @@
                 if (estadoFirebase.toLowerCase().includes("finalizado")) contenedorId = "finalizado";
 
                 let destinoGrid = document.getElementById("grid-" + contenedorId);
-                let tarjeta = document.getElementById("card-" + idLocal);
-                const imgElemento = document.getElementById("img-" + idLocal);
+                let tarjeta = document.getElementById("card-" + idLocalDetectada);
+                let imgElemento = document.getElementById("img-" + idLocalDetectada);
 
-                // 1. Mover la tarjeta al contenedor correcto según Firebase (Si existe en tu HTML)
                 if (tarjeta && destinoGrid) {
                     destinoGrid.appendChild(tarjeta);
-                    
                     const tag = tarjeta.querySelector(".estado-tag");
                     if (tag) {
                         tag.className = "estado-tag"; 
@@ -253,50 +248,51 @@
                     }
                 }
 
-                // 2. Buscar portadas actualizadas asíncronamente en subcarpetas de forma segura
                 try {
-                    const historiaRef = dbInstancia.collection(idFirebase);
+                    const historiaRef = dbInstancia.collection(idOriginalFirebase);
+                    
+                    // Eliminado por completo el archivo muerto proyecto.html de las búsquedas internas
                     const [docProy, docInfo] = await Promise.all([
                         historiaRef.doc("datos_proyecto").get(),
                         historiaRef.doc("informacion").get()
                     ]);
 
-                    let portadaElegida = "";
-                    let tiempoMaximo = 0;
+                    let urlRemota = "";
+                    let tiempoMax = 0;
 
                     if (docProy.exists) {
-                        const dProy = docProy.data();
-                        portadaElegida = dProy.portadaUrl || dProy.portada || "";
-                        tiempoMaximo = dProy.fecha_actualizacion || dProy.timestamp || 1;
+                        const dP = docProy.data();
+                        urlRemota = dP.portadaUrl || dP.portada || "";
+                        tiempoMax = dP.fecha_actualizacion || dP.timestamp || 1;
                     }
 
                     if (docInfo.exists) {
-                        const dInfo = docInfo.data();
-                        const urlInfo = dInfo.portadaUrl || dInfo.portada || "";
-                        const tiempoInfo = dInfo.fecha_actualizacion || dInfo.timestamp || 0;
+                        const dI = docInfo.data();
+                        const urlI = dI.portadaUrl || dI.portada || "";
+                        const tiempoI = dI.fecha_actualizacion || dI.timestamp || 0;
 
-                        if (urlInfo && (tiempoInfo > tiempoMaximo || !portadaElegida)) {
-                            portadaElegida = urlInfo;
+                        if (urlI && (tiempoI > tiempoMax || !urlRemota)) {
+                            urlRemota = urlI;
                         }
                     }
 
-                    // Aplicamos los cambios solo si encontramos URLs válidas en la base de datos
-                    if (portadaElegida && imgElemento) {
-                        imgElemento.src = transformarLinkDrive(portadaElegida);
-                    } else if (datos.portadaUrl && datos.portadaUrl.trim() !== "" && imgElemento) {
-                        imgElemento.src = transformarLinkDrive(datos.portadaUrl);
+                    if (!urlRemota && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                        urlRemota = datos.portadaUrl;
                     }
-                    // Si todo viene vacío, NO se toca el src local (.jpg), protegiendo tus imágenes.
 
-                } catch (err) {
-                    console.log("No hay subcarpetas para: " + idFirebase);
-                    if (datos.portadaUrl && datos.portadaUrl.trim() !== "" && imgElemento) {
-                        imgElemento.src = transformarLinkDrive(datos.portadaUrl);
+                    // Protección estricta: si la URL remota es válida, actualiza; si no, deja intacta tu imagen local
+                    if (urlRemota && urlRemota.trim() !== "" && urlRemota.includes("http")) {
+                        if (imgElemento) {
+                            imgElemento.src = transformarLinkDrive(urlRemota);
+                        }
                     }
+
+                } catch (subErr) {
+                    console.log("Error en subcarpetas para: " + idOriginalFirebase);
                 }
             }
         } catch (error) {
-            console.log("Error general en el proceso síncrono:", error);
+            console.log("Error general:", error);
         }
     });
 </script>
