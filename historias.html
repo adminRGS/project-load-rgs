@@ -206,60 +206,67 @@
         return url;
     }
 
-    // Normaliza el texto quitando acentos y espacios raros para enlazar la ID de Firebase con tu HTML
-    function limpiarTextoId(texto) {
-        if (!texto) return "";
-        return texto.trim().toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]/g, "");
-    }
-
-    function obtenerNombreBonito(idLimpia, nombreFirebase) {
-        if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
-        if (idLimpia.includes("amigos")) return "Los amigos no hacen esto";
-        if (idLimpia.includes("confesion")) return "Confesión";
-        if (idLimpia.includes("embarazada")) return "Fingí estar embarazada pero mi marido regresó";
-        if (idLimpia.includes("guarderia")) return "La guardería de la villana";
-        if (idLimpia.includes("hermana")) return "Mi hermana que era mi enemiga ahora me ama";
-        if (idLimpia.includes("leopardo")) return "La pequeña leopardo de las nieves de la familia de panteras negras";
-        if (idLimpia.includes("lobo")) return "Soy un lobo pero no te lastimaré";
-        if (idLimpia.includes("matrimonio")) return "Matrimonio de conveniencia a una obsesión";
-        if (idLimpia.includes("princesa")) return "¡No, solo encanté a la princesa!";
-        if (idLimpia.includes("salvada")) return "Salvada por la pequeña dama sin poderes";
-        return idLimpia;
-    }
+    // MAPA CONTROLADOR: Vincula la ID exacta de tu Firestore (izquierda) con el ID de tu tarjeta HTML (derecha)
+    const MAPA_IDS = {
+        "salvada": "salvada",
+        "confesion": "confesion",
+        "embarazada": "embarazada",
+        "leopardo": "leopardo",
+        "guarderia": "guarderia",
+        "hermana": "hermana",
+        "amigos": "amigos",
+        "matrimonio": "matrimonio",
+        "princesa": "princesa",
+        "lobo": "lobo"
+    };
 
     document.addEventListener("DOMContentLoaded", async () => {
         try {
             const querySnapshot = await dbInstancia.collection("estado_historias").get();
             
             for (const doc of querySnapshot.docs) {
-                const idOriginalFirebase = doc.id; 
+                const idFirebase = doc.id; 
                 const datos = doc.data();
                 
-                // Normalizamos la ID para que busque correctamente los elementos en tu HTML
-                const idHistoria = limpiarTextoId(idOriginalFirebase);
-                
+                // Buscamos cuál es el id correspondiente en tu HTML estático
+                const idLocal = MAPA_IDS[idFirebase] || idFirebase;
+
                 let estadoFirebase = datos.estado || "emision"; 
                 let contenedorId = "emision";
                 if (estadoFirebase.toLowerCase().includes("hiatus")) contenedorId = "hiatus";
                 if (estadoFirebase.toLowerCase().includes("finalizado")) contenedorId = "finalizado";
 
-                let portadaFinal = "";
-                let tiempoMaximo = 0;
+                let destinoGrid = document.getElementById("grid-" + contenedorId);
+                let tarjeta = document.getElementById("card-" + idLocal);
+                const imgElemento = document.getElementById("img-" + idLocal);
 
-                // Hacemos la consulta usando la ID exacta como está guardada originalmente en Firebase
+                // 1. Mover la tarjeta al contenedor correcto según Firebase (Si existe en tu HTML)
+                if (tarjeta && destinoGrid) {
+                    destinoGrid.appendChild(tarjeta);
+                    
+                    const tag = tarjeta.querySelector(".estado-tag");
+                    if (tag) {
+                        tag.className = "estado-tag"; 
+                        if (contenedorId === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
+                        else if (contenedorId === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
+                        else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
+                    }
+                }
+
+                // 2. Buscar portadas actualizadas asíncronamente en subcarpetas de forma segura
                 try {
-                    const historiaRef = dbInstancia.collection(idOriginalFirebase);
+                    const historiaRef = dbInstancia.collection(idFirebase);
                     const [docProy, docInfo] = await Promise.all([
                         historiaRef.doc("datos_proyecto").get(),
                         historiaRef.doc("informacion").get()
                     ]);
 
+                    let portadaElegida = "";
+                    let tiempoMaximo = 0;
+
                     if (docProy.exists) {
                         const dProy = docProy.data();
-                        portadaFinal = dProy.portadaUrl || dProy.portada || "";
+                        portadaElegida = dProy.portadaUrl || dProy.portada || "";
                         tiempoMaximo = dProy.fecha_actualizacion || dProy.timestamp || 1;
                     }
 
@@ -268,59 +275,28 @@
                         const urlInfo = dInfo.portadaUrl || dInfo.portada || "";
                         const tiempoInfo = dInfo.fecha_actualizacion || dInfo.timestamp || 0;
 
-                        if (urlInfo && (tiempoInfo > tiempoMaximo || !portadaFinal)) {
-                            portadaFinal = urlInfo;
-                            tiempoMaximo = tiempoInfo;
+                        if (urlInfo && (tiempoInfo > tiempoMaximo || !portadaElegida)) {
+                            portadaElegida = urlInfo;
                         }
                     }
-                } catch (err) {
-                    console.log("Error buscando subcarpetas para: " + idOriginalFirebase);
-                }
 
-                if (!portadaFinal) {
-                    portadaFinal = (datos.portadaUrl && datos.portadaUrl.trim() !== "") ? datos.portadaUrl : (idHistoria + ".jpg");
-                }
-
-                const urlSincronizada = transformarLinkDrive(portadaFinal);
-                const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
-
-                let destinoGrid = document.getElementById("grid-" + contenedorId);
-                if (!destinoGrid) continue;
-
-                // Buscamos si la tarjeta ya existe en tu HTML (por ejemplo, card-confesion)
-                let tarjeta = document.getElementById("card-" + idHistoria);
-
-                if (tarjeta) {
-                    const imgElemento = document.getElementById("img-" + idHistoria);
-                    if (imgElemento) {
-                        imgElemento.src = urlSincronizada;
+                    // Aplicamos los cambios solo si encontramos URLs válidas en la base de datos
+                    if (portadaElegida && imgElemento) {
+                        imgElemento.src = transformarLinkDrive(portadaElegida);
+                    } else if (datos.portadaUrl && datos.portadaUrl.trim() !== "" && imgElemento) {
+                        imgElemento.src = transformarLinkDrive(datos.portadaUrl);
                     }
-                    destinoGrid.appendChild(tarjeta);
-                } else {
-                    // Si no existía, creamos una nueva tarjeta bien enlazada
-                    tarjeta = document.createElement("a");
-                    tarjeta.href = idHistoria + ".html";
-                    tarjeta.className = "card";
-                    tarjeta.id = "card-" + idHistoria;
-                    
-                    tarjeta.innerHTML = `
-                        <span class="estado-tag"></span>
-                        <img src="${urlSincronizada}" class="portada" id="img-${idHistoria}">
-                        <div class="info">${nombreProyecto}</div>
-                    `;
-                    destinoGrid.appendChild(tarjeta);
-                }
+                    // Si todo viene vacío, NO se toca el src local (.jpg), protegiendo tus imágenes.
 
-                const tag = tarjeta.querySelector(".estado-tag");
-                if (tag) {
-                    tag.className = "estado-tag"; 
-                    if (contenedorId === "emision") { tag.classList.add("tag-emision"); tag.innerText = "Emisión"; }
-                    else if (contenedorId === "hiatus") { tag.classList.add("tag-hiatus"); tag.innerText = "Hiatus"; }
-                    else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
+                } catch (err) {
+                    console.log("No hay subcarpetas para: " + idFirebase);
+                    if (datos.portadaUrl && datos.portadaUrl.trim() !== "" && imgElemento) {
+                        imgElemento.src = transformarLinkDrive(datos.portadaUrl);
+                    }
                 }
             }
         } catch (error) {
-            console.log("Error general en la sincronización:", error);
+            console.log("Error general en el proceso síncrono:", error);
         }
     });
 </script>
