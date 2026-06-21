@@ -197,6 +197,16 @@
     }
     const dbInstancia = firebase.firestore();
 
+    // Función idéntica a tus páginas individuales para desencriptar URLs de Google Drive
+    function transformarLinkDrive(url) {
+        if (!url) return "";
+        if (url.includes('drive.google.com')) {
+            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
+            return `https://docs.google.com/uc?export=view&id=${id}`;
+        }
+        return url;
+    }
+
     function obtenerNombreBonito(id, nombreFirebase) {
         if (nombreFirebase && nombreFirebase.trim() !== "") return nombreFirebase;
         switch(id) {
@@ -215,21 +225,24 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // CORRECCIÓN CLAVE: Ahora lee de 'proyectos_lista', que es la colección que maneja tu panel
-        dbInstancia.collection("proyectos_lista").get().then((querySnapshot) => {
+        // CORRECCIÓN SINCRONIZADA: Ahora busca en 'estado_historias' para usar el mismo enlace que salvada.html
+        dbInstancia.collection("estado_historias").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const idHistoria = doc.id; 
                 const datos = doc.data();
                 
-                // Si el proyecto no tiene estado guardado aún, por defecto lo dejamos en emisión
-                let estadoFirebase = datos.estado || "🔴 En Emisión"; 
+                let estadoFirebase = datos.estado || "emision"; 
                 
-                // Traducimos el estado con emojis del panel al ID del contenedor de esta pantalla
                 let contenedorId = "emision";
-                if (estadoFirebase.includes("Hiatus")) contenedorId = "hiatus";
-                if (estadoFirebase.includes("Finalizado")) contenedorId = "finalizado";
+                if (estadoFirebase.toLowerCase().includes("hiatus")) contenedorId = "hiatus";
+                if (estadoFirebase.toLowerCase().includes("finalizado")) contenedorId = "finalizado";
 
-                const nuevaPortada = datos.portadaUrl || (idHistoria + ".jpg");
+                // Sincroniza la URL usando transformarLinkDrive igual que adentro
+                let nuevaPortada = (idHistoria + ".jpg");
+                if (datos.portadaUrl && datos.portadaUrl.trim() !== "") {
+                    nuevaPortada = transformarLinkDrive(datos.portadaUrl);
+                }
+                
                 const nombreProyecto = obtenerNombreBonito(idHistoria, datos.nombre);
 
                 let destinoGrid = document.getElementById("grid-" + contenedorId);
@@ -238,14 +251,12 @@
                 let tarjeta = document.getElementById("card-" + idHistoria);
 
                 if (tarjeta) {
-                    // Si la tarjeta ya existe, actualiza la portada si se cambió en el panel y la mueve de sección en vivo
                     const imgElemento = document.getElementById("img-" + idHistoria);
                     if (imgElemento && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
-                        imgElemento.src = datos.portadaUrl;
+                        imgElemento.src = nuevaPortada;
                     }
                     destinoGrid.appendChild(tarjeta);
                 } else {
-                    // Si creas una historia COMPLETAMENTE NUEVA en el panel, se creará sola aquí sin tocar el HTML
                     tarjeta = document.createElement("a");
                     tarjeta.href = idHistoria + ".html";
                     tarjeta.className = "card";
@@ -259,7 +270,6 @@
                     destinoGrid.appendChild(tarjeta);
                 }
 
-                // Aplica los estilos correctos a los tags dependiendo de la sección donde cayó
                 const tag = tarjeta.querySelector(".estado-tag");
                 if (tag) {
                     tag.className = "estado-tag"; 
@@ -268,8 +278,8 @@
                     else if (contenedorId === "finalizado") { tag.classList.add("tag-finalizado"); tag.innerText = "Finalizado"; }
                 }
             });
-        }).catch((error) => console.log("Error al sincronizar con el panel administrativo:", error));
+        }).catch((error) => console.log("Error al sincronizar las portadas:", error));
     });
 </script>
 </body>
-</html>
+        </html>
