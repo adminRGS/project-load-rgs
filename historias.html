@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historias - Rose Garden Scan</title>
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
     <link rel="stylesheet" href="estilos-rose.css">
-    
     <style>
         body { margin: 0; padding: 0; background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); color: var(--texto-rose, white); font-family: 'serif'; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
@@ -31,44 +28,26 @@
     </style>
 </head>
 <body>
-
-<header>
-    <a href="index.html" class="btn-inicio">🏠 Inicio</a>
-    <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
-</header>
-
-<div class="seccion-titulo">En Emisión</div>
-<div class="grid-historias" id="grid-emision">
-    <a href="confesion.html" class="card" id="card-confesion"><span class="estado-tag tag-emision">Emisión</span><img src="confesion.jpg" class="portada" id="img-confesion"><div class="info">Confesión</div></a>
-    <a href="embarazada.html" class="card" id="card-embarazada"><span class="estado-tag tag-emision">Emisión</span><img src="embarazada.jpg" class="portada" id="img-embarazada"><div class="info">Fingí estar embarazada pero mi marido regresó</div></a>
-    <a href="salvada.html" class="card" id="card-salvada"><span class="estado-tag tag-emision">Emisión</span><img src="salvada.jpg" class="portada" id="img-salvada"><div class="info">Salvada por la pequeña dama sin poderes</div></a>
-    <a href="leopardo.html" class="card" id="card-leopardo"><span class="estado-tag tag-emision">Emisión</span><img src="leopardo.jpg" class="portada" id="img-leopardo"><div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div></a>
-</div>
-
-<div class="seccion-titulo">En Hiatus</div>
-<div class="grid-historias" id="grid-hiatus">
-    <a href="guarderia.html" class="card" id="card-guarderia"><span class="estado-tag tag-hiatus">Hiatus</span><img src="guarderia.jpg" class="portada" id="img-guarderia"><div class="info">La guardería de la villana</div></a>
-    <a href="hermana.html" class="card" id="card-hermana"><span class="estado-tag tag-hiatus">Hiatus</span><img src="hermana.jpg" class="portada" id="img-hermana"><div class="info">Mi hermana que era mi enemiga ahora me ama</div></a>
-    <a href="amigos.html" class="card" id="card-amigos"><span class="estado-tag tag-hiatus">Hiatus</span><img src="amigos.jpg" class="portada" id="img-amigos"><div class="info">Los amigos no hacen esto</div></a>
-</div>
-
-<div class="seccion-titulo">Finalizados</div>
-<div class="grid-historias" id="grid-finalizado">
-    <a href="matrimonio.html" class="card" id="card-matrimonio"><span class="estado-tag tag-finalizado">Finalizado</span><img src="matrimonio.jpg" class="portada" id="img-matrimonio"><div class="info">Matrimonio de conveniencia a una obsesión</div></a>
-    <a href="princesa.html" class="card" id="card-princesa"><span class="estado-tag tag-finalizado">Finalizado</span><img src="princesa.jpg" class="portada" id="img-princesa"><div class="info">¡No, solo encanté a la princesa!</div></a>
-    <a href="lobo.html" class="card" id="card-lobo"><span class="estado-tag tag-finalizado">Finalizado</span><img src="lobo.jpg" class="portada" id="img-lobo"><div class="info">Soy un lobo pero no te lastimaré</div></a>
-</div>
-
-<div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
-    <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">🎨</button>
-    <div class="sub-menu-colores" id="sub-menu-colores">
-        <div onclick="cambiarTemaRose('dark')" style="width: 22px; height: 22px; background: #000; border-radius: 50%; border: 1.5px solid white; cursor: pointer;"></div>
-        <div onclick="cambiarTemaRose('gris')" style="width: 22px; height: 22px; background: #2c2c2c; border-radius: 50%; border: 1.5px solid white; cursor: pointer;"></div>
-        <div onclick="cambiarTemaRose('malva')" style="width: 22px; height: 22px; background: #dfd3e3; border-radius: 50%; border: 1.5px solid #4a3b4e; cursor: pointer;"></div>
+    <header><a href="index.html" class="btn-inicio">🏠 Inicio</a><p class="frase-biblioteca">Tu biblioteca de historias favoritas</p></header>
+    <div class="seccion-titulo">En Emisión</div>
+    <div class="grid-historias" id="grid-emision">
+        <a href="confesion.html" class="card" id="card-confesion"><span class="estado-tag tag-emision">Emisión</span><img src="confesion.jpg" class="portada" id="img-confesion"><div class="info">Confesión</div></a>
+        <a href="embarazada.html" class="card" id="card-embarazada"><span class="estado-tag tag-emision">Emisión</span><img src="embarazada.jpg" class="portada" id="img-embarazada"><div class="info">Fingí estar embarazada pero mi marido regresó</div></a>
+        <a href="salvada.html" class="card" id="card-salvada"><span class="estado-tag tag-emision">Emisión</span><img src="salvada.jpg" class="portada" id="img-salvada"><div class="info">Salvada por la pequeña dama sin poderes</div></a>
+        <a href="leopardo.html" class="card" id="card-leopardo"><span class="estado-tag tag-emision">Emisión</span><img src="leopardo.jpg" class="portada" id="img-leopardo"><div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div></a>
     </div>
-</div>
-
-<script src="funciones-rose.js"></script>
+    <div class="seccion-titulo">En Hiatus</div>
+    <div class="grid-historias" id="grid-hiatus">
+        <a href="guarderia.html" class="card" id="card-guarderia"><span class="estado-tag tag-hiatus">Hiatus</span><img src="guarderia.jpg" class="portada" id="img-guarderia"><div class="info">La guardería de la villana</div></a>
+        <a href="hermana.html" class="card" id="card-hermana"><span class="estado-tag tag-hiatus">Hiatus</span><img src="hermana.jpg" class="portada" id="img-hermana"><div class="info">Mi hermana que era mi enemiga ahora me ama</div></a>
+        <a href="amigos.html" class="card" id="card-amigos"><span class="estado-tag tag-hiatus">Hiatus</span><img src="amigos.jpg" class="portada" id="img-amigos"><div class="info">Los amigos no hacen esto</div></a>
+    </div>
+    <div class="seccion-titulo">Finalizados</div>
+    <div class="grid-historias" id="grid-finalizado">
+        <a href="matrimonio.html" class="card" id="card-matrimonio"><span class="estado-tag tag-finalizado">Finalizado</span><img src="matrimonio.jpg" class="portada" id="img-matrimonio"><div class="info">Matrimonio de conveniencia a una obsesión</div></a>
+        <a href="princesa.html" class="card" id="card-princesa"><span class="estado-tag tag-finalizado">Finalizado</span><img src="princesa.jpg" class="portada" id="img-princesa"><div class="info">¡No, solo encanté a la princesa!</div>]</a>
+        <a href="lobo.html" class="card" id="card-lobo"><span class="estado-tag tag-finalizado">Finalizado</span><img src="lobo.jpg" class="portada" id="img-lobo"><div class="info">Soy un lobo pero no te lastimaré</div></a>
+    </div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs", authDomain: "prgs-f2ef8.firebaseapp.com", projectId: "prgs-f2ef8", storageBucket: "prgs-f2ef8.firebasestorage.app", messagingSenderId: "639472415083", appId: "1:639472415083:web:2940245a8a70ed6c88dc2e" };
@@ -77,53 +56,38 @@
 
     function transformarLinkDrive(url) {
         if (!url) return "";
+        // Convierte automáticamente cualquier link de Drive a una imagen cargable
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://docs.google.com/uc?export=view&id=${id}`;
+            return `https://lh3.googleusercontent.com/d/${id}`;
         }
         return url;
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
         const querySnapshot = await dbInstancia.collection("estado_historias").get();
-        for (const doc of querySnapshot.docs) {
+        querySnapshot.forEach(async (doc) => {
             const idFirebase = doc.id; 
             const datos = doc.data();
             let idLocal = idFirebase.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-            if (idLocal.includes("amigos")) idLocal = "amigos";
-            if (idLocal.includes("embarazada")) idLocal = "embarazada";
-            if (idLocal.includes("leopardo")) idLocal = "leopardo";
-            if (idLocal.includes("guarderia")) idLocal = "guarderia";
-
+            
             let estadoFirebase = (datos.estado || "emision").toLowerCase();
             let contenedorId = estadoFirebase.includes("hiatus") ? "hiatus" : (estadoFirebase.includes("finalizado") ? "finalizado" : "emision");
-
             let destinoGrid = document.getElementById("grid-" + contenedorId);
             let tarjeta = document.getElementById("card-" + idLocal);
             let imgElemento = document.getElementById("img-" + idLocal);
 
-            if (tarjeta && destinoGrid) {
-                destinoGrid.appendChild(tarjeta);
-                const tag = tarjeta.querySelector(".estado-tag");
-                if (tag) {
-                    tag.className = "estado-tag " + "tag-" + contenedorId;
-                    tag.innerText = contenedorId.charAt(0).toUpperCase() + contenedorId.slice(1);
-                }
-            }
+            if (tarjeta && destinoGrid) destinoGrid.appendChild(tarjeta);
 
             let urlFinal = datos.portadaUrl || datos.portada || "";
             if (!urlFinal) {
                 try {
                     const snap = await dbInstancia.collection(idFirebase).doc("datos_proyecto").get();
                     if (snap.exists) urlFinal = snap.data().portadaUrl || snap.data().portada || "";
-                    if (!urlFinal) {
-                        const snapInfo = await dbInstancia.collection(idFirebase).doc("informacion").get();
-                        if (snapInfo.exists) urlFinal = snapInfo.data().portadaUrl || snapInfo.data().portada || "";
-                    }
                 } catch(e) {}
             }
-            if (imgElemento && urlFinal && urlFinal.startsWith("http")) imgElemento.src = transformarLinkDrive(urlFinal);
-        }
+            if (imgElemento && urlFinal) imgElemento.src = transformarLinkDrive(urlFinal);
+        });
     });
 </script>
 </body>
