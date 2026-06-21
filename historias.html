@@ -214,7 +214,6 @@
                 const idFirebase = doc.id; 
                 const datos = doc.data();
                 
-                // Mapeo directo y forzado de IDs limpias para evitar errores con "amigos" u otras historias
                 let idLocal = idFirebase.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
                 if (idLocal.includes("amigos")) idLocal = "amigos";
                 if (idLocal.includes("embarazada")) idLocal = "embarazada";
@@ -230,7 +229,6 @@
                 let tarjeta = document.getElementById("card-" + idLocal);
                 let imgElemento = document.getElementById("img-" + idLocal);
 
-                // Mover tarjeta al contenedor de estado correspondiente
                 if (tarjeta && destinoGrid) {
                     destinoGrid.appendChild(tarjeta);
                     const tag = tarjeta.querySelector(".estado-tag");
@@ -242,7 +240,6 @@
                     }
                 }
 
-                // Buscar portadas de forma segura sin depender de archivos muertos
                 try {
                     const historiaRef = dbInstancia.collection(idFirebase);
                     const [docProy, docInfo] = await Promise.all([
@@ -269,22 +266,17 @@
                         }
                     }
 
-                    if (!urlRemota && datos.portadaUrl && datos.portadaUrl.trim() !== "") {
-                        urlRemota = datos.portadaUrl;
-                    }
-
-                    // Forzar el cambio solo si se encuentra un enlace válido de Drive/Web en Firebase
-                    if (urlRemota && urlRemota.trim() !== "" && urlRemota.includes("http")) {
-                        if (imgElemento) {
-                            imgElemento.src = transformarLinkDrive(urlRemota);
-                        }
+                    // MODIFICACIÓN ÚNICA: Solo cambia el src si Firebase realmente tiene una URL
+                    // Si urlRemota es un string vacío, el código simplemente no hace nada.
+                    if (imgElemento && urlRemota && urlRemota.trim() !== "" && urlRemota.startsWith("http")) {
+                        imgElemento.src = transformarLinkDrive(urlRemota);
                     }
                 } catch (subErr) {
-                    console.log("Ignorando subcarpetas vacías para: " + idFirebase);
+                    console.log("Subcarpeta inexistente, conservando imagen local para: " + idFirebase);
                 }
             }
         } catch (error) {
-            console.log("Error general de sincronización:", error);
+            console.log("Error general:", error);
         }
     });
 </script>
