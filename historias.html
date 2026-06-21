@@ -45,7 +45,7 @@
     <div class="seccion-titulo">Finalizados</div>
     <div class="grid-historias" id="grid-finalizado">
         <a href="matrimonio.html" class="card" id="card-matrimonio"><span class="estado-tag tag-finalizado">Finalizado</span><img src="matrimonio.jpg" class="portada" id="img-matrimonio"><div class="info">Matrimonio de conveniencia a una obsesión</div></a>
-        <a href="princesa.html" class="card" id="card-princesa"><span class="estado-tag tag-finalizado">Finalizado</span><img src="princesa.jpg" class="portada" id="img-princesa"><div class="info">¡No, solo encanté a la princesa!</div>]</a>
+        <a href="princesa.html" class="card" id="card-princesa"><span class="estado-tag tag-finalizado">Finalizado</span><img src="princesa.jpg" class="portada" id="img-princesa"><div class="info">¡No, solo encanté a la princesa!</div></a>
         <a href="lobo.html" class="card" id="card-lobo"><span class="estado-tag tag-finalizado">Finalizado</span><img src="lobo.jpg" class="portada" id="img-lobo"><div class="info">Soy un lobo pero no te lastimaré</div></a>
     </div>
 
@@ -56,38 +56,61 @@
 
     function transformarLinkDrive(url) {
         if (!url) return "";
-        // Convierte automáticamente cualquier link de Drive a una imagen cargable
         if (url.includes('drive.google.com')) {
             let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://lh3.googleusercontent.com/d/${id}`;
+            return `https://docs.google.com/uc?export=view&id=${id}`;
         }
         return url;
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
         const querySnapshot = await dbInstancia.collection("estado_historias").get();
-        querySnapshot.forEach(async (doc) => {
-            const idFirebase = doc.id; 
+        // Procesamos uno a uno para evitar el caos de reordenamiento
+        for (const doc of querySnapshot.docs) {
+            const idFirebase = doc.id;
             const datos = doc.data();
-            let idLocal = idFirebase.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
             
-            let estadoFirebase = (datos.estado || "emision").toLowerCase();
-            let contenedorId = estadoFirebase.includes("hiatus") ? "hiatus" : (estadoFirebase.includes("finalizado") ? "finalizado" : "emision");
-            let destinoGrid = document.getElementById("grid-" + contenedorId);
-            let tarjeta = document.getElementById("card-" + idLocal);
-            let imgElemento = document.getElementById("img-" + idLocal);
+            // Limpieza de ID igual que el original
+            let idLocal = idFirebase.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+            if (idLocal.includes("amigos")) idLocal = "amigos";
+            else if (idLocal.includes("embarazada")) idLocal = "embarazada";
+            else if (idLocal.includes("leopardo")) idLocal = "leopardo";
+            else if (idLocal.includes("guarderia")) idLocal = "guarderia";
 
-            if (tarjeta && destinoGrid) destinoGrid.appendChild(tarjeta);
+            const estado = (datos.estado || "emision").toLowerCase();
+            const contenedorId = estado.includes("hiatus") ? "hiatus" : (estado.includes("finalizado") ? "finalizado" : "emision");
+            
+            const tarjeta = document.getElementById("card-" + idLocal);
+            const grid = document.getElementById("grid-" + contenedorId);
+            
+            if (tarjeta && grid) {
+                // Actualizar tag antes de mover
+                const tag = tarjeta.querySelector(".estado-tag");
+                if (tag) {
+                    tag.className = "estado-tag " + "tag-" + contenedorId;
+                    tag.innerText = contenedorId.charAt(0).toUpperCase() + contenedorId.slice(1);
+                }
+                grid.appendChild(tarjeta);
+            }
 
+            // Carga de imagen: jerarquía clara
             let urlFinal = datos.portadaUrl || datos.portada || "";
             if (!urlFinal) {
                 try {
                     const snap = await dbInstancia.collection(idFirebase).doc("datos_proyecto").get();
                     if (snap.exists) urlFinal = snap.data().portadaUrl || snap.data().portada || "";
+                    if (!urlFinal) {
+                        const snapInfo = await dbInstancia.collection(idFirebase).doc("informacion").get();
+                        if (snapInfo.exists) urlFinal = snapInfo.data().portadaUrl || snapInfo.data().portada || "";
+                    }
                 } catch(e) {}
             }
-            if (imgElemento && urlFinal) imgElemento.src = transformarLinkDrive(urlFinal);
-        });
+            
+            const imgElemento = document.getElementById("img-" + idLocal);
+            if (imgElemento && urlFinal && urlFinal.startsWith("http")) {
+                imgElemento.src = transformarLinkDrive(urlFinal);
+            }
+        }
     });
 </script>
 </body>
