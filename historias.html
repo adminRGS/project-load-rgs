@@ -262,7 +262,6 @@
     document.addEventListener("DOMContentLoaded", () => {
 
         // 🔒 Ocultar todas las tarjetas ANTES de leer Firebase
-        // para que el usuario no vea el movimiento
         document.querySelectorAll(".card").forEach(card => {
             card.style.visibility = "hidden";
         });
@@ -279,10 +278,10 @@
                     const tarjeta = document.getElementById("card-" + idHistoria);
                     if (!tarjeta) return;
 
-                    // 🖼️ Actualizar portada si Firebase tiene una URL guardada
-                    if (datos.portadaURL) {
+                    // 🖼️ Actualizar portada — corregido a portadaUrl (u minúscula)
+                    if (datos.portadaUrl) {
                         const img = tarjeta.querySelector(".portada");
-                        if (img) img.src = datos.portadaURL;
+                        if (img) img.src = datos.portadaUrl;
                     }
 
                     // 📦 Mover tarjeta a la sección correcta
