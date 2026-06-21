@@ -4,113 +4,302 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historias - Rose Garden Scan</title>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <link rel="stylesheet" href="estilos-rose.css">
+    
     <style>
-        body { margin: 0; padding: 0; background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); color: var(--texto-rose, white); font-family: 'serif'; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; z-index: -1; }
-        header { padding: 60px 20px 20px 20px; text-align: center; position: relative; width: 100%; max-width: 1000px; }
-        .btn-inicio { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #ff66b2; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border: 1px solid #ff66b2; padding: 8px 15px; border-radius: 20px; transition: 0.3s; z-index: 10; background: transparent; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
+            color: var(--texto-rose, white); 
+            font-family: 'serif'; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        header {
+            padding: 60px 20px 20px 20px;
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .btn-inicio {
+            position: absolute;
+            top: 20px; left: 20px;
+            text-decoration: none;
+            color: #ff66b2;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border: 1px solid #ff66b2;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            z-index: 10;
+            background: transparent;
+        }
         .btn-inicio:hover { background: #ff66b2; color: white; box-shadow: 0 0 10px #ff66b2; }
-        .frase-biblioteca { font-style: italic; font-size: 1.8rem; background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shine 3s linear infinite; margin: 20px 0; font-family: 'Georgia', serif; }
+
+        .frase-biblioteca { 
+            font-style: italic;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: shine 3s linear infinite;
+            margin: 20px 0;
+            font-family: 'Georgia', serif;
+        }
         @keyframes shine { to { background-position: 200% center; } }
-        .seccion-titulo { width: 90%; max-width: 1000px; margin: 30px 0 15px 0; font-size: 1.2rem; border-left: 4px solid #ff66b2; padding-left: 15px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-        .grid-historias { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 95%; max-width: 1000px; padding: 10px 10px 40px 10px; }
-        .card { background: var(--panel-rose, #161616); border-radius: 10px; overflow: hidden; transition: 0.3s; text-decoration: none; color: inherit; text-align: center; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid var(--borde-tarjeta, rgba(255, 102, 178, 0.2)); }
+
+        .seccion-titulo {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px 0 15px 0;
+            font-size: 1.2rem;
+            border-left: 4px solid #ff66b2;
+            padding-left: 15px;
+            color: #ff66b2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .grid-historias {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            width: 95%;
+            max-width: 1000px;
+            padding: 10px 10px 40px 10px;
+        }
+        
+        .card { 
+            background: var(--panel-rose, #161616); 
+            border-radius: 10px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            text-decoration: none; 
+            color: inherit; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            border: 1px solid var(--borde-tarjeta, rgba(255, 102, 178, 0.2));
+        }
         .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); }
-        .estado-tag { position: absolute; top: 8px; left: 8px; padding: 3px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; z-index: 2; letter-spacing: 1px; }
-        .tag-emision { background: #4caf50; color: white; } .tag-finalizado { background: #ff66b2; color: white; } .tag-hiatus { background: #ffd700; color: black; }
+        
+        .estado-tag {
+            position: absolute;
+            top: 8px; left: 8px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+            letter-spacing: 1px;
+        }
+        .tag-emision    { background: #4caf50; color: white; } 
+        .tag-finalizado { background: #ff66b2; color: white; }
+        .tag-hiatus     { background: #ffd700; color: black; }
+
         .portada { width: 100%; height: 240px; object-fit: cover; background: #222; }
-        .info { padding: 15px 8px; font-size: 0.85rem; font-weight: bold; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.3; background: var(--fondo-info, transparent); border-top: 1px solid var(--linea-caja, rgba(255, 255, 255, 0.05)); }
-        .sub-menu-colores { display: none; position: absolute; bottom: 60px; right: 0; background: rgba(0, 0, 0, 0.95); border: 1px solid #ff66b2; padding: 10px; border-radius: 20px; flex-direction: column; gap: 10px; box-shadow: 0 0 15px rgba(255, 102, 178, 0.5); }
+        
+        .info { 
+            padding: 15px 8px; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.3; 
+            background: var(--fondo-info, transparent); 
+            border-top: 1px solid var(--linea-caja, rgba(255, 255, 255, 0.05));
+        }
+
+        .sub-menu-colores {
+            display: none;
+            position: absolute;
+            bottom: 60px; right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #ff66b2;
+            padding: 10px;
+            border-radius: 20px;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
+        }
         .sub-menu-colores.visible-rose { display: flex; }
     </style>
 </head>
 <body>
-    <header><a href="index.html" class="btn-inicio">🏠 Inicio</a><p class="frase-biblioteca">Tu biblioteca de historias favoritas</p></header>
-    <div class="seccion-titulo">En Emisión</div>
-    <div class="grid-historias" id="grid-emision">
-        <a href="confesion.html" class="card" id="card-confesion"><span class="estado-tag tag-emision">Emisión</span><img src="confesion.jpg" class="portada" id="img-confesion"><div class="info">Confesión</div></a>
-        <a href="embarazada.html" class="card" id="card-embarazada"><span class="estado-tag tag-emision">Emisión</span><img src="embarazada.jpg" class="portada" id="img-embarazada"><div class="info">Fingí estar embarazada pero mi marido regresó</div></a>
-        <a href="salvada.html" class="card" id="card-salvada"><span class="estado-tag tag-emision">Emisión</span><img src="salvada.jpg" class="portada" id="img-salvada"><div class="info">Salvada por la pequeña dama sin poderes</div></a>
-        <a href="leopardo.html" class="card" id="card-leopardo"><span class="estado-tag tag-emision">Emisión</span><img src="leopardo.jpg" class="portada" id="img-leopardo"><div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div></a>
+
+<header>
+    <a href="index.html" class="btn-inicio">🏠 Inicio</a>
+    <p class="frase-biblioteca">Tu biblioteca de historias favoritas</p>
+</header>
+
+<!-- Las 3 secciones fijas. El JS moverá las tarjetas según Firebase. -->
+<div class="seccion-titulo">En Emisión</div>
+<div class="grid-historias" id="grid-emision">
+    <a href="confesion.html" class="card" id="card-confesion">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="confesion.jpg" class="portada" id="img-confesion">
+        <div class="info">Confesión</div>
+    </a>
+    <a href="embarazada.html" class="card" id="card-embarazada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="embarazada.jpg" class="portada" id="img-embarazada">
+        <div class="info">Fingí estar embarazada pero mi marido regresó</div>
+    </a>
+    <a href="salvada.html" class="card" id="card-salvada">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="salvada.jpg" class="portada" id="img-salvada">
+        <div class="info">Salvada por la pequeña dama sin poderes</div>
+    </a>
+    <a href="leopardo.html" class="card" id="card-leopardo">
+        <span class="estado-tag tag-emision">Emisión</span>
+        <img src="leopardo.jpg" class="portada" id="img-leopardo">
+        <div class="info">La pequeña leopardo de las nieves de la familia de panteras negras</div>
+    </a>
+</div>
+
+<div class="seccion-titulo">En Hiatus</div>
+<div class="grid-historias" id="grid-hiatus">
+    <a href="guarderia.html" class="card" id="card-guarderia">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="guarderia.jpg" class="portada" id="img-guarderia">
+        <div class="info">La guardería de la villana</div>
+    </a>
+    <a href="hermana.html" class="card" id="card-hermana">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="hermana.jpg" class="portada" id="img-hermana">
+        <div class="info">Mi hermana que era mi enemiga ahora me ama</div>
+    </a>
+    <a href="amigos.html" class="card" id="card-amigos">
+        <span class="estado-tag tag-hiatus">Hiatus</span>
+        <img src="amigos.jpg" class="portada" id="img-amigos">
+        <div class="info">Los amigos no hacen esto</div>
+    </a>
+</div>
+
+<div class="seccion-titulo">Finalizados</div>
+<div class="grid-historias" id="grid-finalizado">
+    <a href="matrimonio.html" class="card" id="card-matrimonio">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="matrimonio.jpg" class="portada" id="img-matrimonio">
+        <div class="info">Matrimonio de conveniencia a una obsesión</div>
+    </a>
+    <a href="princesa.html" class="card" id="card-princesa">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="princesa.jpg" class="portada" id="img-princesa">
+        <div class="info">¡No, solo encanté a la princesa!</div>
+    </a>
+    <a href="lobo.html" class="card" id="card-lobo">
+        <span class="estado-tag tag-finalizado">Finalizado</span>
+        <img src="lobo.jpg" class="portada" id="img-lobo">
+        <div class="info">Soy un lobo pero no te lastimaré</div>
+    </a>
+</div>
+
+<!-- Botón de temas -->
+<div class="menu-colores-flotante" style="position: fixed; bottom: 30px; right: 20px; z-index: 99999;">
+    <button onclick="toggleMenuColores(event)" style="background: #111111; border: 2px solid #ff66b2; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); outline: none;">
+        🎨
+    </button>
+    <div class="sub-menu-colores" id="sub-menu-colores">
+        <div onclick="cambiarTemaRose('dark')"  style="width:22px;height:22px;background:#000;border-radius:50%;border:1.5px solid white;cursor:pointer;" title="Modo Oscuro"></div>
+        <div onclick="cambiarTemaRose('gris')"  style="width:22px;height:22px;background:#2c2c2c;border-radius:50%;border:1.5px solid white;cursor:pointer;" title="Modo Gris"></div>
+        <div onclick="cambiarTemaRose('malva')" style="width:22px;height:22px;background:#dfd3e3;border-radius:50%;border:1.5px solid #4a3b4e;cursor:pointer;" title="Modo Malva Suave"></div>
     </div>
-    <div class="seccion-titulo">En Hiatus</div>
-    <div class="grid-historias" id="grid-hiatus">
-        <a href="guarderia.html" class="card" id="card-guarderia"><span class="estado-tag tag-hiatus">Hiatus</span><img src="guarderia.jpg" class="portada" id="img-guarderia"><div class="info">La guardería de la villana</div></a>
-        <a href="hermana.html" class="card" id="card-hermana"><span class="estado-tag tag-hiatus">Hiatus</span><img src="hermana.jpg" class="portada" id="img-hermana"><div class="info">Mi hermana que era mi enemiga ahora me ama</div></a>
-        <a href="amigos.html" class="card" id="card-amigos"><span class="estado-tag tag-hiatus">Hiatus</span><img src="amigos.jpg" class="portada" id="img-amigos"><div class="info">Los amigos no hacen esto</div></a>
-    </div>
-    <div class="seccion-titulo">Finalizados</div>
-    <div class="grid-historias" id="grid-finalizado">
-        <a href="matrimonio.html" class="card" id="card-matrimonio"><span class="estado-tag tag-finalizado">Finalizado</span><img src="matrimonio.jpg" class="portada" id="img-matrimonio"><div class="info">Matrimonio de conveniencia a una obsesión</div></a>
-        <a href="princesa.html" class="card" id="card-princesa"><span class="estado-tag tag-finalizado">Finalizado</span><img src="princesa.jpg" class="portada" id="img-princesa"><div class="info">¡No, solo encanté a la princesa!</div></a>
-        <a href="lobo.html" class="card" id="card-lobo"><span class="estado-tag tag-finalizado">Finalizado</span><img src="lobo.jpg" class="portada" id="img-lobo"><div class="info">Soy un lobo pero no te lastimaré</div></a>
-    </div>
+</div>
+
+<script src="funciones-rose.js"></script>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs", authDomain: "prgs-f2ef8.firebaseapp.com", projectId: "prgs-f2ef8", storageBucket: "prgs-f2ef8.firebasestorage.app", messagingSenderId: "639472415083", appId: "1:639472415083:web:2940245a8a70ed6c88dc2e" };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    // ── FIREBASE ──────────────────────────────────────────────────
+    const firebaseConfig = {
+        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
+        authDomain: "prgs-f2ef8.firebaseapp.com",
+        projectId: "prgs-f2ef8",
+        storageBucket: "prgs-f2ef8.firebasestorage.app",
+        messagingSenderId: "639472415083",
+        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+    };
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const dbInstancia = firebase.firestore();
 
-    function transformarLinkDrive(url) {
-        if (!url) return "";
-        if (url.includes('drive.google.com')) {
-            let id = url.includes('id=') ? url.split('id=')[1].split('&')[0] : url.split('/d/')[1].split('/')[0];
-            return `https://docs.google.com/uc?export=view&id=${id}`;
-        }
-        return url;
+    // ── MAPA DE IDs a sección CSS ─────────────────────────────────
+    // Los valores guardados por el panel son: "emision", "hiatus", "finalizado"
+    function estadoAContenedor(estado) {
+        if (estado === "hiatus")     return "hiatus";
+        if (estado === "finalizado") return "finalizado";
+        return "emision"; // valor por defecto si es "emision" o cualquier otro
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        const querySnapshot = await dbInstancia.collection("estado_historias").get();
-        // Procesamos uno a uno para evitar el caos de reordenamiento
-        for (const doc of querySnapshot.docs) {
-            const idFirebase = doc.id;
-            const datos = doc.data();
-            
-            // Limpieza de ID igual que el original
-            let idLocal = idFirebase.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-            if (idLocal.includes("amigos")) idLocal = "amigos";
-            else if (idLocal.includes("embarazada")) idLocal = "embarazada";
-            else if (idLocal.includes("leopardo")) idLocal = "leopardo";
-            else if (idLocal.includes("guarderia")) idLocal = "guarderia";
+    // ── SINCRONIZAR ESTADOS DESDE FIREBASE ───────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
 
-            const estado = (datos.estado || "emision").toLowerCase();
-            const contenedorId = estado.includes("hiatus") ? "hiatus" : (estado.includes("finalizado") ? "finalizado" : "emision");
-            
-            const tarjeta = document.getElementById("card-" + idLocal);
-            const grid = document.getElementById("grid-" + contenedorId);
-            
-            if (tarjeta && grid) {
-                // Actualizar tag antes de mover
-                const tag = tarjeta.querySelector(".estado-tag");
-                if (tag) {
-                    tag.className = "estado-tag " + "tag-" + contenedorId;
-                    tag.innerText = contenedorId.charAt(0).toUpperCase() + contenedorId.slice(1);
-                }
-                grid.appendChild(tarjeta);
-            }
+        // Lee la colección "estado_historias" (con guion bajo, igual que el panel)
+        dbInstancia.collection("estado_historias").get()
+            .then(querySnapshot => {
 
-            // Carga de imagen: jerarquía clara
-            let urlFinal = datos.portadaUrl || datos.portada || "";
-            if (!urlFinal) {
-                try {
-                    const snap = await dbInstancia.collection(idFirebase).doc("datos_proyecto").get();
-                    if (snap.exists) urlFinal = snap.data().portadaUrl || snap.data().portada || "";
-                    if (!urlFinal) {
-                        const snapInfo = await dbInstancia.collection(idFirebase).doc("informacion").get();
-                        if (snapInfo.exists) urlFinal = snapInfo.data().portadaUrl || snapInfo.data().portada || "";
+                querySnapshot.forEach(doc => {
+                    const idHistoria  = doc.id;
+                    const datos       = doc.data();
+                    const estado      = datos.estado || "emision";
+                    const contenedor  = estadoAContenedor(estado);
+
+                    const tarjeta = document.getElementById("card-" + idHistoria);
+                    if (!tarjeta) return; // historia no definida en este HTML
+
+                    // Mover tarjeta a la sección correcta
+                    const destinoGrid = document.getElementById("grid-" + contenedor);
+                    if (destinoGrid) destinoGrid.appendChild(tarjeta);
+
+                    // Actualizar badge de estado
+                    const tag = tarjeta.querySelector(".estado-tag");
+                    if (tag) {
+                        tag.className = "estado-tag";
+                        if (contenedor === "emision") {
+                            tag.classList.add("tag-emision");
+                            tag.innerText = "Emisión";
+                        } else if (contenedor === "hiatus") {
+                            tag.classList.add("tag-hiatus");
+                            tag.innerText = "Hiatus";
+                        } else if (contenedor === "finalizado") {
+                            tag.classList.add("tag-finalizado");
+                            tag.innerText = "Finalizado";
+                        }
                     }
-                } catch(e) {}
-            }
-            
-            const imgElemento = document.getElementById("img-" + idLocal);
-            if (imgElemento && urlFinal && urlFinal.startsWith("http")) {
-                imgElemento.src = transformarLinkDrive(urlFinal);
-            }
-        }
+                });
+            })
+            .catch(error => console.error("Error al leer estados desde Firebase:", error));
     });
 </script>
 </body>
