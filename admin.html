@@ -159,7 +159,7 @@
             min-height: 48px;
         }
 
-        #caja-estado-actual .badge {
+        .badge {
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -280,8 +280,6 @@
     </div>
 
     <script>
-
-        // ── FIREBASE ──────────────────────────────────────────────
         const firebaseConfig = {
             apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
             authDomain: "prgs-f2ef8.firebaseapp.com",
@@ -300,7 +298,6 @@
             if (clave === "Rose2026") {
                 document.getElementById("bloque-login").style.display = "none";
                 document.getElementById("contenido-panel").style.display = "flex";
-                // ✅ Carga los proyectos desde Firebase al entrar
                 cargarProyectosDesdeFirebase();
             } else {
                 alert("Contraseña incorrecta");
@@ -313,166 +310,114 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        // ── LIMPIADOR DE ENLACES DE DRIVE ─────────────────────────
+        // ── CORRECCIÓN AQUÍ: LIMPIADOR DE ENLACES DE DRIVE ─────────
         function blindarEnlaceDrive(link) {
             if (!link) return "";
             link = link.trim();
-            if (link.includes('drive.google.com')) {
-                let id = "";
-                const matchUc = link.match(/[?&]id=([\w-]+)/);
-                if (matchUc && matchUc[1]) {
-                    id = matchUc[1];
-                } else {
-                    const matchD = link.match(/\/d\/([\w-]+)/);
-                    if (matchD && matchD[1]) id = matchD[1];
-                }
-                if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
+            // Si ya es un enlace de vista directa, retornarlo
+            if (link.includes('uc?export=view')) return link;
+            
+            let id = "";
+            const matchD = link.match(/\/d\/([\w-]+)/);
+            if (matchD && matchD[1]) id = matchD[1];
+            else {
+                const matchId = link.match(/[?&]id=([\w-]+)/);
+                if (matchId && matchId[1]) id = matchId[1];
             }
+            if (id) return `https://docs.google.com/uc?export=view&id=${id}`;
             return link;
         }
 
-        // ── CARGAR PROYECTOS DINÁMICAMENTE DESDE FIREBASE ─────────
-        // ✅ Ya no depende de una lista fija en el código.
-        //    Lee todos los documentos de "estado_historias" y los pone
-        //    en los tres selects automáticamente.
+        // ── CARGAR PROYECTOS ──────────────────────────────────────
         function cargarProyectosDesdeFirebase() {
             const selects = [
                 document.getElementById("select-proyecto-capitulo"),
                 document.getElementById("select-proyecto-estatus"),
                 document.getElementById("select-proyecto-editar")
             ];
-
-            // Poner opción vacía mientras carga
-            selects.forEach(select => {
-                select.innerHTML = '<option value="">-- Selecciona --</option>';
-            });
+            selects.forEach(select => select.innerHTML = '<option value="">-- Selecciona --</option>');
 
             db.collection("estado_historias").orderBy("nombre").get()
                 .then(querySnapshot => {
-                    if (querySnapshot.empty) {
-                        selects.forEach(select => {
-                            select.innerHTML = '<option value="">No hay proyectos aún</option>';
-                        });
-                        return;
-                    }
-
                     querySnapshot.forEach(doc => {
-                        const id     = doc.id;
-                        const nombre = doc.data().nombre || id; // Si no tiene nombre, muestra el ID
-
+                        const id = doc.id;
+                        const nombre = doc.data().nombre || id;
                         selects.forEach(select => {
                             const opt = document.createElement("option");
-                            opt.value       = id;
+                            opt.value = id;
                             opt.textContent = nombre;
                             select.appendChild(opt);
                         });
                     });
-                })
-                .catch(error => {
-                    console.error("Error al cargar proyectos:", error);
-                    selects.forEach(select => {
-                        select.innerHTML = '<option value="">Error al cargar</option>';
-                    });
                 });
         }
 
-        // ── LEER ESTADO ACTUAL DESDE FIREBASE ─────────────────────
         function cargarEstadoActual() {
-            const id   = document.getElementById("select-proyecto-estatus").value;
+            const id = document.getElementById("select-proyecto-estatus").value;
             const caja = document.getElementById("caja-estado-actual");
-
-            if (!id) {
-                caja.innerHTML = '<span style="color:#aaa; font-weight:normal;">Selecciona una historia arriba</span>';
-                return;
-            }
-
-            caja.innerHTML = '<span style="color:#aaa; font-weight:normal;">Cargando...</span>';
-
-            db.collection("estado_historias").doc(id).get()
-                .then(doc => {
-                    let estado = "emision";
-                    if (doc.exists && doc.data().estado) estado = doc.data().estado;
-                    mostrarBadgeEstado(caja, estado);
-                    document.getElementById("nuevo-estado-valor").value = estado;
-                })
-                .catch(() => {
-                    caja.innerHTML = '<span style="color:#e57373;">Error al leer Firebase</span>';
-                });
+            if (!id) return;
+            db.collection("estado_historias").doc(id).get().then(doc => {
+                let estado = doc.exists && doc.data().estado ? doc.data().estado : "emision";
+                mostrarBadgeEstado(caja, estado);
+                document.getElementById("nuevo-estado-valor").value = estado;
+            });
         }
 
         function mostrarBadgeEstado(caja, estado) {
             const etiquetas = {
-                emision:    { texto: "🔴 En Emisión", clase: "badge-emision"    },
-                hiatus:     { texto: "🟡 En Hiatus",  clase: "badge-hiatus"     },
+                emision:    { texto: "🔴 En Emisión", clase: "badge-emision" },
+                hiatus:     { texto: "🟡 En Hiatus",  clase: "badge-hiatus" },
                 finalizado: { texto: "💖 Finalizado", clase: "badge-finalizado" }
             };
             const info = etiquetas[estado] || { texto: estado, clase: "badge-emision" };
             caja.innerHTML = `<span class="badge ${info.clase}">${info.texto}</span>`;
         }
 
-        // ── CARGAR PORTADA Y SINOPSIS AL EDITAR ───────────────────
         function cargarPortadaActualEditar() {
             const id = document.getElementById("select-proyecto-editar").value;
             if (!id) return;
-
             db.collection("estado_historias").doc(id).get().then(doc => {
                 if (doc.exists) {
                     const d = doc.data();
-                    // ✅ Corregido: usa portadaUrl (igual que donde se guarda)
-                    document.getElementById("editar-portada").value  = d.portadaUrl || "";
-                    document.getElementById("editar-sinopsis").value = d.sinopsis   || "";
-                } else {
-                    document.getElementById("editar-portada").value  = "";
-                    document.getElementById("editar-sinopsis").value = "";
+                    document.getElementById("editar-portada").value = d.portadaUrl || "";
+                    document.getElementById("editar-sinopsis").value = d.sinopsis || "";
                 }
             });
         }
 
-        // ── GUARDAR ESTADO ────────────────────────────────────────
         function actualizarEstadoFirebase() {
-            const id          = document.getElementById("select-proyecto-estatus").value;
+            const id = document.getElementById("select-proyecto-estatus").value;
             const nuevoEstado = document.getElementById("nuevo-estado-valor").value;
-
-            if (!id) { alert("Selecciona una historia primero."); return; }
-
-            db.collection("estado_historias").doc(id)
-                .set({ estado: nuevoEstado }, { merge: true })
-                .then(() => {
-                    alert("¡Estatus actualizado!");
-                    mostrarBadgeEstado(document.getElementById("caja-estado-actual"), nuevoEstado);
-                })
-                .catch(error => alert("Error: " + error));
+            if (!id) return;
+            db.collection("estado_historias").doc(id).set({ estado: nuevoEstado }, { merge: true })
+                .then(() => alert("¡Estatus actualizado!"));
         }
 
-        // ── SUBIR CAPÍTULO ────────────────────────────────────────
+        // ── SUBIR CAPÍTULO (Corregido) ────────────────────────────
         function subirCapitulo() {
             const proyecto = document.getElementById("select-proyecto-capitulo").value;
-            const numero   = document.getElementById("num-capitulo").value;
-            const enlaces  = document.getElementById("enlaces-imagenes").value
+            const numero = document.getElementById("num-capitulo").value;
+            const enlaces = document.getElementById("enlaces-imagenes").value
                 .split("\n")
                 .filter(link => link.trim() !== "")
                 .map(link => blindarEnlaceDrive(link.trim()));
 
-            if (!proyecto || !numero || enlaces.length === 0) {
-                alert("Completa todos los campos.");
-                return;
-            }
+            if (!proyecto || !numero || enlaces.length === 0) { alert("Completa todos los campos."); return; }
 
             db.collection(proyecto).doc("capitulo_" + numero)
                 .set({ numero: numero, imagenes: enlaces, fecha: new Date() })
                 .then(() => {
                     alert("¡Capítulo publicado!");
-                    document.getElementById("num-capitulo").value    = "";
+                    document.getElementById("num-capitulo").value = "";
                     document.getElementById("enlaces-imagenes").value = "";
-                })
-                .catch(error => alert("Error: " + error));
+                });
         }
 
-        // ── CREAR PROYECTO ────────────────────────────────────────
+        // ── CREAR PROYECTO (Corregido) ────────────────────────────
         function crearNuevoProyecto() {
-            const id       = document.getElementById("nuevo-id").value.trim();
-            const titulo   = document.getElementById("nuevo-titulo").value.trim();
-            const portada  = blindarEnlaceDrive(document.getElementById("nuevo-portada").value.trim());
+            const id = document.getElementById("nuevo-id").value.trim();
+            const titulo = document.getElementById("nuevo-titulo").value.trim();
+            const portada = blindarEnlaceDrive(document.getElementById("nuevo-portada").value.trim());
             const sinopsis = document.getElementById("nuevo-sinopsis").value.trim();
 
             if (!id || !titulo) { alert("ID y Nombre son obligatorios."); return; }
@@ -480,32 +425,20 @@
             db.collection("estado_historias").doc(id)
                 .set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis, estado: "emision" }, { merge: true })
                 .then(() => {
-                    alert("¡Proyecto creado con éxito!");
-                    document.getElementById("nuevo-id").value      = "";
-                    document.getElementById("nuevo-titulo").value   = "";
-                    document.getElementById("nuevo-portada").value  = "";
-                    document.getElementById("nuevo-sinopsis").value = "";
-                    // ✅ Recarga los selects para que aparezca el nuevo proyecto
+                    alert("¡Proyecto creado!");
                     cargarProyectosDesdeFirebase();
-                })
-                .catch(error => alert("Error: " + error));
+                });
         }
 
-        // ── EDITAR PROYECTO ───────────────────────────────────────
         function guardarEdicionProyecto() {
-            const id       = document.getElementById("select-proyecto-editar").value;
-            const portada  = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim());
+            const id = document.getElementById("select-proyecto-editar").value;
+            const portada = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim());
             const sinopsis = document.getElementById("editar-sinopsis").value.trim();
-
-            if (!id) { alert("Selecciona un proyecto."); return; }
-
-            // ✅ Guarda como portadaUrl (consistente en todo el código)
+            if (!id) return;
             db.collection("estado_historias").doc(id)
                 .set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true })
-                .then(() => alert("¡Portada y cambios actualizados con éxito!"))
-       .catch(error => alert("Error: " + error));
+                .then(() => alert("¡Cambios actualizados!"));
         }
-
     </script>
 </body>
 </html>
