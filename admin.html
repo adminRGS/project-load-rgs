@@ -49,68 +49,41 @@
 
         <div id="opcion-cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
-            <div class="grupo-control">
-                <label>Proyecto</label>
-                <select id="select-proyecto-capitulo"><option value="">Cargando proyectos...</option></select>
-            </div>
-            <div class="grupo-control">
-                <label>Número Capítulo</label>
-                <input type="number" id="num-capitulo" step="any">
-            </div>
-            <div class="grupo-control">
-                <label>Imágenes (Opcional: Subida a GitHub)</label>
-                <input type="file" id="input-imgs" multiple accept="image/*">
-            </div>
-            <button class="btn-guardar" onclick="procesarSubidaGitHub()">Subir a GitHub y Publicar</button>
-            <div class="grupo-control" style="margin-top:20px;">
-                <label>Imágenes (Links de Drive)</label>
-                <textarea id="enlaces-imagenes" rows="4"></textarea>
-            </div>
-            <button class="btn-guardar" onclick="subirCapitulo()">Publicar solo con Links</button>
+            <select id="select-proyecto-capitulo"><option value="">Cargando...</option></select>
+            <input type="number" id="num-capitulo" placeholder="Número" step="any">
+            <label>Imágenes (Subir a GitHub)</label>
+            <input type="file" id="input-imgs" multiple accept="image/*">
+            <button class="btn-guardar" onclick="procesarSubidaGitHub()">Subir y Publicar</button>
+            <hr>
+            <label>Links (Drive)</label>
+            <textarea id="enlaces-imagenes" rows="3"></textarea>
+            <button class="btn-guardar" onclick="subirCapitulo()">Publicar con Links</button>
         </div>
 
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
-            <div class="grupo-control">
-                <label>Selecciona la historia</label>
-                <select id="select-proyecto-estatus" onchange="cargarEstadoActual()"></select>
-            </div>
-            <div class="grupo-control">
-                <label>Estado actual</label>
-                <div id="caja-estado-actual"><span>Selecciona una historia arriba</span></div>
-            </div>
-            <div class="grupo-control">
-                <label>Cambiar a</label>
-                <select id="nuevo-estado-valor">
-                    <option value="emision">🔴 En Emisión</option>
-                    <option value="hiatus">🟡 En Hiatus</option>
-                    <option value="finalizado">💖 Finalizado</option>
-                </select>
-            </div>
+            <select id="select-proyecto-estatus" onchange="cargarEstadoActual()"></select>
+            <div id="caja-estado-actual"></div>
+            <select id="nuevo-estado-valor">
+                <option value="emision">🔴 En Emisión</option>
+                <option value="hiatus">🟡 En Hiatus</option>
+                <option value="finalizado">💖 Finalizado</option>
+            </select>
             <button class="btn-guardar" onclick="actualizarEstadoFirebase()">💾 Guardar Estado</button>
         </div>
 
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-            <div class="grupo-control">
-                <label>ID / Nombre / Portada / Sinopsis</label>
-                <input type="text" id="nuevo-id" placeholder="ID">
-                <input type="text" id="nuevo-titulo" placeholder="Nombre">
-                <input type="text" id="nuevo-portada" placeholder="Link Portada">
-                <textarea id="nuevo-sinopsis" placeholder="Sinopsis"></textarea>
-            </div>
-            <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Proyecto</button>
+            <input type="text" id="nuevo-id" placeholder="ID">
+            <input type="text" id="nuevo-titulo" placeholder="Nombre">
+            <input type="text" id="nuevo-portada" placeholder="Portada">
+            <textarea id="nuevo-sinopsis" placeholder="Sinopsis"></textarea>
+            <button class="btn-guardar" onclick="crearNuevoProyecto()">Guardar Nuevo</button>
             <hr>
-            <div class="grupo-control">
-                <label>Editar Proyecto</label>
-                <select id="select-proyecto-editar" onchange="cargarPortadaActualEditar()"></select>
-            </div>
-            <div class="grupo-control">
-                <label>Editar Portada / Sinopsis</label>
-                <input type="text" id="editar-portada">
-                <textarea id="editar-sinopsis"></textarea>
-            </div>
-            <button class="btn-guardar" onclick="guardarEdicionProyecto()">Guardar Cambios</button>
+            <select id="select-proyecto-editar" onchange="cargarPortadaActualEditar()"></select>
+            <input type="text" id="editar-portada">
+            <textarea id="editar-sinopsis"></textarea>
+            <button class="btn-guardar" onclick="guardarEdicionProyecto()">Guardar Edición</button>
         </div>
     </div>
 
@@ -118,20 +91,26 @@
         const firebaseConfig = { apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs", authDomain: "prgs-f2ef8.firebaseapp.com", projectId: "prgs-f2ef8", storageBucket: "prgs-f2ef8.firebasestorage.app", appId: "1:639472415083:web:2940245a8a70ed6c88dc2e" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // TU TOKEN VA AQUÍ:
-        const GITHUB_TOKEN = "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"; 
         const GITHUB_REPO = "adminGRS/RoseGardenAdmin";
 
-        // FUNCIONES NUEVAS GITHUB
+        function obtenerToken() {
+            let token = localStorage.getItem('mi_token_github');
+            if (!token) {
+                token = prompt("Ingresa tu GitHub Token:");
+                if (token) localStorage.setItem('mi_token_github', token);
+            }
+            return token;
+        }
+
         async function subirAGitHub(file, path) {
+            const token = obtenerToken();
             const reader = new FileReader();
             return new Promise((resolve) => {
                 reader.onloadend = async () => {
                     const base64 = reader.result.split(',')[1];
                     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
                         method: 'PUT',
-                        headers: { Authorization: `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                        headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
                         body: JSON.stringify({ message: "Upload", content: base64 })
                     });
                     const data = await res.json();
@@ -146,28 +125,26 @@
             const cap = document.getElementById("num-capitulo").value;
             const files = document.getElementById("input-imgs").files;
             if(!proy || !cap || files.length === 0) return alert("Completa los datos");
-            alert("Subiendo, no cierres la página...");
+            alert("Subiendo...");
             let links = [];
             for (let i = 0; i < files.length; i++) {
-                const url = await subirAGitHub(files[i], `${proy}/cap_${cap}/img_${i}.jpg`);
-                links.push(url);
+                links.push(await subirAGitHub(files[i], `${proy}/cap_${cap}/img_${i}.jpg`));
             }
             await db.collection(proy).doc("capitulo_" + cap).set({ numero: cap, imagenes: links, fecha: new Date() });
             alert("¡Publicado!");
         }
 
-        // TU CÓDIGO ORIGINAL (MANTENIDO ÍNTEGRO)
-        function verificarClave() { const clave = document.getElementById("clave-input").value; if (clave === "Rose2026") { document.getElementById("bloque-login").style.display = "none"; document.getElementById("contenido-panel").style.display = "flex"; cargarProyectosDesdeFirebase(); } else { alert("Contraseña incorrecta"); } }
-        function abrirSeccion(event, id) { document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
-        function blindarEnlaceDrive(link) { if (!link) return ""; link = link.trim(); if (link.includes('uc?export=view')) return link; let id = ""; const matchD = link.match(/\/d\/([\w-]+)/); if (matchD && matchD[1]) id = matchD[1]; else { const matchId = link.match(/[?&]id=([\w-]+)/); if (matchId && matchId[1]) id = matchId[1]; } if (id) return `https://docs.google.com/uc?export=view&id=${id}`; return link; }
-        function cargarProyectosDesdeFirebase() { const selects = [document.getElementById("select-proyecto-capitulo"), document.getElementById("select-proyecto-estatus"), document.getElementById("select-proyecto-editar")]; selects.forEach(select => select.innerHTML = '<option value="">-- Selecciona --</option>'); db.collection("estado_historias").orderBy("nombre").get().then(qs => { qs.forEach(doc => { const id = doc.id; const nombre = doc.data().nombre || id; selects.forEach(select => { const opt = document.createElement("option"); opt.value = id; opt.textContent = nombre; select.appendChild(opt); }); }); }); }
-        function cargarEstadoActual() { const id = document.getElementById("select-proyecto-estatus").value; const caja = document.getElementById("caja-estado-actual"); if (!id) return; db.collection("estado_historias").doc(id).get().then(doc => { let estado = doc.exists && doc.data().estado ? doc.data().estado : "emision"; mostrarBadgeEstado(caja, estado); document.getElementById("nuevo-estado-valor").value = estado; }); }
-        function mostrarBadgeEstado(caja, estado) { const etiquetas = { emision: { texto: "🔴 En Emisión", clase: "badge-emision" }, hiatus: { texto: "🟡 En Hiatus", clase: "badge-hiatus" }, finalizado: { texto: "💖 Finalizado", clase: "badge-finalizado" } }; const info = etiquetas[estado] || { texto: estado, clase: "badge-emision" }; caja.innerHTML = `<span class="badge ${info.clase}">${info.texto}</span>`; }
-        function actualizarEstadoFirebase() { const id = document.getElementById("select-proyecto-estatus").value; const nuevoEstado = document.getElementById("nuevo-estado-valor").value; if (!id) return; db.collection("estado_historias").doc(id).set({ estado: nuevoEstado }, { merge: true }).then(() => alert("¡Estatus actualizado!")); }
-        function subirCapitulo() { const proyecto = document.getElementById("select-proyecto-capitulo").value; const numero = document.getElementById("num-capitulo").value; const enlaces = document.getElementById("enlaces-imagenes").value.split("\n").filter(l => l.trim() !== "").map(l => blindarEnlaceDrive(l.trim())); if (!proyecto || !numero || enlaces.length === 0) { alert("Completa campos."); return; } db.collection(proyecto).doc("capitulo_" + numero).set({ numero: numero, imagenes: enlaces, fecha: new Date() }).then(() => { alert("¡Publicado!"); }); }
-        function crearNuevoProyecto() { const id = document.getElementById("nuevo-id").value.trim(); const titulo = document.getElementById("nuevo-titulo").value.trim(); const portada = blindarEnlaceDrive(document.getElementById("nuevo-portada").value.trim()); const sinopsis = document.getElementById("nuevo-sinopsis").value.trim(); if (!id || !titulo) { alert("ID y Nombre son obligatorios."); return; } db.collection("estado_historias").doc(id).set({ nombre: titulo, portadaUrl: portada, sinopsis: sinopsis, estado: "emision" }, { merge: true }).then(() => { alert("¡Proyecto creado!"); cargarProyectosDesdeFirebase(); }); }
-        function guardarEdicionProyecto() { const id = document.getElementById("select-proyecto-editar").value; const portada = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim()); const sinopsis = document.getElementById("editar-sinopsis").value.trim(); if (!id) return; db.collection("estado_historias").doc(id).set({ portadaUrl: portada, sinopsis: sinopsis }, { merge: true }).then(() => alert("¡Cambios actualizados!")); }
-        function cargarPortadaActualEditar() { const id = document.getElementById("select-proyecto-editar").value; if (!id) return; db.collection("estado_historias").doc(id).get().then(doc => { if (doc.exists) { const d = doc.data(); document.getElementById("editar-portada").value = d.portadaUrl || ""; document.getElementById("editar-sinopsis").value = d.sinopsis || ""; } }); }
+        function verificarClave() { if (document.getElementById("clave-input").value === "Rose2026") { document.getElementById("bloque-login").style.display = "none"; document.getElementById("contenido-panel").style.display = "flex"; cargarProyectosDesdeFirebase(); } else { alert("Clave mal"); } }
+        function abrirSeccion(e, id) { document.querySelectorAll('.seccion-admin').forEach(sec => sec.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
+        function blindarEnlaceDrive(l) { if (!l) return ""; l = l.trim(); if (l.includes('uc?export=view')) return l; let id = ""; const mD = l.match(/\/d\/([\w-]+)/); if (mD && mD[1]) id = mD[1]; else { const mI = l.match(/[?&]id=([\w-]+)/); if (mI && mI[1]) id = mI[1]; } return id ? `https://docs.google.com/uc?export=view&id=${id}` : l; }
+        function cargarProyectosDesdeFirebase() { const selects = [document.getElementById("select-proyecto-capitulo"), document.getElementById("select-proyecto-estatus"), document.getElementById("select-proyecto-editar")]; selects.forEach(s => s.innerHTML = '<option value="">-- Selecciona --</option>'); db.collection("estado_historias").orderBy("nombre").get().then(qs => { qs.forEach(d => { const id = d.id; const nom = d.data().nombre || id; selects.forEach(s => { const o = document.createElement("option"); o.value = id; o.textContent = nom; s.appendChild(o); }); }); }); }
+        function cargarEstadoActual() { const id = document.getElementById("select-proyecto-estatus").value; const caja = document.getElementById("caja-estado-actual"); if (!id) return; db.collection("estado_historias").doc(id).get().then(d => { let est = d.exists && d.data().estado ? d.data().estado : "emision"; mostrarBadgeEstado(caja, est); document.getElementById("nuevo-estado-valor").value = est; }); }
+        function mostrarBadgeEstado(caja, est) { const etiq = { emision: { t: "🔴 En Emisión", c: "badge-emision" }, hiatus: { t: "🟡 En Hiatus", c: "badge-hiatus" }, finalizado: { t: "💖 Finalizado", c: "badge-finalizado" } }; const info = etiq[est] || { t: est, c: "badge-emision" }; caja.innerHTML = `<span class="badge ${info.c}">${info.t}</span>`; }
+        function actualizarEstadoFirebase() { const id = document.getElementById("select-proyecto-estatus").value; const est = document.getElementById("nuevo-estado-valor").value; if (!id) return; db.collection("estado_historias").doc(id).set({ estado: est }, { merge: true }).then(() => alert("¡Actualizado!")); }
+        function subirCapitulo() { const p = document.getElementById("select-proyecto-capitulo").value; const n = document.getElementById("num-capitulo").value; const l = document.getElementById("enlaces-imagenes").value.split("\n").filter(a => a.trim() !== "").map(a => blindarEnlaceDrive(a.trim())); if (!p || !n || l.length === 0) return alert("Completa campos."); db.collection(p).doc("capitulo_" + n).set({ numero: n, imagenes: l, fecha: new Date() }).then(() => alert("¡Publicado!")); }
+        function crearNuevoProyecto() { const id = document.getElementById("nuevo-id").value.trim(); const tit = document.getElementById("nuevo-titulo").value.trim(); const por = blindarEnlaceDrive(document.getElementById("nuevo-portada").value.trim()); const sin = document.getElementById("nuevo-sinopsis").value.trim(); if (!id || !tit) return alert("ID y Nombre obligatorios."); db.collection("estado_historias").doc(id).set({ nombre: tit, portadaUrl: por, sinopsis: sin, estado: "emision" }, { merge: true }).then(() => { alert("¡Creado!"); cargarProyectosDesdeFirebase(); }); }
+        function guardarEdicionProyecto() { const id = document.getElementById("select-proyecto-editar").value; const por = blindarEnlaceDrive(document.getElementById("editar-portada").value.trim()); const sin = document.getElementById("editar-sinopsis").value.trim(); if (!id) return; db.collection("estado_historias").doc(id).set({ portadaUrl: por, sinopsis: sin }, { merge: true }).then(() => alert("¡Actualizado!")); }
+        function cargarPortadaActualEditar() { const id = document.getElementById("select-proyecto-editar").value; if (!id) return; db.collection("estado_historias").doc(id).get().then(d => { if (d.exists) { const da = d.data(); document.getElementById("editar-portada").value = da.portadaUrl || ""; document.getElementById("editar-sinopsis").value = da.sinopsis || ""; } }); }
     </script>
 </body>
 </html>
