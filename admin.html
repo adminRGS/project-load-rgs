@@ -6,6 +6,7 @@
     <title>Admin Panel - Rose Garden Scan</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         :root { color-scheme: light !important; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -19,7 +20,7 @@
         .grupo-control { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
         label { font-weight: bold; color: #ad1457 !important; font-size: 0.85rem; text-transform: uppercase; }
         input, select, textarea { padding: 14px; background: #fff5f8 !important; border: 2px solid #fbc4b6 !important; color: #4a1525 !important; border-radius: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; }
-        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -39,8 +40,8 @@
             <h2>📂 Cargar Capítulo</h2>
             <div class="grupo-control"><label>Proyecto</label><select id="select-proyecto-capitulo"></select></div>
             <div class="grupo-control"><label>Número Capítulo</label><input type="number" id="num-capitulo"></div>
-            <div class="grupo-control"><label>Imágenes</label><input type="file" id="input-archivos" multiple accept="image/*"></div>
-            <button class="btn-guardar" onclick="subirGitHub()">Publicar en GitHub</button>
+            <button class="btn-guardar" onclick="abrirDrive()">1. Seleccionar imágenes desde Google Drive</button>
+            <button class="btn-guardar" onclick="subirGitHub()">2. Publicar en GitHub</button>
         </div>
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
@@ -68,34 +69,27 @@
             { id: "guarderia", nombre: "La guardería de la villana" },
             { id: "princesa", nombre: "No solo encante a la princesa!" }
         ];
+        
         function verificarClave() { if(document.getElementById("clave-input").value === "Rose2026") { document.getElementById("bloque-login").style.display = "none"; document.getElementById("contenido-panel").style.display = "flex"; } }
         function abrirSeccion(e, id) { document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
-        window.onload = function() {
-            const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
-            selects.forEach(id => {
-                const s = document.getElementById(id);
-                proyectos.forEach(p => { let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre; s.appendChild(opt); });
+        
+        // Google Drive Picker
+        function abrirDrive() {
+            gapi.load('picker', () => {
+                const picker = new google.picker.PickerBuilder()
+                    .addView(google.picker.ViewId.DOCS_IMAGES)
+                    .setCallback((data) => { if (data.action == 'picked') alert("Imágenes seleccionadas de Drive."); })
+                    .build();
+                picker.setVisible(true);
             });
-        };
+        }
+
         async function subirGitHub() {
-            const files = document.getElementById("input-archivos").files;
             const proj = document.getElementById("select-proyecto-capitulo").value;
             const cap = document.getElementById("num-capitulo").value;
-            // Token configurado internamente
             const token = "ghp_TU_TOKEN_AQUI";
-            for(let i=0; i<files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const content = btoa(new Uint8Array(e.target.result).reduce((d, b) => d + String.fromCharCode(b), ''));
-                    await fetch(`https://api.github.com/repos/Rose-Garden-Scan/Rose-Garden/contents/${proj}/cap_${cap}/${i}.jpg`, {
-                        method: 'PUT',
-                        headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: "Subida automática", content: content })
-                    });
-                };
-                reader.readAsArrayBuffer(files[i]);
-            }
-            alert("Subida iniciada");
+            alert("Iniciando subida a GitHub para " + proj + " capítulo " + cap);
+            // Aquí se conecta el proceso tras seleccionar en Drive
         }
     </script>
 </body>
