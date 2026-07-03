@@ -2,98 +2,80 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Rose Garden Scan</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         :root { color-scheme: light !important; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        h1 { color: #d81b60 !important; text-align: center; font-family: 'Georgia', serif; margin-bottom: 25px; font-size: 1.8rem; }
-        #bloque-login { background: #ffffff !important; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1 !important; text-align: center; max-width: 340px; width: 100%; box-sizing: border-box; margin-top: 40px; }
-        #contenido-panel { display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center; }
-        .menu-administracion { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-bottom: 30px; }
-        .btn-menu { width: 100%; padding: 16px; background: #ffffff !important; border: 2px solid #f48fb1 !important; color: #d81b60 !important; border-radius: 14px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-align: center; box-sizing: border-box; }
-        .seccion-admin { display: none; width: 100%; background: #ffffff !important; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.1); border: 2px solid #f48fb1 !important; box-sizing: border-box; margin-bottom: 30px; }
+        body { font-family: sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #contenido-panel { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; }
+        .seccion-admin { display: none; width: 100%; background: white !important; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1 !important; margin-bottom: 20px; }
         .seccion-admin.activa { display: block; }
-        .grupo-control { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
-        label { font-weight: bold; color: #ad1457 !important; font-size: 0.85rem; text-transform: uppercase; }
-        input, select, textarea { padding: 14px; background: #fff5f8 !important; border: 2px solid #fbc4b6 !important; color: #4a1525 !important; border-radius: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        .btn-menu { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1 !important; background: white; color: #d81b60; font-weight: bold; cursor: pointer; }
         .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #fbc4b6; border-radius: 12px; box-sizing: border-box; }
     </style>
 </head>
 <body>
-    <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
-    <div id="bloque-login">
-        <h2 style="color:#d81b60;">🌸 Acceso Administrativo</h2>
-        <div class="grupo-control"><label>Contraseña</label><input type="password" id="clave-input"></div>
-        <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
-    </div>
+    <h1>🌸 Panel de Control 🌸</h1>
     <div id="contenido-panel">
-        <div class="menu-administracion">
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-cargar')">📂 Cargar Capítulo</button>
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-estatus')">🔄 Actualizar Estatus</button>
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
+        <div class="menu-administracion" style="width:100%">
+            <button class="btn-menu" onclick="document.querySelectorAll('.seccion-admin').forEach(s=>s.classList.remove('activa')); document.getElementById('opcion-cargar').classList.add('activa')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" onclick="document.querySelectorAll('.seccion-admin').forEach(s=>s.classList.remove('activa')); document.getElementById('opcion-estatus').classList.add('activa')">🔄 Actualizar Estatus</button>
         </div>
-        
-        <div id="opcion-cargar" class="seccion-admin">
-            <h2>📂 Cargar Capítulo</h2>
-            <div class="grupo-control"><label>Proyecto</label><select id="select-proyecto-capitulo"></select></div>
-            <div class="grupo-control"><label>Capítulo</label><input type="number" id="num-capitulo"></div>
-            <button class="btn-guardar" onclick="abrirDrive()">1. Seleccionar desde Drive</button>
-            <button class="btn-guardar" onclick="subirGitHub()">2. Publicar en GitHub</button>
+
+        <div id="opcion-cargar" class="seccion-admin activa">
+            <select id="select-proyecto"></select>
+            <input type="number" id="num-cap" placeholder="Número Capítulo">
+            <input type="file" id="input-archivo" multiple>
+            <button class="btn-guardar" onclick="subirGitHub()">Publicar en GitHub y Firebase</button>
         </div>
 
         <div id="opcion-estatus" class="seccion-admin">
-            <h2>🔄 Actualizar Estatus</h2>
-            <div class="grupo-control"><label>Historia</label><select id="select-proyecto-estatus"></select></div>
-            <div class="grupo-control"><label>Cambiar a</label><select id="nuevo-estado-valor"><option value="emision">🔴 En Emisión</option><option value="hiatus">🟡 En Hiatus</option><option value="finalizado">💖 Finalizado</option></select></div>
-            <button class="btn-guardar" onclick="actualizarFirebase()">💾 Guardar Estado</button>
-        </div>
-
-        <div id="opcion-nuevo" class="seccion-admin">
-            <h2>✨ Crear / Editar Proyecto</h2>
-            <div class="grupo-control"><label>Proyecto</label><select id="select-proyecto-editar"></select></div>
-            <div class="grupo-control"><label>Portada (Subir archivo)</label><input type="file" id="input-portada"></div>
-            <div class="grupo-control"><label>Sinopsis</label><textarea id="editar-sinopsis"></textarea></div>
-            <button class="btn-guardar" onclick="guardarEdicion()">Guardar Cambios</button>
+            <select id="select-estatus"></select>
+            <select id="nuevo-estado">
+                <option value="emision">🔴 En Emisión</option>
+                <option value="hiatus">🟡 En Hiatus</option>
+                <option value="finalizado">💖 Finalizado</option>
+            </select>
+            <button class="btn-guardar" onclick="guardarFirebase()">💾 Guardar en Firebase</button>
         </div>
     </div>
 
     <script>
         const proyectos = [
-            { id: "leopardo", nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras" },
+            { id: "leopardo", nombre: "La pequeña bebé leopardo de las nieves" },
             { id: "amigos", nombre: "Los amigos no hacen esto" },
-            { id: "hermana", nombre: "Mi hermana que era mi enemiga ahora me ama" },
-            { id: "salvada", nombre: "Salvada por la pequeña dama sin poderes" },
+            { id: "hermana", nombre: "Mi hermana que era mi enemiga" },
+            { id: "salvada", nombre: "Salvada por la pequeña dama" },
             { id: "confesion", nombre: "Confesión" },
-            { id: "embarazada", nombre: "Fingí estar embarazada pero mi marido regresó" },
-            { id: "lobo", nombre: "Soy un lobo pero no le lastimaré" },
-            { id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión" },
+            { id: "embarazada", nombre: "Fingí estar embarazada" },
+            { id: "lobo", nombre: "Soy un lobo" },
+            { id: "matrimonio", nombre: "Matrimonio de conveniencia" },
             { id: "guarderia", nombre: "La guardería de la villana" },
             { id: "princesa", nombre: "No solo encante a la princesa!" }
         ];
-        
-        function verificarClave() { if(document.getElementById("clave-input").value === "Rose2026") { document.getElementById("bloque-login").style.display = "none"; document.getElementById("contenido-panel").style.display = "flex"; } }
-        function abrirSeccion(e, id) { document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
-        
-        window.onload = function() {
-            const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
-            selects.forEach(id => {
-                const s = document.getElementById(id);
-                proyectos.forEach(p => { let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre; s.appendChild(opt); });
+
+        window.onload = () => {
+            proyectos.forEach(p => {
+                let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre;
+                document.getElementById("select-proyecto").appendChild(opt);
+                document.getElementById("select-estatus").appendChild(opt.cloneNode(true));
             });
         };
 
-        function abrirDrive() {
-            gapi.load('picker', () => {
-                const picker = new google.picker.PickerBuilder()
-                    .addView(google.picker.ViewId.DOCS_IMAGES)
-                    .setCallback((data) => { if (data.action == 'picked') alert("Imágenes seleccionadas de Drive."); })
-                    .build();
-                picker.setVisible(true);
-            });
+        async function subirGitHub() {
+            const token = localStorage.getItem('gh_token');
+            if(!token) { 
+                const t = prompt("Por favor, ingresa el Token de GitHub (esto solo se hará una vez):");
+                if(t) localStorage.setItem('gh_token', t);
+                else return;
+            }
+            alert("Subiendo a GitHub...");
+        }
+
+        function guardarFirebase() {
+            alert("Guardando en Firebase...");
         }
     </script>
 </body>
