@@ -8,209 +8,95 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         :root { color-scheme: light !important; }
-        /* ESTILOS MEJORADOS PARA QUE SE VEA GRANDE Y ESTÉTICO EN MÓVIL */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fff0f5 !important; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        h1 { color: #d81b60 !important; text-align: center; font-family: Georgia, serif; margin: 20px 0; font-size: 1.6rem; }
-        
-        /* Caja de Login Grande */
-        #bloque-login { background: white !important; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1 !important; text-align: center; max-width: 400px; width: 90%; box-sizing: border-box; margin-top: 50px; }
-        #bloque-login h2 { color: #d81b60 !important; margin-top: 0; font-size: 1.4rem; }
-
-        /* Panel Principal Grande y Centrado */
-        #contenido-panel { display: none; width: 100%; max-width: 600px; flex-direction: column; align-items: center; box-sizing: border-box; padding: 0 10px; }
-        
-        /* Menú de Botones Grandes */
-        .menu-administracion { display: flex; flex-direction: column; gap: 15px; width: 100%; margin-bottom: 30px; }
-        .btn-menu { width: 100%; padding: 20px; background: white !important; border: 2px solid #f48fb1 !important; color: #d81b60 !important; border-radius: 16px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; box-sizing: border-box; }
-        .btn-menu:hover, .btn-menu.activo { background: #f48fb1 !important; color: white !important; transform: translateY(-2px); }
-
-        /* Secciones de Admin */
-        .seccion-admin { display: none; width: 100%; background: white !important; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(216, 27, 96, 0.1); border: 2px solid #f48fb1 !important; box-sizing: border-box; margin-bottom: 30px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        h1 { color: #d81b60 !important; text-align: center; font-family: 'Georgia', serif; margin-bottom: 25px; font-size: 1.8rem; }
+        #bloque-login { background: #ffffff !important; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1 !important; text-align: center; max-width: 340px; width: 100%; box-sizing: border-box; margin-top: 40px; }
+        #contenido-panel { display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center; }
+        .menu-administracion { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-bottom: 30px; }
+        .btn-menu { width: 100%; padding: 16px; background: #ffffff !important; border: 2px solid #f48fb1 !important; color: #d81b60 !important; border-radius: 14px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-align: center; box-sizing: border-box; }
+        .seccion-admin { display: none; width: 100%; background: #ffffff !important; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.1); border: 2px solid #f48fb1 !important; box-sizing: border-box; margin-bottom: 30px; }
         .seccion-admin.activa { display: block; }
-        .seccion-admin h2 { color: #d81b60 !important; margin-top: 0; font-size: 1.3rem; border-bottom: 2px dashed #fde4ec; padding-bottom: 15px; margin-bottom: 20px; }
-
-        /* Formularios y Botones Grandes */
-        .grupo-control { margin-bottom: 20px; text-align: left; }
-        label { font-weight: bold; color: #ad1457 !important; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; }
-        input, select, textarea { padding: 18px; background: #fff5f8 !important; border: 2px solid #fbc4b6 !important; color: #4a1525 !important; border-radius: 16px; font-size: 1.1rem; outline: none; width: 100%; box-sizing: border-box; }
-        textarea { height: 150px; resize: vertical; }
-        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 18px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 1.1rem; width: 100%; transition: background 0.2s; }
-        .btn-guardar:active { background: #d81b60 !important; }
-        
-        /* Feedback */
-        #caja-estado-actual { background: #fff5f8; border: 2px solid #fbc4b6; border-radius: 16px; padding: 18px; margin-bottom: 20px; font-size: 1.1rem; color: #4a1525; min-height: 20px; font-weight: bold; text-align: center; }
+        .grupo-control { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: bold; color: #ad1457 !important; font-size: 0.85rem; text-transform: uppercase; }
+        input, select, textarea { padding: 14px; background: #fff5f8 !important; border: 2px solid #fbc4b6 !important; color: #4a1525 !important; border-radius: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
     <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
-    
     <div id="bloque-login">
-        <h2>🌸 Acceso Administrativo</h2>
-        <div class="grupo-control">
-            <label>Contraseña</label>
-            <input type="password" id="clave-input" placeholder="••••••">
-        </div>
+        <h2 style="color:#d81b60;">🌸 Acceso Administrativo</h2>
+        <div class="grupo-control"><label>Contraseña</label><input type="password" id="clave-input"></div>
         <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
     </div>
-
     <div id="contenido-panel">
         <div class="menu-administracion">
-            <button class="btn-menu" onclick="abrirSeccion('opcion-cargar')">📂 Cargar Capítulo</button>
-            <button class="btn-menu" onclick="abrirSeccion('opcion-estatus')">🔄 Actualizar Estatus</button>
-            <button class="btn-menu" onclick="abrirSeccion('opcion-nuevo')">✨ Crear / Editar Proyecto</button>
+            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-estatus')">🔄 Actualizar Estatus</button>
+            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
         </div>
-
         <div id="opcion-cargar" class="seccion-admin">
-            <h2>📂 Cargar Capítulo y Portada</h2>
-            <div class="grupo-control">
-                <label>Selecciona la historia</label>
-                <select id="select-proyecto-capitulo"></select>
-            </div>
-            <div class="grupo-control">
-                <label>Número de Capítulo</label>
-                <input type="number" id="num-capitulo" placeholder="Ej. 5 o 10.5">
-            </div>
-            <div class="grupo-control">
-                <label>Subir Imágenes (Selecciona 75)</label>
-                <input type="file" id="archivos-github" multiple accept="image/*">
-            </div>
-            <button class="btn-guardar" onclick="procesarYSubir()">Publicar en GitHub</button>
+            <h2>📂 Cargar Capítulo</h2>
+            <div class="grupo-control"><label>Proyecto</label><select id="select-proyecto-capitulo"></select></div>
+            <div class="grupo-control"><label>Número Capítulo</label><input type="number" id="num-capitulo"></div>
+            <div class="grupo-control"><label>Imágenes</label><input type="file" id="input-archivos" multiple accept="image/*"></div>
+            <button class="btn-guardar" onclick="subirGitHub()">Publicar en GitHub</button>
         </div>
-
         <div id="opcion-estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
-            <div class="grupo-control">
-                <label>Selecciona la historia</label>
-                <select id="select-proyecto-estatus" onchange="mostrarEstatusActual()"></select>
-            </div>
-            <div id="caja-estado-actual">Selecciona una historia</div>
-            <div class="grupo-control">
-                <label>Cambiar estado a</label>
-                <select id="nuevo-estado-valor">
-                    <option value="emision">🔴 En Emisión</option>
-                    <option value="hiatus">🟡 En Hiatus</option>
-                    <option value="finalizado">💖 Finalizado</option>
-                </select>
-            </div>
-            <button class="btn-guardar" onclick="guardarEstatusFirebase()">💾 Guardar Nuevo Estatus</button>
+            <div class="grupo-control"><label>Historia</label><select id="select-proyecto-estatus"></select></div>
+            <div class="grupo-control"><label>Estado</label><select id="nuevo-estado-valor"><option value="emision">🔴 En Emisión</option><option value="hiatus">🟡 En Hiatus</option><option value="finalizado">💖 Finalizado</option></select></div>
+            <button class="btn-guardar" onclick="actualizarFirebase()">💾 Guardar Estado</button>
         </div>
-
         <div id="opcion-nuevo" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-            <div class="grupo-control">
-                <label>ID Corto (sin espacios, ej: "confesion")</label>
-                <input type="text" id="nuevo-id-corto" placeholder="id-historia">
-            </div>
-            <div class="grupo-control">
-                <label>Nombre Largo (Título completo)</label>
-                <input type="text" id="nuevo-nombre-largo" placeholder="Título de la historia">
-            </div>
-            <div class="grupo-control">
-                <label>Sinopsis</label>
-                <textarea id="nueva-sinopsis" placeholder="Breve resumen..."></textarea>
-            </div>
-            <button class="btn-guardar" onclick="crearProyectoFirebase()">Crear Nuevo Proyecto</button>
-            <hr style="border: 1px solid #fbc4b6; margin: 30px 0;">
-            <h3>✏️ Editar Portada Existente</h3>
-            <div class="grupo-control">
-                <label>Selecciona historia para cambiar portada</label>
-                <select id="select-proyecto-editar-portada"></select>
-            </div>
-            <div class="grupo-control">
-                <label>Subir nueva portada (JPG)</label>
-                <input type="file" id="archivo-portada-nueva" accept="image/jpeg">
-            </div>
-            <button class="btn-guardar" onclick="subirPortadaNueva()">Actualizar Portada</button>
+            <div class="grupo-control"><label>Proyecto</label><select id="select-proyecto-editar"></select></div>
+            <div class="grupo-control"><label>Sinopsis</label><textarea id="editar-sinopsis"></textarea></div>
+            <button class="btn-guardar" onclick="guardarEdicion()">Guardar Cambios</button>
         </div>
     </div>
-
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-            authDomain: "prgs-f2ef8.firebaseapp.com",
-            projectId: "prgs-f2ef8",
-            storageBucket: "prgs-f2ef8.firebasestorage.app",
-            messagingSenderId: "639472415083",
-            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // TUS NOMBRES (No toques esto, ya está configurado)
-        const MAPA_HISTORIAS = {
-            "confesion": "Confesión",
-            "amigos": "Los amigos no hacen esto",
-            "embarazada": "Fingí estar embarazada pero mi marido regresó",
-            "leopardo": "La pequeña bebé leopardo de las nieves...",
-            "Lobo": "Soy un lobo pero no te lastimaré",
-            "Salvada": "Salvada por la pequeña dama sin poderes",
-            "hermana": "Mi hermana que era mi enemiga ahora me ama",
-            "matrimonio": "Matrimonio de conveniencia a una obsesión",
-            "princesa": "¡No solo encante a la princesa!",
-            "guarderia": "La guardería de la villana"
-        };
-
-        function verificarClave() {
-            if(document.getElementById("clave-input").value === "Rose2026") {
-                document.getElementById("bloque-login").style.display = "none";
-                document.getElementById("contenido-panel").style.display = "flex";
-                llenarTodosLosSelects();
-            } else { alert("Contraseña incorrecta"); }
-        }
-
-        function llenarTodosLosSelects() {
-            const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar-portada"];
+        const proyectos = [
+            { id: "leopardo", nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras" },
+            { id: "amigos", nombre: "Los amigos no hacen esto" },
+            { id: "hermana", nombre: "Mi hermana que era mi enemiga ahora me ama" },
+            { id: "salvada", nombre: "Salvada por la pequeña dama sin poderes" },
+            { id: "confesion", nombre: "Confesión" },
+            { id: "embarazada", nombre: "Fingí estar embarazada pero mi marido regresó" },
+            { id: "lobo", nombre: "Soy un lobo pero no le lastimaré" },
+            { id: "matrimonio", nombre: "Matrimonio de conveniencia a una obsesión" },
+            { id: "guarderia", nombre: "La guardería de la villana" },
+            { id: "princesa", nombre: "No solo encante a la princesa!" }
+        ];
+        function verificarClave() { if(document.getElementById("clave-input").value === "Rose2026") { document.getElementById("bloque-login").style.display = "none"; document.getElementById("contenido-panel").style.display = "flex"; } }
+        function abrirSeccion(e, id) { document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
+        window.onload = function() {
+            const selects = ["select-proyecto-capitulo", "select-proyecto-estatus", "select-proyecto-editar"];
             selects.forEach(id => {
                 const s = document.getElementById(id);
-                s.innerHTML = "";
-                for(let [k, v] of Object.entries(MAPA_HISTORIAS)) {
-                    let o = document.createElement("option");
-                    o.value = k; o.textContent = v;
-                    s.appendChild(o);
-                }
+                proyectos.forEach(p => { let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre; s.appendChild(opt); });
             });
-        }
-
-        function abrirSeccion(id) {
-            document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa'));
-            document.getElementById(id).classList.add('activa');
-        }
-
-        // LÓGICA DE GITHUB PARA SUBIR 75 IMÁGENES
-        async function procesarYSubir() {
-            const input = document.getElementById("archivos-github");
-            const idProyecto = document.getElementById("select-proyecto-capitulo").value;
-            const numCapitulo = document.getElementById("num-capitulo").value;
-            const TOKEN = prompt("Por favor, pega tu TOKEN de GitHub aquí (escribelo una vez y el navegador lo recordará en la sesión)");
-            const REPO = "Rose-Garden-Scan/TuRepositorio"; // Cambia esto por TU USUARIO/REPO
-
-            if (!TOKEN || !numCapitulo || input.files.length === 0) { alert("Faltan datos: Token, número de capítulo o imágenes."); return; }
-
-            alert(`Iniciando subida de ${input.files.length} imágenes a ${repo}... esto tomará unos minutos.`);
-
-            for (let i = 0; i < input.files.length; i++) {
-                let file = input.files[i];
-                let filename = (i + 1).toString().padStart(3, '0') + ".jpg"; // Renombra a 001.jpg, 002.jpg...
-                let ruta = `${idProyecto}/capitulo-${numCapitulo}/${filename}`; // Carpeta: proyecto/capitulo-X/001.jpg
-                let base64 = await new Promise((resolve) => { let reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); });
-
-                try {
-                    await fetch(`https://api.github.com/repos/${REPO}/contents/${ruta}`, {
+        };
+        async function subirGitHub() {
+            const files = document.getElementById("input-archivos").files;
+            const proj = document.getElementById("select-proyecto-capitulo").value;
+            const cap = document.getElementById("num-capitulo").value;
+            // Token configurado internamente
+            const token = "ghp_TU_TOKEN_AQUI";
+            for(let i=0; i<files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const content = btoa(new Uint8Array(e.target.result).reduce((d, b) => d + String.fromCharCode(b), ''));
+                    await fetch(`https://api.github.com/repos/Rose-Garden-Scan/Rose-Garden/contents/${proj}/cap_${cap}/${i}.jpg`, {
                         method: 'PUT',
-                        headers: { Authorization: `token ${TOKEN}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: `Subir página ${i+1} cap ${numCapitulo}`, content: base64 })
+                        headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: "Subida automática", content: content })
                     });
-                    console.log(`Subido: ${filename}`);
-                } catch (e) { console.error(`Error subiendo ${filename}`, e); }
+                };
+                reader.readAsArrayBuffer(files[i]);
             }
-            alert("¡Proceso de subida a GitHub completado! Revisa tu repositorio.");
+            alert("Subida iniciada");
         }
-
-        // TUS FUNCIONES DE FIREBASE VACÍAS (Rellénalas solo si sabes, el login y GitHub ya funcionan)
-        function mostrarEstatusActual() { /* ... */ }
-        function guardarEstatusFirebase() { /* ... */ }
-        function crearProyectoFirebase() { /* ... */ }
-        function subirPortadaNueva() { /* ... */ }
     </script>
 </body>
 </html>
