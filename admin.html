@@ -7,119 +7,97 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         :root { color-scheme: light !important; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        h1 { color: #d81b60 !important; text-align: center; font-family: 'Georgia', serif; margin-bottom: 25px; font-size: 1.8rem; }
-        #bloque-login { background: #ffffff !important; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(216, 27, 96, 0.15); border: 2px solid #f48fb1 !important; text-align: center; max-width: 340px; width: 100%; box-sizing: border-box; margin-top: 40px; }
-        #contenido-panel { display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center; }
-        .menu-administracion { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-bottom: 30px; }
-        .btn-menu { width: 100%; padding: 16px; background: #ffffff !important; border: 2px solid #f48fb1 !important; color: #d81b60 !important; border-radius: 14px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; }
-        .seccion-admin { display: none; width: 100%; background: #ffffff !important; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1 !important; margin-bottom: 30px; }
+        body { font-family: sans-serif; background-color: #ffeef4 !important; padding: 20px; color: #4a1525; }
+        .seccion-admin { display: none; background: white; padding: 20px; border-radius: 20px; border: 2px solid #f48fb1; margin-top: 20px; }
         .seccion-admin.activa { display: block; }
-        .grupo-control { margin-bottom: 15px; }
-        label { font-weight: bold; color: #ad1457 !important; font-size: 0.85rem; text-transform: uppercase; }
-        input, select, textarea { padding: 12px; background: #fff5f8 !important; border: 2px solid #fbc4b6 !important; border-radius: 12px; width: 100%; box-sizing: border-box; }
-        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-guardar { background: #ec407a !important; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #fbc4b6; border-radius: 10px; box-sizing: border-box; }
+        .menu-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1; border-radius: 12px; background: white; color: #d81b60; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>🌸 Panel de Control - Rose Garden Scan 🌸</h1>
-    <div id="bloque-login">
-        <input type="password" id="clave-input" placeholder="Contraseña">
-        <button class="btn-guardar" onclick="verificarClave()">Entrar</button>
-    </div>
+    <h1>🌸 Panel de Control 🌸</h1>
+    
+    <div id="panel-principal">
+        <button class="menu-btn" onclick="mostrar('cargar')">📂 Cargar Capítulo</button>
+        <button class="menu-btn" onclick="mostrar('estatus')">🔄 Actualizar Estatus</button>
+        <button class="menu-btn" onclick="mostrar('editar')">✨ Crear / Editar Proyecto</button>
 
-    <div id="contenido-panel">
-        <div class="menu-administracion">
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-cargar')">📂 Cargar Capítulo</button>
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-estatus')">🔄 Actualizar Estatus</button>
-            <button class="btn-menu" onclick="abrirSeccion(event,'opcion-nuevo')">✨ Crear / Editar Proyecto</button>
-        </div>
-
-        <div id="opcion-cargar" class="seccion-admin">
+        <div id="cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
-            <select id="select-capitulo"></select>
-            <input type="number" id="num-cap" placeholder="Capítulo">
-            <textarea id="links-drive" placeholder="Links Drive..."></textarea>
-            <button class="btn-guardar" onclick="guardarFirebase('capitulo')">Publicar</button>
+            <select id="select-cargar"></select>
+            <input type="number" placeholder="Número de Capítulo">
+            <label>Subir Imágenes a GitHub</label>
+            <input type="file" id="input-files" multiple>
+            <button class="btn-guardar" onclick="alert('Subiendo a GitHub...')">Subir y Publicar</button>
         </div>
 
-        <div id="opcion-estatus" class="seccion-admin">
+        <div id="estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
-            <select id="select-estatus"></select>
+            <select id="select-estatus" onchange="verEstatus()"></select>
+            <div id="caja-estatus-actual" style="padding:10px; background:#fff0f5; border-radius:10px; font-weight:bold;">
+                Estatus actual: Cargando...
+            </div>
             <select id="nuevo-estado">
                 <option value="emision">En Emisión</option>
                 <option value="hiatus">En Hiatus</option>
                 <option value="finalizado">Finalizado</option>
             </select>
-            <button class="btn-guardar" onclick="guardarFirebase('estatus')">Guardar Estado</button>
+            <button class="btn-guardar">Guardar Estatus</button>
         </div>
 
-        <div id="opcion-nuevo" class="seccion-admin">
+        <div id="editar" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-            <input type="text" id="nuevo-id" placeholder="ID corto">
-            <input type="text" id="nuevo-nombre" placeholder="Nombre largo">
-            <textarea id="nuevo-sinopsis" placeholder="Sinopsis"></textarea>
-            <button class="btn-guardar" onclick="guardarFirebase('nuevo')">Guardar Proyecto</button>
+            <input type="text" placeholder="ID corto">
+            <input type="text" placeholder="Nombre largo">
+            <textarea placeholder="Sinopsis"></textarea>
+            <button class="btn-guardar">Guardar Proyecto</button>
+            <hr>
+            <h3>Editar Portada existente</h3>
+            <select id="select-editar"></select>
+            <input type="file" id="input-portada">
+            <button class="btn-guardar">Cambiar Portada (GitHub)</button>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gsJ9cs",
-            authDomain: "prgs-f2ef8.firebaseapp.com",
-            projectId: "prgs-f2ef8",
-            storageBucket: "prgs-f2ef8.firebasestorage.app",
-            messagingSenderId: "639472415083",
-            appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
         const MAPA = {
-            "confesion": "Confesión",
-            "amigos": "Los amigos no hacen esto",
-            "embarazada": "Fingí estar embarazada pero mi marido regresó",
-            "leopardo": "La pequeña bebé leopardo de las nieves de la familia panteras negras",
-            "Lobo": "Soy un lobo pero no te lastimaré",
-            "Salvada": "Salvada por la pequeña dama sin poderes",
-            "hermana": "Mi hermana que era mi enemiga ahora me ama",
-            "matrimonio": "Matrimonio de conveniencia a una obsesión",
-            "princesa": "¡No solo encante a la princesa!",
-            "guarderia": "La guardería de la villana"
+            "confesion": {nombre: "Confesión", estatus: "En Emisión"},
+            "amigos": {nombre: "Los amigos no hacen esto", estatus: "En Emisión"},
+            "embarazada": {nombre: "Fingí estar embarazada pero mi marido regresó", estatus: "En Emisión"},
+            "leopardo": {nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras", estatus: "En Emisión"},
+            "Lobo": {nombre: "Soy un lobo pero no te lastimaré", estatus: "En Emisión"},
+            "Salvada": {nombre: "Salvada por la pequeña dama sin poderes", estatus: "En Emisión"},
+            "hermana": {nombre: "Mi hermana que era mi enemiga ahora me ama", estatus: "En Emisión"},
+            "matrimonio": {nombre: "Matrimonio de conveniencia a una obsesión", estatus: "En Emisión"},
+            "princesa": {nombre: "¡No solo encante a la princesa!", estatus: "En Emisión"},
+            "guarderia": {nombre: "La guardería de la villana", estatus: "En Emisión"}
         };
 
-        function verificarClave() {
-            if(document.getElementById("clave-input").value === "Rose2026") {
-                document.getElementById("bloque-login").style.display = "none";
-                document.getElementById("contenido-panel").style.display = "flex";
-                llenarSelects();
-            } else alert("Contraseña incorrecta");
-        }
-
-        function llenarSelects() {
-            const selects = ["select-capitulo", "select-estatus", "select-proyecto-editar"];
-            selects.forEach(id => {
-                const s = document.getElementById(id);
-                if(s) {
-                    s.innerHTML = "";
-                    for(let [k, v] of Object.entries(MAPA)) {
-                        let o = document.createElement("option");
-                        o.value = k;
-                        o.textContent = v;
-                        s.appendChild(o);
-                    }
-                }
-            });
-        }
-
-        function abrirSeccion(e, id) {
+        function mostrar(id) {
             document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa'));
             document.getElementById(id).classList.add('activa');
         }
 
-        function guardarFirebase(tipo) {
-            alert("Guardado exitosamente (conectado a Firebase)");
+        function llenarSelects() {
+            ["select-cargar", "select-estatus", "select-editar"].forEach(id => {
+                let s = document.getElementById(id);
+                for(let k in MAPA) {
+                    let o = document.createElement("option");
+                    o.value = k; o.textContent = MAPA[k].nombre;
+                    s.appendChild(o);
+                }
+            });
         }
+
+        function verEstatus() {
+            let id = document.getElementById("select-estatus").value;
+            document.getElementById("caja-estatus-actual").textContent = "Estatus actual: " + MAPA[id].estatus;
+        }
+
+        // Inicializar
+        llenarSelects();
+        document.getElementById("panel-principal").style.display = "block";
     </script>
 </body>
-</html>
+    </html>
