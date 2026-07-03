@@ -6,19 +6,18 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        :root { color-scheme: light !important; }
-        body { font-family: sans-serif; background-color: #ffeef4 !important; padding: 20px; color: #4a1525; }
+        body { font-family: sans-serif; background-color: #ffeef4; padding: 20px; }
         .seccion-admin { display: none; background: white; padding: 20px; border-radius: 20px; border: 2px solid #f48fb1; margin-top: 20px; }
         .seccion-admin.activa { display: block; }
-        .btn-guardar { background: #ec407a !important; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-guardar { background: #ec407a; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #fbc4b6; border-radius: 10px; box-sizing: border-box; }
-        .menu-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1; border-radius: 12px; background: white; color: #d81b60; font-weight: bold; cursor: pointer; }
+        .menu-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1; border-radius: 12px; background: white; color: #d81b60; font-weight: bold; }
     </style>
 </head>
 <body>
     <h1>🌸 Panel de Control 🌸</h1>
     
-    <div id="panel-principal">
+    <div id="contenido-panel">
         <button class="menu-btn" onclick="mostrar('cargar')">📂 Cargar Capítulo</button>
         <button class="menu-btn" onclick="mostrar('estatus')">🔄 Actualizar Estatus</button>
         <button class="menu-btn" onclick="mostrar('editar')">✨ Crear / Editar Proyecto</button>
@@ -26,52 +25,48 @@
         <div id="cargar" class="seccion-admin">
             <h2>📂 Cargar Capítulo</h2>
             <select id="select-cargar"></select>
-            <input type="number" placeholder="Número de Capítulo">
-            <label>Subir Imágenes a GitHub</label>
-            <input type="file" id="input-files" multiple>
-            <button class="btn-guardar" onclick="alert('Subiendo a GitHub...')">Subir y Publicar</button>
+            <input type="number" placeholder="Capítulo">
+            <input type="file" multiple>
+            <button class="btn-guardar">Subir a GitHub</button>
         </div>
 
         <div id="estatus" class="seccion-admin">
             <h2>🔄 Actualizar Estatus</h2>
             <select id="select-estatus" onchange="verEstatus()"></select>
-            <div id="caja-estatus-actual" style="padding:10px; background:#fff0f5; border-radius:10px; font-weight:bold;">
-                Estatus actual: Cargando...
-            </div>
-            <select id="nuevo-estado">
-                <option value="emision">En Emisión</option>
-                <option value="hiatus">En Hiatus</option>
-                <option value="finalizado">Finalizado</option>
+            <p><strong>Estado actual:</strong> <span id="estado-actual">Cargando...</span></p>
+            <select id="cambiar-estado">
+                <option value="Emisión">🔴 En Emisión</option>
+                <option value="Hiatus">🟡 En Hiatus</option>
+                <option value="Finalizado">💖 Finalizado</option>
             </select>
-            <button class="btn-guardar">Guardar Estatus</button>
+            <button class="btn-guardar">Cambiar Estado</button>
         </div>
 
         <div id="editar" class="seccion-admin">
             <h2>✨ Crear / Editar Proyecto</h2>
-            <input type="text" placeholder="ID corto">
-            <input type="text" placeholder="Nombre largo">
-            <textarea placeholder="Sinopsis"></textarea>
-            <button class="btn-guardar">Guardar Proyecto</button>
+            <input type="text" id="edit-id" placeholder="ID corto">
+            <input type="text" id="edit-nombre" placeholder="Nombre largo">
+            <textarea id="edit-sinopsis" placeholder="Sinopsis"></textarea>
+            <button class="btn-guardar">Guardar Cambios</button>
             <hr>
-            <h3>Editar Portada existente</h3>
-            <select id="select-editar"></select>
-            <input type="file" id="input-portada">
-            <button class="btn-guardar">Cambiar Portada (GitHub)</button>
+            <h3>Cambiar Portada</h3>
+            <input type="file">
+            <button class="btn-guardar">Subir Portada a GitHub</button>
         </div>
     </div>
 
     <script>
         const MAPA = {
-            "confesion": {nombre: "Confesión", estatus: "En Emisión"},
-            "amigos": {nombre: "Los amigos no hacen esto", estatus: "En Emisión"},
-            "embarazada": {nombre: "Fingí estar embarazada pero mi marido regresó", estatus: "En Emisión"},
-            "leopardo": {nombre: "La pequeña bebé leopardo de las nieves de la familia panteras negras", estatus: "En Emisión"},
-            "Lobo": {nombre: "Soy un lobo pero no te lastimaré", estatus: "En Emisión"},
-            "Salvada": {nombre: "Salvada por la pequeña dama sin poderes", estatus: "En Emisión"},
-            "hermana": {nombre: "Mi hermana que era mi enemiga ahora me ama", estatus: "En Emisión"},
-            "matrimonio": {nombre: "Matrimonio de conveniencia a una obsesión", estatus: "En Emisión"},
-            "princesa": {nombre: "¡No solo encante a la princesa!", estatus: "En Emisión"},
-            "guarderia": {nombre: "La guardería de la villana", estatus: "En Emisión"}
+            "confesion": {n: "Confesión", e: "En Emisión"},
+            "amigos": {n: "Los amigos no hacen esto", e: "En Emisión"},
+            "embarazada": {n: "Fingí estar embarazada pero mi marido regresó", e: "En Emisión"},
+            "leopardo": {n: "La pequeña bebé leopardo de las nieves de la familia panteras negras", e: "En Emisión"},
+            "Lobo": {n: "Soy un lobo pero no te lastimaré", e: "En Emisión"},
+            "Salvada": {n: "Salvada por la pequeña dama sin poderes", e: "En Emisión"},
+            "hermana": {n: "Mi hermana que era mi enemiga ahora me ama", e: "En Emisión"},
+            "matrimonio": {n: "Matrimonio de conveniencia a una obsesión", e: "En Emisión"},
+            "princesa": {n: "¡No solo encante a la princesa!", e: "En Emisión"},
+            "guarderia": {n: "La guardería de la villana", e: "En Emisión"}
         };
 
         function mostrar(id) {
@@ -79,25 +74,20 @@
             document.getElementById(id).classList.add('activa');
         }
 
-        function llenarSelects() {
-            ["select-cargar", "select-estatus", "select-editar"].forEach(id => {
-                let s = document.getElementById(id);
-                for(let k in MAPA) {
-                    let o = document.createElement("option");
-                    o.value = k; o.textContent = MAPA[k].nombre;
-                    s.appendChild(o);
-                }
-            });
-        }
-
         function verEstatus() {
             let id = document.getElementById("select-estatus").value;
-            document.getElementById("caja-estatus-actual").textContent = "Estatus actual: " + MAPA[id].estatus;
+            document.getElementById("estado-actual").textContent = MAPA[id].e;
         }
 
-        // Inicializar
-        llenarSelects();
-        document.getElementById("panel-principal").style.display = "block";
+        // Llenado inicial
+        ["select-cargar", "select-estatus", "select-editar"].forEach(id => {
+            let s = document.getElementById(id);
+            for(let k in MAPA) {
+                let o = document.createElement("option");
+                o.value = k; o.textContent = MAPA[k].n;
+                s.appendChild(o);
+            }
+        });
     </script>
 </body>
-    </html>
+</html>
