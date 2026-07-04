@@ -14,31 +14,41 @@
         .btn-menu { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1 !important; background: white; color: #d81b60; font-weight: bold; cursor: pointer; }
         .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #fbc4b6; border-radius: 12px; box-sizing: border-box; }
+        label { font-weight: bold; color: #ad1457; font-size: 0.8rem; text-transform: uppercase; display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>🌸 Panel de Control 🌸</h1>
     <div id="contenido-panel">
         <div class="menu-administracion" style="width:100%">
-            <button class="btn-menu" onclick="document.querySelectorAll('.seccion-admin').forEach(s=>s.classList.remove('activa')); document.getElementById('opcion-cargar').classList.add('activa')">📂 Cargar Capítulo</button>
-            <button class="btn-menu" onclick="document.querySelectorAll('.seccion-admin').forEach(s=>s.classList.remove('activa')); document.getElementById('opcion-estatus').classList.add('activa')">🔄 Actualizar Estatus</button>
+            <button class="btn-menu" onclick="mostrar('opcion-cargar')">📂 Cargar Capítulo</button>
+            <button class="btn-menu" onclick="mostrar('opcion-estatus')">🔄 Actualizar Estatus</button>
+            <button class="btn-menu" onclick="mostrar('opcion-editar')">✨ Crear / Editar Proyecto</button>
         </div>
 
         <div id="opcion-cargar" class="seccion-admin activa">
-            <select id="select-proyecto"></select>
-            <input type="number" id="num-cap" placeholder="Número Capítulo">
-            <input type="file" id="input-archivo" multiple>
+            <label>Proyecto</label><select id="select-p1"></select>
+            <label>Capítulo</label><input type="number" id="num-cap" placeholder="Número Capítulo">
+            <label>Imágenes</label><input type="file" id="input-archivo" multiple>
             <button class="btn-guardar" onclick="subirGitHub()">Publicar en GitHub y Firebase</button>
         </div>
 
         <div id="opcion-estatus" class="seccion-admin">
-            <select id="select-estatus"></select>
+            <label>Historia</label><select id="select-p2"></select>
+            <label>Estado</label>
             <select id="nuevo-estado">
                 <option value="emision">🔴 En Emisión</option>
                 <option value="hiatus">🟡 En Hiatus</option>
                 <option value="finalizado">💖 Finalizado</option>
             </select>
-            <button class="btn-guardar" onclick="guardarFirebase()">💾 Guardar en Firebase</button>
+            <button class="btn-guardar" onclick="guardarFirebase('estatus')">💾 Guardar Estatus</button>
+        </div>
+
+        <div id="opcion-editar" class="seccion-admin">
+            <label>Proyecto</label><select id="select-p3"></select>
+            <label>Portada</label><input type="file" id="input-portada">
+            <label>Sinopsis</label><textarea id="editar-sinopsis" placeholder="Escribe la sinopsis aquí..."></textarea>
+            <button class="btn-guardar" onclick="guardarFirebase('edicion')">💾 Guardar Cambios</button>
         </div>
     </div>
 
@@ -56,11 +66,18 @@
             { id: "princesa", nombre: "No solo encante a la princesa!" }
         ];
 
+        function mostrar(id) {
+            document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa'));
+            document.getElementById(id).classList.add('activa');
+        }
+
         window.onload = () => {
-            proyectos.forEach(p => {
-                let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre;
-                document.getElementById("select-proyecto").appendChild(opt);
-                document.getElementById("select-estatus").appendChild(opt.cloneNode(true));
+            ["select-p1", "select-p2", "select-p3"].forEach(id => {
+                const s = document.getElementById(id);
+                proyectos.forEach(p => {
+                    let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre;
+                    s.appendChild(opt);
+                });
             });
         };
 
@@ -74,8 +91,8 @@
             alert("Subiendo a GitHub...");
         }
 
-        function guardarFirebase() {
-            alert("Guardando en Firebase...");
+        function guardarFirebase(tipo) {
+            alert("Guardando " + tipo + " en Firebase...");
         }
     </script>
 </body>
