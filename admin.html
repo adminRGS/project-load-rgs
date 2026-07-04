@@ -8,10 +8,11 @@
     <style>
         :root { color-scheme: light !important; }
         body { font-family: sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        #contenido-panel { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; }
+        #bloque-login { width: 100%; max-width: 400px; background: white; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1; text-align: center; margin-top: 50px; }
+        #contenido-panel { width: 100%; max-width: 500px; display: none; flex-direction: column; align-items: center; }
         .seccion-admin { display: none; width: 100%; background: white !important; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1 !important; margin-bottom: 20px; }
         .seccion-admin.activa { display: block; }
-        .btn-menu { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1 !important; background: white; color: #d81b60; font-weight: bold; cursor: pointer; }
+        .btn-menu { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1 !important; background: white; color: #d81b60; font-weight: bold; cursor: pointer; border-radius: 12px; }
         .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #fbc4b6; border-radius: 12px; box-sizing: border-box; }
         label { font-weight: bold; color: #ad1457; font-size: 0.8rem; text-transform: uppercase; display: block; margin-top: 10px; }
@@ -19,6 +20,13 @@
 </head>
 <body>
     <h1>🌸 Panel de Control 🌸</h1>
+    
+    <div id="bloque-login">
+        <label>Contraseña de Acceso</label>
+        <input type="password" id="pass-input">
+        <button class="btn-guardar" onclick="verificar()">Entrar</button>
+    </div>
+
     <div id="contenido-panel">
         <div class="menu-administracion" style="width:100%">
             <button class="btn-menu" onclick="mostrar('opcion-cargar')">📂 Cargar Capítulo</button>
@@ -66,6 +74,13 @@
             { id: "princesa", nombre: "No solo encante a la princesa!" }
         ];
 
+        function verificar() {
+            if(document.getElementById('pass-input').value === "Rose2026") {
+                document.getElementById('bloque-login').style.display = 'none';
+                document.getElementById('contenido-panel').style.display = 'flex';
+            } else { alert("Contraseña incorrecta"); }
+        }
+
         function mostrar(id) {
             document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa'));
             document.getElementById(id).classList.add('activa');
@@ -81,19 +96,8 @@
             });
         };
 
-        async function subirGitHub() {
-            const token = localStorage.getItem('gh_token');
-            if(!token) { 
-                const t = prompt("Por favor, ingresa el Token de GitHub (esto solo se hará una vez):");
-                if(t) localStorage.setItem('gh_token', t);
-                else return;
-            }
-            alert("Subiendo a GitHub...");
-        }
-
-        function guardarFirebase(tipo) {
-            alert("Guardando " + tipo + " en Firebase...");
-        }
+        async function subirGitHub() { alert("Subiendo..."); }
+        function guardarFirebase(tipo) { alert("Guardando " + tipo + " en Firebase..."); }
     </script>
 </body>
 </html>
