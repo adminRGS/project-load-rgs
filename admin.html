@@ -1,103 +1,235 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Panel - Rose Garden Scan</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <style>
-        :root { color-scheme: light !important; }
-        body { font-family: sans-serif; background-color: #ffeef4 !important; color: #4a1525 !important; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        #bloque-login { width: 100%; max-width: 400px; background: white; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1; text-align: center; margin-top: 50px; }
-        #contenido-panel { width: 100%; max-width: 500px; display: none; flex-direction: column; align-items: center; }
-        .seccion-admin { display: none; width: 100%; background: white !important; padding: 25px; border-radius: 20px; border: 2px solid #f48fb1 !important; margin-bottom: 20px; }
-        .seccion-admin.activa { display: block; }
-        .btn-menu { width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #f48fb1 !important; background: white; color: #d81b60; font-weight: bold; cursor: pointer; border-radius: 12px; }
-        .btn-guardar { background: #ec407a !important; color: white !important; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #fbc4b6; border-radius: 12px; box-sizing: border-box; }
-        label { font-weight: bold; color: #ad1457; font-size: 0.8rem; text-transform: uppercase; display: block; margin-top: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rose Garden Scan - Admin Beta</title>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#ffeef4;
+    color:#4a1525;
+}
+
+h1{
+    text-align:center;
+    color:#d81b60;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:15px;
+    border:2px solid #f48fb1;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.nombre{
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.id{
+    color:#888;
+    font-size:0.9rem;
+}
+
+select,
+input,
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    box-sizing:border-box;
+}
+
+button{
+    border:none;
+    background:#ec407a;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.token-box{
+    background:white;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:25px;
+    border:2px solid #f48fb1;
+}
+</style>
 </head>
 <body>
-    <h1>🌸 Panel de Control 🌸</h1>
-    
-    <div id="bloque-login">
-        <label>Contraseña de Acceso</label>
-        <input type="password" id="pass-input">
-        <button class="btn-guardar" onclick="verificar()">Entrar</button>
-    </div>
 
-    <div id="contenido-panel">
-        <div class="menu-administracion" style="width:100%">
-            <button class="btn-menu" onclick="mostrar('opcion-cargar')">📂 Cargar Capítulo</button>
-            <button class="btn-menu" onclick="mostrar('opcion-estatus')">🔄 Actualizar Estatus</button>
-            <button class="btn-menu" onclick="mostrar('opcion-editar')">✨ Crear / Editar Proyecto</button>
-        </div>
+<h1>🌸 Rose Garden Scan Beta 🌸</h1>
 
-        <div id="opcion-cargar" class="seccion-admin activa">
-            <label>Proyecto</label><select id="select-p1"></select>
-            <label>Capítulo</label><input type="number" id="num-cap" placeholder="Número Capítulo">
-            <label>Imágenes</label><input type="file" id="input-archivo" multiple>
-            <button class="btn-guardar" onclick="subirGitHub()">Publicar en GitHub y Firebase</button>
-        </div>
+<div class="token-box">
+    <h3>🔑 GitHub</h3>
 
-        <div id="opcion-estatus" class="seccion-admin">
-            <label>Historia</label><select id="select-p2"></select>
-            <label>Estado</label>
-            <select id="nuevo-estado">
-                <option value="emision">🔴 En Emisión</option>
-                <option value="hiatus">🟡 En Hiatus</option>
-                <option value="finalizado">💖 Finalizado</option>
+    <input type="password"
+           id="github-token"
+           placeholder="Pega tu token aquí">
+
+    <button onclick="guardarToken()">
+        Guardar Token
+    </button>
+
+    <button onclick="borrarToken()">
+        Borrar Token
+    </button>
+
+    <p id="estado-token"></p>
+</div>
+
+<div id="lista-historias"></div>
+
+<script>
+const historias = [
+{
+id:"leopardo",
+nombre:"La pequeña bebé leopardo de las nieves de la familia panteras negras",
+estado:"emision"
+},
+{
+id:"amigos",
+nombre:"Los amigos no hacen esto",
+estado:"hiatus"
+},
+{
+id:"hermana",
+nombre:"Mi hermana que era mi enemiga ahora me ama",
+estado:"hiatus"
+},
+{
+id:"salvada",
+nombre:"Salvada por la pequeña dama sin poderes",
+estado:"emision"
+},
+{
+id:"confesion",
+nombre:"Confesión",
+estado:"emision"
+},
+{
+id:"embarazada",
+nombre:"Fingí estar embarazada pero mi marido regresó",
+estado:"emision"
+},
+{
+id:"lobo",
+nombre:"Soy un lobo pero no te lastimaré",
+estado:"finalizado"
+},
+{
+id:"matrimonio",
+nombre:"Matrimonio de conveniencia a una obsesión",
+estado:"finalizado"
+},
+{
+id:"guarderia",
+nombre:"La guardería de la villana",
+estado:"hiatus"
+},
+{
+id:"princesa",
+nombre:"¡No, solo encanté a la princesa!",
+estado:"finalizado"
+}
+];
+
+function cargarHistorias(){
+    const contenedor =
+        document.getElementById("lista-historias");
+
+    contenedor.innerHTML = "";
+
+    historias.forEach(h => {
+        contenedor.innerHTML += `
+        <div class="card">
+            <div class="nombre">${h.nombre}</div>
+            <div class="id">ID: ${h.id}</div>
+
+            <select>
+                <option value="emision"
+                    ${h.estado==="emision"?"selected":""}>
+                    🔴 En emisión
+                </option>
+
+                <option value="hiatus"
+                    ${h.estado==="hiatus"?"selected":""}>
+                    🟡 Hiatus
+                </option>
+
+                <option value="finalizado"
+                    ${h.estado==="finalizado"?"selected":""}>
+                    💖 Finalizado
+                </option>
             </select>
-            <button class="btn-guardar" onclick="guardarFirebase('estatus')">💾 Guardar Estatus</button>
+
+            <button>
+                Editar Historia
+            </button>
+
+            <button>
+                Subir Capítulo
+            </button>
         </div>
+        `;
+    });
+}
 
-        <div id="opcion-editar" class="seccion-admin">
-            <label>Proyecto</label><select id="select-p3"></select>
-            <label>Portada</label><input type="file" id="input-portada">
-            <label>Sinopsis</label><textarea id="editar-sinopsis" placeholder="Escribe la sinopsis aquí..."></textarea>
-            <button class="btn-guardar" onclick="guardarFirebase('edicion')">💾 Guardar Cambios</button>
-        </div>
-    </div>
+function guardarToken(){
+    const token =
+        document.getElementById("github-token").value;
 
-    <script>
-        const proyectos = [
-            { id: "leopardo", nombre: "La pequeña bebé leopardo de las nieves" },
-            { id: "amigos", nombre: "Los amigos no hacen esto" },
-            { id: "hermana", nombre: "Mi hermana que era mi enemiga" },
-            { id: "salvada", nombre: "Salvada por la pequeña dama" },
-            { id: "confesion", nombre: "Confesión" },
-            { id: "embarazada", nombre: "Fingí estar embarazada" },
-            { id: "lobo", nombre: "Soy un lobo" },
-            { id: "matrimonio", nombre: "Matrimonio de conveniencia" },
-            { id: "guarderia", nombre: "La guardería de la villana" },
-            { id: "princesa", nombre: "No solo encante a la princesa!" }
-        ];
+    if(!token){
+        alert("Ingresa un token.");
+        return;
+    }
 
-        function verificar() {
-            if(document.getElementById('pass-input').value === "Rose2026") {
-                document.getElementById('bloque-login').style.display = 'none';
-                document.getElementById('contenido-panel').style.display = 'flex';
-            } else { alert("Contraseña incorrecta"); }
-        }
+    localStorage.setItem(
+        "github_token_rose",
+        token
+    );
 
-        function mostrar(id) {
-            document.querySelectorAll('.seccion-admin').forEach(s => s.classList.remove('activa'));
-            document.getElementById(id).classList.add('activa');
-        }
+    document.getElementById("estado-token")
+        .innerText =
+        "✅ Token guardado en este navegador.";
+}
 
-        window.onload = () => {
-            ["select-p1", "select-p2", "select-p3"].forEach(id => {
-                const s = document.getElementById(id);
-                proyectos.forEach(p => {
-                    let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.nombre;
-                    s.appendChild(opt);
-                });
-            });
-        };
+function borrarToken(){
+    localStorage.removeItem(
+        "github_token_rose"
+    );
 
-        async function subirGitHub() { alert("Subiendo..."); }
-        function guardarFirebase(tipo) { alert("Guardando " + tipo + " en Firebase..."); }
-    </script>
+    document.getElementById("estado-token")
+        .innerText =
+        "❌ Token eliminado.";
+
+    document.getElementById(
+        "github-token"
+    ).value = "";
+}
+
+window.onload = () => {
+    cargarHistorias();
+
+    if(localStorage.getItem(
+        "github_token_rose"
+    )){
+        document.getElementById(
+            "estado-token"
+        ).innerText =
+        "✅ Ya tienes un token guardado.";
+    }
+};
+</script>
+
 </body>
 </html>
