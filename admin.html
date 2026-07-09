@@ -3,232 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rose Garden Scan - Admin Beta</title>
+<title>Rose Garden Scan Admin 2.0</title>
 
 <style>
-body{
-    margin:0;
-    padding:20px;
+*{
+    box-sizing:border-box;
     font-family:Arial,sans-serif;
-    background:#ffeef4;
-    color:#4a1525;
 }
 
-h1{
+body{
+    margin:0;
+    background:#ffe6ef;
+    color:#5a2a3b;
+}
+
+header{
+    background:#d94f8a;
+    color:white;
+    padding:20px;
     text-align:center;
-    color:#d81b60;
+    font-size:1.6rem;
+    font-weight:bold;
+}
+
+.pantalla{
+    display:none;
+    padding:20px;
+}
+
+.activa{
+    display:block;
 }
 
 .card{
     background:white;
-    border-radius:15px;
-    padding:15px;
-    margin-bottom:15px;
-    border:2px solid #f48fb1;
-    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-.nombre{
-    font-weight:bold;
-    margin-bottom:5px;
-}
-
-.id{
-    color:#888;
-    font-size:0.9rem;
-}
-
-select,
-input,
 button{
     width:100%;
-    padding:12px;
-    margin-top:10px;
-    border-radius:10px;
-    box-sizing:border-box;
-}
-
-button{
+    padding:15px;
     border:none;
-    background:#ec407a;
+    border-radius:15px;
+    margin-top:10px;
+    background:#e75480;
     color:white;
+    font-size:1rem;
     font-weight:bold;
     cursor:pointer;
 }
 
-.token-box{
+input,
+textarea,
+select{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+textarea{
+    min-height:120px;
+}
+
+.volver{
+    background:#999;
+}
+
+/* LOGIN */
+#login{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#ffe6ef;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.login-card{
     background:white;
-    border-radius:15px;
-    padding:15px;
-    margin-bottom:25px;
-    border:2px solid #f48fb1;
+    padding:30px;
+    width:90%;
+    max-width:350px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
 </style>
 </head>
 <body>
 
-<h1>🌸 Rose Garden Scan Beta 🌸</h1>
+<!-- LOGIN -->
+<div id="login">
+    <div class="login-card">
 
-<div class="token-box">
-    <h3>🔑 GitHub</h3>
+        <h2>🌹 Rose Garden Scan</h2>
 
-    <input type="password"
-           id="github-token"
-           placeholder="Pega tu token aquí">
+        <input
+            type="password"
+            id="clave"
+            placeholder="Contraseña">
 
-    <button onclick="guardarToken()">
-        Guardar Token
-    </button>
+        <button onclick="entrar()">
+            Entrar
+        </button>
 
-    <button onclick="borrarToken()">
-        Borrar Token
-    </button>
+        <p id="mensajeLogin"
+           style="color:red;"></p>
 
-    <p id="estado-token"></p>
+    </div>
 </div>
 
-<div id="lista-historias"></div>
+<header>
+🌹 Rose Garden Scan Admin 2.0
+</header>
+
+<!-- INICIO -->
+<div id="inicio" class="pantalla activa">
+
+    <div class="card">
+
+        <button onclick="abrir('subir')">
+            📚 Subir capítulo
+        </button>
+
+        <button onclick="abrir('editar')">
+            📝 Editar historias
+        </button>
+
+        <button onclick="abrir('nueva')">
+            ➕ Crear nueva historia
+        </button>
+
+        <button onclick="salir()">
+            🚪 Cerrar sesión
+        </button>
+
+    </div>
+
+</div>
+
+<!-- SUBIR CAPITULO -->
+<div id="subir" class="pantalla">
+
+    <div class="card">
+
+        <h2>📚 Subir capítulo</h2>
+
+        <label>Historia</label>
+
+        <select>
+            <option>La pequeña bebé leopardo...</option>
+            <option>Los amigos no hacen esto</option>
+            <option>Mi hermana que era mi enemiga ahora me ama</option>
+            <option>Salvada por la pequeña dama sin poderes</option>
+            <option>Confesión</option>
+            <option>Fingí estar embarazada pero mi marido regresó</option>
+            <option>Soy un lobo pero no te lastimaré</option>
+            <option>Matrimonio de conveniencia a una obsesión</option>
+            <option>La guardería de la villana</option>
+            <option>¡No, solo encanté a la princesa!</option>
+        </select>
+
+        <label>Capítulo</label>
+        <input type="number">
+
+        <label>Imágenes</label>
+        <input type="file" multiple>
+
+        <button>
+            🚀 Publicar capítulo
+        </button>
+
+        <button class="volver"
+                onclick="abrir('inicio')">
+            ← Volver
+        </button>
+
+    </div>
+
+</div>
+
+<!-- EDITAR -->
+<div id="editar" class="pantalla">
+
+    <div class="card">
+
+        <h2>📝 Editar historia</h2>
+
+        <label>Historia</label>
+
+        <select>
+            <option>La pequeña bebé leopardo...</option>
+            <option>Los amigos no hacen esto</option>
+            <option>Mi hermana que era mi enemiga ahora me ama</option>
+            <option>Salvada por la pequeña dama sin poderes</option>
+            <option>Confesión</option>
+            <option>Fingí estar embarazada pero mi marido regresó</option>
+            <option>Soy un lobo pero no te lastimaré</option>
+            <option>Matrimonio de conveniencia a una obsesión</option>
+            <option>La guardería de la villana</option>
+            <option>¡No, solo encanté a la princesa!</option>
+        </select>
+
+        <label>Nueva portada</label>
+        <input type="file">
+
+        <label>Sinopsis</label>
+        <textarea></textarea>
+
+        <label>Estado</label>
+
+        <select>
+            <option>En emisión</option>
+            <option>Hiatus</option>
+            <option>Finalizado</option>
+        </select>
+
+        <button>
+            💾 Guardar cambios
+        </button>
+
+        <button class="volver"
+                onclick="abrir('inicio')">
+            ← Volver
+        </button>
+
+    </div>
+
+</div>
+
+<!-- NUEVA HISTORIA -->
+<div id="nueva" class="pantalla">
+
+    <div class="card">
+
+        <h2>➕ Nueva historia</h2>
+
+        <label>ID corto</label>
+        <input type="text"
+               placeholder="ej: leopardo">
+
+        <label>Nombre largo</label>
+        <input type="text">
+
+        <label>Portada</label>
+        <input type="file">
+
+        <label>Sinopsis</label>
+        <textarea></textarea>
+
+        <label>Estado</label>
+
+        <select>
+            <option>En emisión</option>
+            <option>Hiatus</option>
+            <option>Finalizado</option>
+        </select>
+
+        <button>
+            🌹 Crear historia
+        </button>
+
+        <button class="volver"
+                onclick="abrir('inicio')">
+            ← Volver
+        </button>
+
+    </div>
+
+</div>
 
 <script>
-const historias = [
-{
-id:"leopardo",
-nombre:"La pequeña bebé leopardo de las nieves de la familia panteras negras",
-estado:"emision"
-},
-{
-id:"amigos",
-nombre:"Los amigos no hacen esto",
-estado:"hiatus"
-},
-{
-id:"hermana",
-nombre:"Mi hermana que era mi enemiga ahora me ama",
-estado:"hiatus"
-},
-{
-id:"salvada",
-nombre:"Salvada por la pequeña dama sin poderes",
-estado:"emision"
-},
-{
-id:"confesion",
-nombre:"Confesión",
-estado:"emision"
-},
-{
-id:"embarazada",
-nombre:"Fingí estar embarazada pero mi marido regresó",
-estado:"emision"
-},
-{
-id:"lobo",
-nombre:"Soy un lobo pero no te lastimaré",
-estado:"finalizado"
-},
-{
-id:"matrimonio",
-nombre:"Matrimonio de conveniencia a una obsesión",
-estado:"finalizado"
-},
-{
-id:"guarderia",
-nombre:"La guardería de la villana",
-estado:"hiatus"
-},
-{
-id:"princesa",
-nombre:"¡No, solo encanté a la princesa!",
-estado:"finalizado"
-}
-];
+function abrir(id){
 
-function cargarHistorias(){
-    const contenedor =
-        document.getElementById("lista-historias");
+    document
+        .querySelectorAll(".pantalla")
+        .forEach(p=>{
+            p.classList.remove("activa");
+        });
 
-    contenedor.innerHTML = "";
-
-    historias.forEach(h => {
-        contenedor.innerHTML += `
-        <div class="card">
-            <div class="nombre">${h.nombre}</div>
-            <div class="id">ID: ${h.id}</div>
-
-            <select>
-                <option value="emision"
-                    ${h.estado==="emision"?"selected":""}>
-                    🔴 En emisión
-                </option>
-
-                <option value="hiatus"
-                    ${h.estado==="hiatus"?"selected":""}>
-                    🟡 Hiatus
-                </option>
-
-                <option value="finalizado"
-                    ${h.estado==="finalizado"?"selected":""}>
-                    💖 Finalizado
-                </option>
-            </select>
-
-            <button>
-                Editar Historia
-            </button>
-
-            <button>
-                Subir Capítulo
-            </button>
-        </div>
-        `;
-    });
+    document
+        .getElementById(id)
+        .classList.add("activa");
 }
 
-function guardarToken(){
-    const token =
-        document.getElementById("github-token").value;
+function entrar(){
 
-    if(!token){
-        alert("Ingresa un token.");
-        return;
-    }
+    const clave =
+        document.getElementById("clave").value;
 
-    localStorage.setItem(
-        "github_token_rose",
-        token
-    );
+    if(clave === "Rose2026"){
 
-    document.getElementById("estado-token")
-        .innerText =
-        "✅ Token guardado en este navegador.";
-}
+        localStorage.setItem(
+            "rose_admin",
+            "ok"
+        );
 
-function borrarToken(){
-    localStorage.removeItem(
-        "github_token_rose"
-    );
+        document.getElementById("login")
+            .style.display = "none";
 
-    document.getElementById("estado-token")
-        .innerText =
-        "❌ Token eliminado.";
+    }else{
 
-    document.getElementById(
-        "github-token"
-    ).value = "";
-}
-
-window.onload = () => {
-    cargarHistorias();
-
-    if(localStorage.getItem(
-        "github_token_rose"
-    )){
         document.getElementById(
-            "estado-token"
+            "mensajeLogin"
         ).innerText =
-        "✅ Ya tienes un token guardado.";
+        "Contraseña incorrecta.";
     }
-};
+}
+
+function salir(){
+
+    localStorage.removeItem(
+        "rose_admin"
+    );
+
+    location.reload();
+}
+
+window.onload = function(){
+
+    if(
+        localStorage.getItem(
+            "rose_admin"
+        )
+    ){
+        document.getElementById(
+            "login"
+        ).style.display = "none";
+    }
+}
 </script>
 
 </body>
