@@ -75,7 +75,6 @@ textarea{
     background:#999;
 }
 
-/* LOGIN */
 #login{
     position:fixed;
     top:0;
@@ -100,9 +99,9 @@ textarea{
 }
 </style>
 </head>
+
 <body>
 
-<!-- LOGIN -->
 <div id="login">
     <div class="login-card">
 
@@ -127,7 +126,6 @@ textarea{
 🌹 Rose Garden Scan Admin 2.0
 </header>
 
-<!-- INICIO -->
 <div id="inicio" class="pantalla activa">
 
     <div class="card">
@@ -142,6 +140,10 @@ textarea{
 
         <button onclick="abrir('nueva')">
             ➕ Crear nueva historia
+        </button>
+
+        <button onclick="configurarToken()">
+            🔑 Configurar Token GitHub
         </button>
 
         <button onclick="salir()">
@@ -161,38 +163,46 @@ textarea{
 
         <label>Historia</label>
 
-        <select>
-            <option>La pequeña bebé leopardo...</option>
-            <option>Los amigos no hacen esto</option>
-            <option>Mi hermana que era mi enemiga ahora me ama</option>
-            <option>Salvada por la pequeña dama sin poderes</option>
-            <option>Confesión</option>
-            <option>Fingí estar embarazada pero mi marido regresó</option>
-            <option>Soy un lobo pero no te lastimaré</option>
-            <option>Matrimonio de conveniencia a una obsesión</option>
-            <option>La guardería de la villana</option>
-            <option>¡No, solo encanté a la princesa!</option>
+        <select id="historia">
+            <option value="leopardo">La pequeña bebé leopardo...</option>
+            <option value="amigos">Los amigos no hacen esto</option>
+            <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
+            <option value="salvada">Salvada por la pequeña dama sin poderes</option>
+            <option value="confesion">Confesión</option>
+            <option value="embarazada">Fingí estar embarazada pero mi marido regresó</option>
+            <option value="lobo">Soy un lobo pero no te lastimaré</option>
+            <option value="matrimonio">Matrimonio de conveniencia a una obsesión</option>
+            <option value="guarderia">La guardería de la villana</option>
+            <option value="princesa">¡No, solo encanté a la princesa!</option>
         </select>
 
         <label>Capítulo</label>
-        <input type="number">
+
+        <input
+            type="text"
+            id="numeroCapitulo"
+            placeholder="Ej: 1 o 43.5">
 
         <label>Imágenes</label>
-        <input type="file" multiple>
 
-        <button>
+        <input
+            type="file"
+            id="imagenes"
+            multiple>
+
+        <button onclick="subirCapitulo()">
             🚀 Publicar capítulo
         </button>
 
-        <button class="volver"
-                onclick="abrir('inicio')">
+        <button
+            class="volver"
+            onclick="abrir('inicio')">
             ← Volver
         </button>
 
     </div>
 
 </div>
-
 <!-- EDITAR -->
 <div id="editar" class="pantalla">
 
@@ -202,39 +212,40 @@ textarea{
 
         <label>Historia</label>
 
-        <select>
-            <option>La pequeña bebé leopardo...</option>
-            <option>Los amigos no hacen esto</option>
-            <option>Mi hermana que era mi enemiga ahora me ama</option>
-            <option>Salvada por la pequeña dama sin poderes</option>
-            <option>Confesión</option>
-            <option>Fingí estar embarazada pero mi marido regresó</option>
-            <option>Soy un lobo pero no te lastimaré</option>
-            <option>Matrimonio de conveniencia a una obsesión</option>
-            <option>La guardería de la villana</option>
-            <option>¡No, solo encanté a la princesa!</option>
+        <select id="editarHistoria">
+            <option value="leopardo">La pequeña bebé leopardo...</option>
+            <option value="amigos">Los amigos no hacen esto</option>
+            <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
+            <option value="salvada">Salvada por la pequeña dama sin poderes</option>
+            <option value="confesion">Confesión</option>
+            <option value="embarazada">Fingí estar embarazada pero mi marido regresó</option>
+            <option value="lobo">Soy un lobo pero no te lastimaré</option>
+            <option value="matrimonio">Matrimonio de conveniencia a una obsesión</option>
+            <option value="guarderia">La guardería de la villana</option>
+            <option value="princesa">¡No, solo encanté a la princesa!</option>
         </select>
 
         <label>Nueva portada</label>
-        <input type="file">
+        <input type="file" id="nuevaPortada">
 
         <label>Sinopsis</label>
-        <textarea></textarea>
+        <textarea id="nuevaSinopsis"></textarea>
 
         <label>Estado</label>
 
-        <select>
-            <option>En emisión</option>
-            <option>Hiatus</option>
-            <option>Finalizado</option>
+        <select id="nuevoEstado">
+            <option value="En emisión">En emisión</option>
+            <option value="Hiatus">Hiatus</option>
+            <option value="Finalizado">Finalizado</option>
         </select>
 
-        <button>
+        <button onclick="guardarCambios()">
             💾 Guardar cambios
         </button>
 
-        <button class="volver"
-                onclick="abrir('inicio')">
+        <button
+            class="volver"
+            onclick="abrir('inicio')">
             ← Volver
         </button>
 
@@ -250,32 +261,39 @@ textarea{
         <h2>➕ Nueva historia</h2>
 
         <label>ID corto</label>
-        <input type="text"
-               placeholder="ej: leopardo">
+        <input
+            type="text"
+            id="nuevoID"
+            placeholder="ej: leopardo">
 
         <label>Nombre largo</label>
-        <input type="text">
+        <input
+            type="text"
+            id="nuevoNombre">
 
         <label>Portada</label>
-        <input type="file">
+        <input
+            type="file"
+            id="portadaNuevaHistoria">
 
         <label>Sinopsis</label>
-        <textarea></textarea>
+        <textarea id="sinopsisNuevaHistoria"></textarea>
 
         <label>Estado</label>
 
-        <select>
-            <option>En emisión</option>
-            <option>Hiatus</option>
-            <option>Finalizado</option>
+        <select id="estadoNuevaHistoria">
+            <option value="En emisión">En emisión</option>
+            <option value="Hiatus">Hiatus</option>
+            <option value="Finalizado">Finalizado</option>
         </select>
 
-        <button>
+        <button onclick="crearHistoria()">
             🌹 Crear historia
         </button>
 
-        <button class="volver"
-                onclick="abrir('inicio')">
+        <button
+            class="volver"
+            onclick="abrir('inicio')">
             ← Volver
         </button>
 
@@ -284,6 +302,10 @@ textarea{
 </div>
 
 <script>
+    const GITHUB_USUARIO = "adminRGS";
+const GITHUB_REPO = "project-load-rgs";
+const GITHUB_BRANCH = "main";
+
 function abrir(id){
 
     document
@@ -309,8 +331,9 @@ function entrar(){
             "ok"
         );
 
-        document.getElementById("login")
-            .style.display = "none";
+        document.getElementById(
+            "login"
+        ).style.display = "none";
 
     }else{
 
@@ -341,6 +364,200 @@ window.onload = function(){
             "login"
         ).style.display = "none";
     }
+};
+
+function configurarToken(){
+
+    const token = prompt(
+        "Pega tu token de GitHub"
+    );
+
+    if(!token) return;
+
+    localStorage.setItem(
+        "github_token",
+        token
+    );
+
+    alert(
+        "Token guardado correctamente."
+    );
+}
+
+function obtenerToken(){
+
+    return localStorage.getItem(
+        "github_token"
+    );
+}
+
+function convertirBase64(
+    archivo
+){
+
+    return new Promise(resolve=>{
+
+        const lector =
+            new FileReader();
+
+        lector.onload = ()=>{
+
+            resolve(
+                lector.result
+                    .split(",")[1]
+            );
+        };
+
+        lector.readAsDataURL(
+            archivo
+        );
+    });
+}
+
+async function subirImagenGitHub(
+    archivo,
+    carpeta
+){
+
+    const token =
+        obtenerToken();
+
+    if(!token){
+
+        alert(
+            "Primero configura el token."
+        );
+
+        return null;
+    }
+
+    const nombre =
+        Date.now() +
+        "_" +
+        archivo.name;
+
+    const ruta =
+        `${carpeta}/${nombre}`;
+
+    const contenido =
+        await convertirBase64(
+            archivo
+        );
+
+    const respuesta =
+        await fetch(
+            `https://api.github.com/repos/${GITHUB_USUARIO}/${GITHUB_REPO}/contents/${ruta}`,
+            {
+                method:"PUT",
+                headers:{
+                    Authorization:
+                        `token ${token}`,
+                    Accept:
+                        "application/vnd.github+json"
+                },
+                body:JSON.stringify({
+                    message:
+                        `Subir ${nombre}`,
+                    content:
+                        contenido,
+                    branch:
+                        GITHUB_BRANCH
+                })
+            }
+        );
+
+    const datos =
+        await respuesta.json();
+
+    if(datos.content){
+
+        return `https://raw.githubusercontent.com/${GITHUB_USUARIO}/${GITHUB_REPO}/${GITHUB_BRANCH}/${ruta}`;
+    }
+
+    console.log(datos);
+
+    return null;
+}
+
+async function subirCapitulo(){
+
+    const historia =
+        document.getElementById(
+            "historia"
+        ).value;
+
+    const numero =
+        document.getElementById(
+            "numeroCapitulo"
+        ).value;
+
+    const archivos =
+        document.getElementById(
+            "imagenes"
+        ).files;
+
+    if(!numero){
+
+        alert(
+            "Ingresa el número del capítulo."
+        );
+
+        return;
+    }
+
+    if(
+        archivos.length === 0
+    ){
+
+        alert(
+            "Selecciona imágenes."
+        );
+
+        return;
+    }
+
+    const enlaces = [];
+
+    for(
+        let archivo
+        of archivos
+    ){
+
+        const url =
+            await subirImagenGitHub(
+                archivo,
+                `${historia}/capitulo_${numero}`
+            );
+
+        if(url){
+
+            enlaces.push(url);
+        }
+    }
+
+    console.log(
+        enlaces
+    );
+
+    alert(
+        "Se subieron " +
+        enlaces.length +
+        " imágenes correctamente."
+    );
+}
+
+function guardarCambios(){
+
+    alert(
+        "La conexión con Firebase se agregará en la siguiente etapa."
+    );
+}
+
+function crearHistoria(){
+
+    alert(
+        "La creación automática de historias se agregará en la siguiente etapa."
+    );
 }
 </script>
 
