@@ -13,7 +13,7 @@
         overflow-x: hidden; min-height: 100vh; 
         transition: background 0.3s ease;
     }
-    
+
     body::after {
         content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px);
@@ -87,7 +87,7 @@
         margin: 0;
         padding: 0;
     }
-    
+
     .cargando-pdf {
         text-align: center;
         padding: 100px 20px;
@@ -103,7 +103,7 @@
         font-family: sans-serif;
         line-height: 1.6;
     }
-    
+
     .nav-lector { 
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; 
         background: var(--panel-rose, rgba(0, 0, 0, 0.96)); padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
@@ -127,10 +127,11 @@
     .emoji { font-size: 1.5rem; }
     .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
     .count { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
-</style>
+            </style>
+        </head>
+<body>
 
-</head>
-<body><div id="barra-progreso-rose"></div>
+<div id="barra-progreso-rose"></div>
 
 <div class="contenedor-regreso">
     <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
@@ -142,60 +143,113 @@
     </div>
 
     <h1 id="titulo-proyecto" class="titulo-manga">Confesión</h1>
-    
-    <p class="sinopsis-texto" id="sinopsis-dinamica">✨ Cargando los detalles... ✨</p>
+
+    <p class="sinopsis-texto" id="sinopsis-dinamica">
+        ✨ Cargando los detalles... ✨
+    </p>
 
     <div class="seccion-titulo">Capítulos Disponibles</div>
-    
+
     <div class="grid-caps" id="grid"></div>
 </div>
 
 <div id="lector">
+
     <div class="nav-lector">
-        
+
         <div style="position: relative; display: flex; align-items: center; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px;">
-            <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">🎨</button>
-            
+
+            <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">
+                🎨
+            </button>
+
             <div id="sub-menu-colores-lector" class="sub-menu-colores">
-                <div class="dot" style="background: #000;" onclick="cambiarTemaRose('dark')" title="Modo Oscuro"></div>
-                <div class="dot" style="background: #2c2c2c;" onclick="cambiarTemaRose('gris')" title="Modo Gris"></div>
-                <div class="dot" style="background: #dfd3e3;" onclick="cambiarTemaRose('malva')" title="Modo Malva Suave"></div>
+
+                <div class="dot"
+                     style="background: #000;"
+                     onclick="cambiarTemaRose('dark')"
+                     title="Modo Oscuro">
+                </div>
+
+                <div class="dot"
+                     style="background: #2c2c2c;"
+                     onclick="cambiarTemaRose('gris')"
+                     title="Modo Gris">
+                </div>
+
+                <div class="dot"
+                     style="background: #dfd3e3;"
+                     onclick="cambiarTemaRose('malva')"
+                     title="Modo Malva Suave">
+                </div>
+
             </div>
+
         </div>
 
         <div class="grupo-flechas">
-            <button id="btn-ant" class="nav-btn">← Ant.</button>
-            <button id="btn-sig" class="nav-btn">Sig. →</button>
+
+            <button id="btn-ant" class="nav-btn">
+                ← Ant.
+            </button>
+
+            <button id="btn-sig" class="nav-btn">
+                Sig. →
+            </button>
+
         </div>
-        
-        <button class="btn-cerrar" onclick="cerrarLector()">✕</button>
+
+        <button class="btn-cerrar" onclick="cerrarLector()">
+            ✕
+        </button>
 
         <div class="btn-votar-pink" onclick="toggleStats(event)">
+
             <span class="thumb-icon">👍</span>
+
             <div class="popover-stats" id="stats-menu">
+
                 <div class="stat-item" onclick="votar('loves', event)">
                     <span class="emoji pink-fx">❤️</span>
                     <span id="txt-loves" class="count">0</span>
                 </div>
+
                 <div class="stat-item" onclick="votar('likes', event)">
                     <span class="emoji pink-fx">👍</span>
                     <span id="txt-likes" class="count">0</span>
                 </div>
+
                 <div class="stat-item" onclick="votar('haha', event)">
                     <span class="emoji">😂</span>
                     <span id="txt-haha" class="count">0</span>
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
     <div id="contenido-imagenes"></div>
+
 </div>
 
-<script src="funciones-rose.js"></script><script type="module">
+<script src="funciones-rose.js"></script>
+
+<script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    import {
+        getFirestore,
+        collection,
+        getDocs,
+        doc,
+        getDoc,
+        updateDoc,
+        increment,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
 
@@ -212,15 +266,20 @@
         appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
     };
 
+
     const app = initializeApp(firebaseConfig);
+
     const db = getFirestore(app);
-    
-    const historiaID = "confesion"; 
+
+    const historiaID = "confesion";
+
     let capsOrdenados = [];
+
     let idCapActual = "";
 
 
     if (window.conectarAdminConManga) {
+
         window.conectarAdminConManga(
             db,
             getDoc,
@@ -230,72 +289,116 @@
             "sinopsis-dinamica",
             onSnapshot
         );
+
     }
 
 
+    /* ============================================================
+       CONVERTIR ENLACES DE GOOGLE DRIVE
+       ============================================================ */
+
     function arreglarLink(url) {
+
         if (!url) return "";
 
         if (url.includes('drive.google.com')) {
-            let id = url.includes('id=')
-                ? url.split('id=')[1].split('&')[0]
-                : url.split('/d/')[1].split('/')[0];
 
-            return `https://docs.google.com/uc?export=view&id=${id}`;
+            let id = "";
+
+            if (url.includes('id=')) {
+
+                id =
+                    url.split('id=')[1].split('&')[0];
+
+            } else if (url.includes('/d/')) {
+
+                id =
+                    url.split('/d/')[1].split('/')[0];
+
+            }
+
+            return `https://drive.google.com/uc?export=download&id=${id}`;
         }
 
         return url;
     }
 
 
+    /* ============================================================
+       CARGAR PROYECTO DESDE FIREBASE
+       ============================================================ */
+
     async function cargarProyectoDesdeFirebase() {
 
-        const grid = document.getElementById('grid');
+        const grid =
+            document.getElementById('grid');
 
         grid.innerHTML =
             "<p style='grid-column: 1/-1; text-align:center;'>✨ Cargando capítulos... ✨</p>";
-        
+
+
         try {
 
             const querySnapshot =
-                await getDocs(collection(db, historiaID));
+                await getDocs(
+                    collection(db, historiaID)
+                );
+
 
             let disponibles = [];
-            
+
+
             querySnapshot.forEach((docSnap) => {
 
                 if (docSnap.id.startsWith("capitulo_")) {
 
                     const idOriginal =
-                        docSnap.id.replace("capitulo_", "");
+                        docSnap.id.replace(
+                            "capitulo_",
+                            ""
+                        );
 
                     disponibles.push(idOriginal);
                 }
+
             });
 
-            capsOrdenados =
-                disponibles.sort((a, b) => parseFloat(a) - parseFloat(b));
 
-            grid.innerHTML = ""; 
+            capsOrdenados =
+                disponibles.sort(
+                    (a, b) => parseFloat(a) - parseFloat(b)
+                );
+
+
+            grid.innerHTML = "";
+
 
             capsOrdenados.forEach(idCap => {
 
-                const btn = document.createElement('div');
+                const btn =
+                    document.createElement('div');
 
-                btn.className = 'cap-btn-dinamico';
+                btn.className =
+                    'cap-btn-dinamico';
 
-                btn.innerText = idCap;
+                btn.innerText =
+                    idCap;
 
-                btn.onclick = () => abrirLector(idCap);
+                btn.onclick =
+                    () => abrirLector(idCap);
 
                 grid.appendChild(btn);
+
             });
+
 
             if (capsOrdenados.length === 0) {
 
                 grid.innerHTML =
                     "<p style='grid-column: 1/-1; text-align:center;'>Próximamente más capítulos ✨</p>";
+
             }
+
 
         } catch (e) {
 
@@ -303,12 +406,18 @@
 
             grid.innerHTML =
                 "<p style='grid-column: 1/-1; text-align:center; color:#ff4d4d;'>Error cargando el servidor.</p>";
+
         }
+
     }
 
 
     cargarProyectoDesdeFirebase();
 
+
+    /* ============================================================
+       MOSTRAR PDF COMO TIRA VERTICAL
+       ============================================================ */
 
     async function mostrarPDFComoTira(url, contenedor) {
 
@@ -317,19 +426,36 @@
             contenedor.innerHTML =
                 "<div class='cargando-pdf'>✨ Preparando el capítulo... ✨</div>";
 
-            const pdf = await pdfjsLib.getDocument({
-                url: url
-            }).promise;
+
+            /* ====================================================
+               CAMBIO IMPORTANTE:
+               Ahora PDF.js recibe el enlace corregido de Drive.
+               ==================================================== */
+
+            const pdf =
+                await pdfjsLib.getDocument({
+                    url: arreglarLink(url)
+                }).promise;
+
 
             contenedor.innerHTML = "";
 
-            for (let numeroPagina = 1; numeroPagina <= pdf.numPages; numeroPagina++) {
 
-                const pagina = await pdf.getPage(numeroPagina);
+            for (
+                let numeroPagina = 1;
+                numeroPagina <= pdf.numPages;
+                numeroPagina++
+            ) {
 
-                const viewportOriginal = pagina.getViewport({
-                    scale: 1
-                });
+                const pagina =
+                    await pdf.getPage(numeroPagina);
+
+
+                const viewportOriginal =
+                    pagina.getViewport({
+                        scale: 1
+                    });
+
 
                 const anchoDisponible =
                     Math.min(
@@ -337,235 +463,307 @@
                         900
                     );
 
+
                 const escala =
-                    anchoDisponible / viewportOriginal.width;
+                    anchoDisponible /
+                    viewportOriginal.width;
+
 
                 const viewport =
                     pagina.getViewport({
                         scale: escala
                     });
 
+
                 const paginaDiv =
                     document.createElement('div');
 
-                paginaDiv.className = 'pagina-pdf';
+                paginaDiv.className =
+                    'pagina-pdf';
+
 
                 const canvas =
                     document.createElement('canvas');
 
+
                 const contexto =
                     canvas.getContext('2d');
 
-                canvas.width = Math.floor(viewport.width);
-                canvas.height = Math.floor(viewport.height);
+
+                canvas.width =
+                    Math.floor(viewport.width);
+
+                canvas.height =
+                    Math.floor(viewport.height);
+
 
                 paginaDiv.appendChild(canvas);
 
                 contenedor.appendChild(paginaDiv);
 
+
                 await pagina.render({
                     canvasContext: contexto,
                     viewport: viewport
                 }).promise;
+
             }
+
 
         } catch (error) {
 
-            console.error("Error cargando PDF:", error);
+            console.error(
+                "Error cargando PDF:",
+                error
+            );
+
 
             contenedor.innerHTML = `
                 <div class="error-pdf">
                     ❌ No se pudo cargar este capítulo.<br><br>
-                    <small>Revisa que el enlace del PDF guardado en Firebase sea público y válido.</small>
+                    <small>
+                        Revisa que el enlace del PDF guardado en Firebase sea público y válido.
+                    </small>
                 </div>
             `;
+
         }
+
     }
-/* ============================================================
-       ABRIR CAPÍTULO
-       ============================================================ */
-
-    window.abrirLector = async function(idCap) {
-
-        idCapActual = idCap;
-
-        const lector =
-            document.getElementById('lector');
-
-        const contenedor =
-            document.getElementById('contenido-imagenes');
-
-        lector.style.display = 'block';
-
-        lector.scrollTop = 0;
-
-        contenedor.innerHTML =
-            "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando... ✨</p>";
-
-
-        /* --------------------------------------------------------
-           BOTONES ANTERIOR / SIGUIENTE
-           -------------------------------------------------------- */
-
-        const index =
-            capsOrdenados.indexOf(idCap.toString());
-
-        document.getElementById('btn-ant').onclick = () => {
-
-            if (index > 0) {
-                abrirLector(capsOrdenados[index - 1]);
-            }
-        };
-
-        document.getElementById('btn-sig').onclick = () => {
-
-            if (index < capsOrdenados.length - 1) {
-                abrirLector(capsOrdenados[index + 1]);
-            }
-        };
-
-        document.getElementById('btn-ant').disabled =
-            (index <= 0);
-
-        document.getElementById('btn-sig').disabled =
-            (index >= capsOrdenados.length - 1);
-
-
-        /* --------------------------------------------------------
-           LEER CAPÍTULO DESDE FIREBASE
-           -------------------------------------------------------- */
-
-        try {
-
-            const docRef =
-                doc(
-                    db,
-                    historiaID,
-                    "capitulo_" + idCap
-                );
-
-            const snap =
-                await getDoc(docRef);
-
-
-            if (snap.exists()) {
-
-                const data = snap.data();
-
-
-                /* ------------------------------------------------
-                   REACCIONES
-                   ------------------------------------------------ */
-
-                document.getElementById('txt-loves').innerText =
-                    data.loves || 0;
-
-                document.getElementById('txt-likes').innerText =
-                    data.likes || 0;
-
-                document.getElementById('txt-haha').innerText =
-                    data.haha || 0;
-
-
-                contenedor.innerHTML = "";
-
-
-                /* ------------------------------------------------
-                   PRIMERO: BUSCAR PDF
-
-                   El campo principal esperado es "pdf".
-                   También dejamos compatibilidad con pdfUrl/linkPdf.
-                   ------------------------------------------------ */
-
-                const enlacePDF =
-                    data.pdf ||
-                    data.pdfUrl ||
-                    data.linkPdf ||
-                    "";
-
-
-                if (
-                    typeof enlacePDF === "string" &&
-                    enlacePDF.trim() !== ""
-                ) {
-
-                    await mostrarPDFComoTira(
-                        enlacePDF.trim(),
-                        contenedor
-                    );
-
-                    return;
-                }
-
-
-                /* ------------------------------------------------
-                   SI NO HAY PDF:
-                   UTILIZAR EL SISTEMA ANTIGUO DE IMÁGENES
-
-                   Esto mantiene funcionando los capítulos
-                   anteriores que ya tienen imágenes.
-                   ------------------------------------------------ */
-
-                let imgs =
-                    Array.isArray(data.imagenes)
-                        ? data.imagenes
-                        : (data.link ? [data.link] : []);
-
-
-                imgs.forEach(url => {
-
-                    if (
-                        url &&
-                        url.trim() !== ""
-                    ) {
-
-                        const img =
-                            document.createElement('img');
-
-                        img.src =
-                            arreglarLink(url.trim());
-
-                        contenedor.appendChild(img);
-                    }
-                });
-
-
-                /* ------------------------------------------------
-                   SI NO HAY NI PDF NI IMÁGENES
-                   ------------------------------------------------ */
-
-                if (imgs.length === 0) {
-
-                    contenedor.innerHTML = `
-                        <div class="error-pdf">
-                            ✨ Este capítulo todavía no tiene contenido disponible.
-                        </div>
-                    `;
-                }
-
-            } else {
-
-                contenedor.innerHTML = `
-                    <div class="error-pdf">
-                        ❌ No se encontró el capítulo ${idCap}.
-                    </div>
-                `;
-            }
-
-        } catch (e) {
-
-            console.error(e);
-
-            contenedor.innerHTML = `
-                <div class="error-pdf">
-                    ❌ Ocurrió un error al cargar el capítulo.
-                </div>
-            `;
-        }
-    };
 
 
     /* ============================================================
+       ABRIR CAPÍTULO
+       ============================================================ */
+
+    window.abrirLector =
+        async function(idCap) {
+
+            idCapActual =
+                idCap;
+
+
+            const lector =
+                document.getElementById('lector');
+
+
+            const contenedor =
+                document.getElementById('contenido-imagenes');
+
+
+            lector.style.display =
+                'block';
+
+
+            lector.scrollTop =
+                0;
+
+
+            contenedor.innerHTML =
+                "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando... ✨</p>";
+
+
+            /* ----------------------------------------------------
+               BOTONES ANTERIOR / SIGUIENTE
+               ---------------------------------------------------- */
+
+            const index =
+                capsOrdenados.indexOf(
+                    idCap.toString()
+                );
+
+
+            document.getElementById('btn-ant').onclick =
+                () => {
+
+                    if (index > 0) {
+
+                        abrirLector(
+                            capsOrdenados[index - 1]
+                        );
+
+                    }
+
+                };
+
+
+            document.getElementById('btn-sig').onclick =
+                () => {
+
+                    if (
+                        index <
+                        capsOrdenados.length - 1
+                    ) {
+
+                        abrirLector(
+                            capsOrdenados[index + 1]
+                        );
+
+                    }
+
+                };
+
+
+            document.getElementById('btn-ant').disabled =
+                (index <= 0);
+
+
+            document.getElementById('btn-sig').disabled =
+                (
+                    index >=
+                    capsOrdenados.length - 1
+                );
+
+
+            /* ----------------------------------------------------
+               LEER CAPÍTULO DESDE FIREBASE
+               ---------------------------------------------------- */
+
+            try {
+
+                const docRef =
+                    doc(
+                        db,
+                        historiaID,
+                        "capitulo_" + idCap
+                    );
+
+
+                const snap =
+                    await getDoc(docRef);
+
+
+                if (snap.exists()) {
+
+                    const data =
+                        snap.data();
+
+
+                    /* ------------------------------------------------
+                       REACCIONES
+                       ------------------------------------------------ */
+
+                    document.getElementById('txt-loves').innerText =
+                        data.loves || 0;
+
+                    document.getElementById('txt-likes').innerText =
+                        data.likes || 0;
+
+                    document.getElementById('txt-haha').innerText =
+                        data.haha || 0;
+
+
+                    contenedor.innerHTML =
+                        "";
+
+
+                    /* ------------------------------------------------
+                       BUSCAR PDF
+                       ------------------------------------------------ */
+
+                    const enlacePDF =
+                        data.pdf ||
+                        data.pdfUrl ||
+                        data.linkPdf ||
+                        "";
+
+
+                    if (
+                        typeof enlacePDF === "string" &&
+                        enlacePDF.trim() !== ""
+                    ) {
+
+                        await mostrarPDFComoTira(
+                            enlacePDF.trim(),
+                            contenedor
+                        );
+
+                        return;
+
+                    }
+
+
+                    /* ------------------------------------------------
+                       SISTEMA ANTIGUO DE IMÁGENES
+                       ------------------------------------------------ */
+
+                    let imgs =
+                        Array.isArray(data.imagenes)
+                            ? data.imagenes
+                            : (
+                                data.link
+                                    ? [data.link]
+                                    : []
+                            );
+
+
+                    imgs.forEach(url => {
+
+                        if (
+                            url &&
+                            url.trim() !== ""
+                        ) {
+
+                            const img =
+                                document.createElement('img');
+
+
+                            img.src =
+                                arreglarLink(
+                                    url.trim()
+                                );
+
+
+                            contenedor.appendChild(
+                                img
+                            );
+
+                        }
+
+                    });
+
+
+                    /* ------------------------------------------------
+                       SIN PDF NI IMÁGENES
+                       ------------------------------------------------ */
+
+                    if (imgs.length === 0) {
+
+                        contenedor.innerHTML = `
+                            <div class="error-pdf">
+                                ✨ Este capítulo todavía no tiene contenido disponible.
+                            </div>
+                        `;
+
+                    }
+
+
+                } else {
+
+                    contenedor.innerHTML = `
+                        <div class="error-pdf">
+                            ❌ No se encontró el capítulo ${idCap}.
+                        </div>
+                    `;
+
+                }
+
+
+            } catch (e) {
+
+                console.error(e);
+
+
+                contenedor.innerHTML = `
+                    <div class="error-pdf">
+                        ❌ Ocurrió un error al cargar el capítulo.
+                    </div>
+                `;
+
+            }
+
+        };
+        /* ============================================================
        VOTACIONES
        ============================================================ */
 
@@ -588,7 +786,9 @@
         );
 
         const txt =
-            document.getElementById('txt-' + tipo);
+            document.getElementById(
+                'txt-' + tipo
+            );
 
         txt.innerText =
             parseInt(txt.innerText) + 1;
@@ -633,6 +833,7 @@
             .getElementById('stats-menu')
             .classList
             .remove('active');
+
     });
 
 </script>
