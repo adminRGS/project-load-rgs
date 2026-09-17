@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rose Garden Scan Admin 2.0</title>
+
+<title>Rose Garden Scan Admin</title>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <style>
+
 *{
     box-sizing:border-box;
     font-family:Arial,sans-serif;
@@ -22,7 +28,7 @@ header{
     color:white;
     padding:20px;
     text-align:center;
-    font-size:1.6rem;
+    font-size:1.5rem;
     font-weight:bold;
 }
 
@@ -56,19 +62,20 @@ button{
     cursor:pointer;
 }
 
+button:disabled{
+    background:#aaa;
+    cursor:not-allowed;
+}
+
 input,
-textarea,
 select{
     width:100%;
     padding:12px;
     border-radius:12px;
     border:1px solid #ccc;
     margin-top:10px;
-    margin-bottom:10px;
-}
-
-textarea{
-    min-height:120px;
+    margin-bottom:15px;
+    font-size:1rem;
 }
 
 .volver{
@@ -97,12 +104,36 @@ textarea{
     text-align:center;
     box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
+
+.info-pdf{
+    background:#fff0f6;
+    border:1px solid #f3b3cd;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:15px;
+    font-size:0.9rem;
+    line-height:1.5;
+}
+
+.mensaje{
+    text-align:center;
+    font-weight:bold;
+    line-height:1.5;
+    margin-top:15px;
+}
+
 </style>
 </head>
 
 <body>
 
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
 <div id="login">
+
     <div class="login-card">
 
         <h2>🌹 Rose Garden Scan</h2>
@@ -117,14 +148,26 @@ textarea{
         </button>
 
         <p id="mensajeLogin"
-           style="color:red;"></p>
+           style="color:red;">
+        </p>
 
     </div>
+
 </div>
 
+
+<!-- =====================================================
+     ENCABEZADO
+===================================================== -->
+
 <header>
-🌹 Rose Garden Scan Admin 2.0
+    🌹 Rose Garden Scan Admin
 </header>
+
+
+<!-- =====================================================
+     INICIO
+===================================================== -->
 
 <div id="inicio" class="pantalla activa">
 
@@ -132,18 +175,6 @@ textarea{
 
         <button onclick="abrir('subir')">
             📚 Subir capítulo
-        </button>
-
-        <button onclick="abrir('editar')">
-            📝 Editar historias
-        </button>
-
-        <button onclick="abrir('nueva')">
-            ➕ Crear nueva historia
-        </button>
-
-        <button onclick="configurarToken()">
-            🔑 Configurar Token GitHub
         </button>
 
         <button onclick="salir()">
@@ -154,175 +185,222 @@ textarea{
 
 </div>
 
-<!-- SUBIR CAPITULO -->
+
+<!-- =====================================================
+     SUBIR CAPÍTULO
+===================================================== -->
+
 <div id="subir" class="pantalla">
 
     <div class="card">
 
         <h2>📚 Subir capítulo</h2>
 
-        <label>Historia</label>
+
+        <label>
+            Historia
+        </label>
 
         <select id="historia">
-            <option value="leopardo">La pequeña bebé leopardo...</option>
-            <option value="amigos">Los amigos no hacen esto</option>
-            <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
-            <option value="salvada">Salvada por la pequeña dama sin poderes</option>
-            <option value="confesion">Confesión</option>
-            <option value="embarazada">Fingí estar embarazada pero mi marido regresó</option>
-            <option value="lobo">Soy un lobo pero no te lastimaré</option>
-            <option value="matrimonio">Matrimonio de conveniencia a una obsesión</option>
-            <option value="guarderia">La guardería de la villana</option>
-            <option value="princesa">¡No, solo encanté a la princesa!</option>
+
+            <option value="leopardo">
+                La pequeña bebé leopardo...
+            </option>
+
+            <option value="amigos">
+                Los amigos no hacen esto
+            </option>
+
+            <option value="hermana">
+                Mi hermana que era mi enemiga ahora me ama
+            </option>
+
+            <option value="salvada">
+                Salvada por la pequeña dama sin poderes
+            </option>
+
+            <option value="confesion">
+                Confesión
+            </option>
+
+            <option value="embarazada">
+                Fingí estar embarazada pero mi marido regresó
+            </option>
+
+            <option value="lobo">
+                Soy un lobo pero no te lastimaré
+            </option>
+
+            <option value="matrimonio">
+                Matrimonio de conveniencia a una obsesión
+            </option>
+
+            <option value="guarderia">
+                La guardería de la villana
+            </option>
+
+            <option value="princesa">
+                ¡No, solo encanté a la princesa!
+            </option>
+
         </select>
 
-        <label>Capítulo</label>
+
+        <label>
+            Número de capítulo
+        </label>
 
         <input
             type="text"
             id="numeroCapitulo"
-            placeholder="Ej: 1 o 43.5">
+            placeholder="Ejemplo: 109 o 43.5">
 
-        <label>Imágenes</label>
+
+        <label>
+            Tipo de capítulo
+        </label>
+
+        <select id="tipoCapitulo">
+
+            <option value="pdf">
+                📄 PDF
+            </option>
+
+        </select>
+
+
+        <label>
+            🔗 Enlace del PDF
+        </label>
 
         <input
-            type="file"
-            id="imagenes"
-            multiple>
+            type="url"
+            id="enlacePDF"
+            placeholder="Pega aquí el enlace del PDF">
 
-        <button onclick="subirCapitulo()">
+
+        <div class="info-pdf">
+
+            📄 <strong>Importante:</strong>
+
+            <br><br>
+
+            El PDF debe estar configurado para que
+            cualquier persona que tenga el enlace
+            pueda verlo.
+
+            <br><br>
+
+            Puedes utilizar Google Drive.
+
+        </div>
+
+
+        <button
+            id="btnPublicar"
+            onclick="subirCapitulo()">
+
             🚀 Publicar capítulo
+
         </button>
+
+
+        <p
+            id="mensajeSubida"
+            class="mensaje">
+        </p>
+
 
         <button
             class="volver"
             onclick="abrir('inicio')">
+
             ← Volver
-        </button>
 
-    </div>
-
-</div>
-<!-- EDITAR -->
-<div id="editar" class="pantalla">
-
-    <div class="card">
-
-        <h2>📝 Editar historia</h2>
-
-        <label>Historia</label>
-
-        <select id="editarHistoria">
-            <option value="leopardo">La pequeña bebé leopardo...</option>
-            <option value="amigos">Los amigos no hacen esto</option>
-            <option value="hermana">Mi hermana que era mi enemiga ahora me ama</option>
-            <option value="salvada">Salvada por la pequeña dama sin poderes</option>
-            <option value="confesion">Confesión</option>
-            <option value="embarazada">Fingí estar embarazada pero mi marido regresó</option>
-            <option value="lobo">Soy un lobo pero no te lastimaré</option>
-            <option value="matrimonio">Matrimonio de conveniencia a una obsesión</option>
-            <option value="guarderia">La guardería de la villana</option>
-            <option value="princesa">¡No, solo encanté a la princesa!</option>
-        </select>
-
-        <label>Nueva portada</label>
-        <input type="file" id="nuevaPortada">
-
-        <label>Sinopsis</label>
-        <textarea id="nuevaSinopsis"></textarea>
-
-        <label>Estado</label>
-
-        <select id="nuevoEstado">
-            <option value="En emisión">En emisión</option>
-            <option value="Hiatus">Hiatus</option>
-            <option value="Finalizado">Finalizado</option>
-        </select>
-
-        <button onclick="guardarCambios()">
-            💾 Guardar cambios
-        </button>
-
-        <button
-            class="volver"
-            onclick="abrir('inicio')">
-            ← Volver
         </button>
 
     </div>
 
 </div>
 
-<!-- NUEVA HISTORIA -->
-<div id="nueva" class="pantalla">
-
-    <div class="card">
-
-        <h2>➕ Nueva historia</h2>
-
-        <label>ID corto</label>
-        <input
-            type="text"
-            id="nuevoID"
-            placeholder="ej: leopardo">
-
-        <label>Nombre largo</label>
-        <input
-            type="text"
-            id="nuevoNombre">
-
-        <label>Portada</label>
-        <input
-            type="file"
-            id="portadaNuevaHistoria">
-
-        <label>Sinopsis</label>
-        <textarea id="sinopsisNuevaHistoria"></textarea>
-
-        <label>Estado</label>
-
-        <select id="estadoNuevaHistoria">
-            <option value="En emisión">En emisión</option>
-            <option value="Hiatus">Hiatus</option>
-            <option value="Finalizado">Finalizado</option>
-        </select>
-
-        <button onclick="crearHistoria()">
-            🌹 Crear historia
-        </button>
-
-        <button
-            class="volver"
-            onclick="abrir('inicio')">
-            ← Volver
-        </button>
-
-    </div>
-
-</div>
 
 <script>
-    const GITHUB_USUARIO = "adminRGS";
-const GITHUB_REPO = "project-load-rgs";
-const GITHUB_BRANCH = "main";
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gs9",
+
+    authDomain:
+        "prgs-f2ef8.firebaseapp.com",
+
+    projectId:
+        "prgs-f2ef8",
+
+    storageBucket:
+        "prgs-f2ef8.firebasestorage.app",
+
+    messagingSenderId:
+        "639472415083",
+
+    appId:
+        "1:639472415083:web:2940245a8a70ed6c88dc2e"
+
+};
+
+
+if(!firebase.apps.length){
+
+    firebase.initializeApp(
+        firebaseConfig
+    );
+
+}
+
+
+const db =
+    firebase.firestore();
+
+
+
+/* =====================================================
+   NAVEGACIÓN
+===================================================== */
 
 function abrir(id){
 
     document
         .querySelectorAll(".pantalla")
-        .forEach(p=>{
+        .forEach(p => {
+
             p.classList.remove("activa");
+
         });
+
 
     document
         .getElementById(id)
         .classList.add("activa");
+
 }
+
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
 
 function entrar(){
 
     const clave =
-        document.getElementById("clave").value;
+        document
+        .getElementById("clave")
+        .value;
+
 
     if(clave === "Rose2026"){
 
@@ -331,18 +409,28 @@ function entrar(){
             "ok"
         );
 
-        document.getElementById(
-            "login"
-        ).style.display = "none";
+
+        document
+            .getElementById("login")
+            .style.display = "none";
+
 
     }else{
 
-        document.getElementById(
-            "mensajeLogin"
-        ).innerText =
-        "Contraseña incorrecta.";
+        document
+            .getElementById("mensajeLogin")
+            .innerText =
+            "Contraseña incorrecta.";
+
     }
+
 }
+
+
+
+/* =====================================================
+   CERRAR SESIÓN
+===================================================== */
 
 function salir(){
 
@@ -351,7 +439,14 @@ function salir(){
     );
 
     location.reload();
+
 }
+
+
+
+/* =====================================================
+   COMPROBAR SESIÓN
+===================================================== */
 
 window.onload = function(){
 
@@ -360,205 +455,237 @@ window.onload = function(){
             "rose_admin"
         )
     ){
-        document.getElementById(
-            "login"
-        ).style.display = "none";
+
+        document
+            .getElementById("login")
+            .style.display = "none";
+
     }
+
 };
 
-function configurarToken(){
 
-    const token = prompt(
-        "Pega tu token de GitHub"
-    );
 
-    if(!token) return;
-
-    localStorage.setItem(
-        "github_token",
-        token
-    );
-
-    alert(
-        "Token guardado correctamente."
-    );
-}
-
-function obtenerToken(){
-
-    return localStorage.getItem(
-        "github_token"
-    );
-}
-
-function convertirBase64(
-    archivo
-){
-
-    return new Promise(resolve=>{
-
-        const lector =
-            new FileReader();
-
-        lector.onload = ()=>{
-
-            resolve(
-                lector.result
-                    .split(",")[1]
-            );
-        };
-
-        lector.readAsDataURL(
-            archivo
-        );
-    });
-}
-
-async function subirImagenGitHub(
-    archivo,
-    carpeta
-){
-
-    const token =
-        obtenerToken();
-
-    if(!token){
-
-        alert(
-            "Primero configura el token."
-        );
-
-        return null;
-    }
-
-    const nombre =
-        Date.now() +
-        "_" +
-        archivo.name;
-
-    const ruta =
-        `${carpeta}/${nombre}`;
-
-    const contenido =
-        await convertirBase64(
-            archivo
-        );
-
-    const respuesta =
-        await fetch(
-            `https://api.github.com/repos/${GITHUB_USUARIO}/${GITHUB_REPO}/contents/${ruta}`,
-            {
-                method:"PUT",
-                headers:{
-                    Authorization:
-                        `token ${token}`,
-                    Accept:
-                        "application/vnd.github+json"
-                },
-                body:JSON.stringify({
-                    message:
-                        `Subir ${nombre}`,
-                    content:
-                        contenido,
-                    branch:
-                        GITHUB_BRANCH
-                })
-            }
-        );
-
-    const datos =
-        await respuesta.json();
-
-    if(datos.content){
-
-        return `https://raw.githubusercontent.com/${GITHUB_USUARIO}/${GITHUB_REPO}/${GITHUB_BRANCH}/${ruta}`;
-    }
-
-    console.log(datos);
-
-    return null;
-}
+/* =====================================================
+   SUBIR CAPÍTULO PDF
+===================================================== */
 
 async function subirCapitulo(){
 
     const historia =
-        document.getElementById(
-            "historia"
-        ).value;
+        document
+        .getElementById("historia")
+        .value;
+
 
     const numero =
-        document.getElementById(
-            "numeroCapitulo"
-        ).value;
+        document
+        .getElementById("numeroCapitulo")
+        .value
+        .trim();
 
-    const archivos =
-        document.getElementById(
-            "imagenes"
-        ).files;
+
+    const enlacePDF =
+        document
+        .getElementById("enlacePDF")
+        .value
+        .trim();
+
+
+    const boton =
+        document
+        .getElementById("btnPublicar");
+
+
+    const mensaje =
+        document
+        .getElementById("mensajeSubida");
+
+
+
+    /* -----------------------------------------
+       VALIDAR NÚMERO
+    ----------------------------------------- */
 
     if(!numero){
 
-        alert(
-            "Ingresa el número del capítulo."
-        );
+        mensaje.style.color =
+            "#d00000";
+
+        mensaje.innerText =
+            "❌ Ingresa el número del capítulo.";
 
         return;
+
     }
+
+
+
+    /* -----------------------------------------
+       VALIDAR ENLACE
+    ----------------------------------------- */
+
+    if(!enlacePDF){
+
+        mensaje.style.color =
+            "#d00000";
+
+        mensaje.innerText =
+            "❌ Pega el enlace del PDF.";
+
+        return;
+
+    }
+
+
 
     if(
-        archivos.length === 0
+        !enlacePDF.startsWith("http://") &&
+        !enlacePDF.startsWith("https://")
     ){
 
-        alert(
-            "Selecciona imágenes."
-        );
+        mensaje.style.color =
+            "#d00000";
+
+        mensaje.innerText =
+            "❌ El enlace debe comenzar con https://";
 
         return;
+
     }
 
-    const enlaces = [];
 
-    for(
-        let archivo
-        of archivos
-    ){
 
-        const url =
-            await subirImagenGitHub(
-                archivo,
-                `${historia}/capitulo_${numero}`
-            );
+    /* -----------------------------------------
+       BLOQUEAR BOTÓN
+    ----------------------------------------- */
 
-        if(url){
+    boton.disabled = true;
 
-            enlaces.push(url);
-        }
+    boton.innerText =
+        "⏳ Guardando...";
+
+
+    mensaje.style.color =
+        "#5a2a3b";
+
+    mensaje.innerText =
+        "✨ Guardando capítulo en Firebase...";
+
+
+
+    try{
+
+        const idDocumento =
+            "capitulo_" + numero;
+
+
+
+        /* -----------------------------------------
+           GUARDAR EN FIREBASE
+        ----------------------------------------- */
+
+        await db
+            .collection(historia)
+            .doc(idDocumento)
+            .set({
+
+                pdf: enlacePDF,
+
+                loves: 0,
+
+                likes: 0,
+
+                haha: 0
+
+            },{
+
+                merge:true
+
+            });
+
+
+
+        /* -----------------------------------------
+           ÉXITO
+        ----------------------------------------- */
+
+        mensaje.style.color =
+            "#188038";
+
+        mensaje.innerText =
+            "✅ ¡Capítulo guardado correctamente en Firebase!";
+
+
+        console.log(
+            "CAPÍTULO GUARDADO"
+        );
+
+
+        console.log(
+            "Historia:",
+            historia
+        );
+
+
+        console.log(
+            "Documento:",
+            idDocumento
+        );
+
+
+        console.log(
+            "PDF:",
+            enlacePDF
+        );
+
+
+
+        /* -----------------------------------------
+           LIMPIAR CAMPOS
+        ----------------------------------------- */
+
+        document
+            .getElementById("numeroCapitulo")
+            .value = "";
+
+
+        document
+            .getElementById("enlacePDF")
+            .value = "";
+
+
+
+    }catch(error){
+
+        console.error(
+            "Error guardando capítulo:",
+            error
+        );
+
+
+        mensaje.style.color =
+            "#d00000";
+
+
+        mensaje.innerText =
+            "❌ No se pudo guardar el capítulo en Firebase.";
+
     }
 
-    console.log(
-        enlaces
-    );
 
-    alert(
-        "Se subieron " +
-        enlaces.length +
-        " imágenes correctamente."
-    );
+
+    /* -----------------------------------------
+       RESTAURAR BOTÓN
+    ----------------------------------------- */
+
+    boton.disabled = false;
+
+    boton.innerText =
+        "🚀 Publicar capítulo";
+
 }
 
-function guardarCambios(){
-
-    alert(
-        "La conexión con Firebase se agregará en la siguiente etapa."
-    );
-}
-
-function crearHistoria(){
-
-    alert(
-        "La creación automática de historias se agregará en la siguiente etapa."
-    );
-}
 </script>
 
 </body>
