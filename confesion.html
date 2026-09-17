@@ -127,8 +127,8 @@
     .emoji { font-size: 1.5rem; }
     .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
     .count { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
-            </style>
-        </head>
+</style>
+</head>
 <body>
 
 <div id="barra-progreso-rose"></div>
@@ -322,9 +322,7 @@
 
         return url;
     }
-
-
-    /* ============================================================
+        /* ============================================================
        CARGAR PROYECTO DESDE FIREBASE
        ============================================================ */
 
@@ -334,7 +332,7 @@
             document.getElementById('grid');
 
         grid.innerHTML =
-            "<p style='grid-column: 1/-1; text-align:center;'>✨ Cargando capítulos... ✨</p>";
+            "<p style='grid-column: 1/-1; text-align:center;'>✨ Cargando capítulos... ✨";
 
 
         try {
@@ -428,13 +426,14 @@
 
 
             /* ====================================================
-               CAMBIO IMPORTANTE:
-               Ahora PDF.js recibe el enlace corregido de Drive.
+               PRUEBA:
+               PDF.js recibe directamente el enlace guardado
+               en Firebase, sin modificarlo.
                ==================================================== */
 
             const pdf =
                 await pdfjsLib.getDocument({
-                    url: arreglarLink(url)
+                    url: url
                 }).promise;
 
 
