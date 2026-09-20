@@ -1,228 +1,1067 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confesión - Rose Garden Scan</title><link rel="stylesheet" href="estilos-rose.css">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Confesión - Rose Garden Scan</title>
+
+    <link rel="stylesheet"
+          href="estilos-rose.css">
+
 
 <style>
-    body { 
-        margin: 0; padding: 0; 
-        background: var(--fondo-rose, radial-gradient(circle at center, #1a0a1a 0%, #050505 100%)); 
-        color: var(--texto-rose, white); font-family: 'serif'; 
-        display: flex; flex-direction: column; align-items: center; 
-        overflow-x: hidden; min-height: 100vh; 
-        transition: background 0.3s ease;
+
+    body {
+
+        margin: 0;
+        padding: 0;
+
+        background:
+            var(
+                --fondo-rose,
+                radial-gradient(
+                    circle at center,
+                    #1a0a1a 0%,
+                    #050505 100%
+                )
+            );
+
+        color:
+            var(
+                --texto-rose,
+                white
+            );
+
+        font-family: 'serif';
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        overflow-x: hidden;
+
+        min-height: 100vh;
+
+        transition:
+            background 0.3s ease;
     }
+
 
     body::after {
-        content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-image: radial-gradient(circle, #fff 1px, transparent 1px), radial-gradient(circle, #fff 1.5px, transparent 1.5px);
-        background-size: 80px 80px, 150px 150px; opacity: 0.2; animation: moveStars 30s linear infinite; pointer-events: none; z-index: 1;
+
+        content: "";
+
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background-image:
+            radial-gradient(
+                circle,
+                #fff 1px,
+                transparent 1px
+            ),
+            radial-gradient(
+                circle,
+                #fff 1.5px,
+                transparent 1.5px
+            );
+
+        background-size:
+            80px 80px,
+            150px 150px;
+
+        opacity: 0.2;
+
+        animation:
+            moveStars 30s linear infinite;
+
+        pointer-events: none;
+
+        z-index: 1;
     }
 
-    @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-150px); } }
 
-    .contenedor-manga { width: 90%; max-width: 600px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px; z-index: 10; }
-    .contenedor-regreso { width: 100%; padding: 20px; display: flex; justify-content: flex-start; box-sizing: border-box; z-index: 10; }
-    .btn-catalogo { 
-        text-decoration: none; color: #ff66b2; border: 2px solid #ff66b2; padding: 10px 22px; 
-        border-radius: 30px; font-weight: bold; font-size: 0.95rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; 
-        background: rgba(255, 102, 178, 0.1); backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(255, 102, 178, 0.2);
+    @keyframes moveStars {
+
+        from {
+            transform:
+                translateY(0);
+        }
+
+        to {
+            transform:
+                translateY(-150px);
+        }
+
     }
-    .btn-catalogo:hover { background: #ff66b2; color: white; transform: scale(1.05); }
 
-    .portada-box { width: 220px; height: 310px; border-radius: 12px; border: 2px solid #ff66b2; box-shadow: 0 0 20px rgba(255, 102, 178, 0.4); background: #222; margin-bottom: 25px; overflow: hidden; }
-    .portada-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    .titulo-manga { 
-        font-size: 2.2rem; color: #ff66b2; margin: 10px 0 15px 0; font-family: 'Georgia', serif; font-weight: bold; line-height: 1.3;
-        background: linear-gradient(90deg, #ff66b2, #ffd700, #ff66b2); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shineText 4s linear infinite;
+    .contenedor-manga {
+
+        width: 90%;
+
+        max-width: 600px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+
+        padding: 20px 10px;
+
+        z-index: 10;
     }
-    @keyframes shineText { to { background-position: 200% center; } }
 
-    .sinopsis-texto { font-size: 0.95rem; line-height: 1.6; color: var(--texto-rose, rgba(255, 255, 255, 0.85)); margin: 0 0 30px 0; font-family: sans-serif; text-align: justify; text-align-last: center; }
-    .seccion-titulo { width: 100%; max-width: 500px; margin: 20px 0 10px 0; font-size: 1.1rem; border-bottom: 2px solid #ff66b2; padding-bottom: 8px; color: #ff66b2; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
-    .grid-caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 15px; width: 100%; max-width: 500px; padding-bottom: 60px; margin-top: 15px; z-index: 10; }
-    .cap-btn-dinamico { border: 1px solid #ff66b2; color: white; background: rgba(255, 102, 178, 0.15); text-align: center; padding: 20px 0; border-radius: 15px; font-weight: bold; transition: 0.4s ease; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-    .cap-btn-dinamico:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 102, 178, 0.6); background: rgba(255, 102, 178, 0.3); }
+    .contenedor-regreso {
 
-    #lector { 
-        display: none; 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
-        background: var(--fondo-rose, #000); 
-        z-index: 100; 
+        width: 100%;
+
+        padding: 20px;
+
+        display: flex;
+
+        justify-content: flex-start;
+
+        box-sizing: border-box;
+
+        z-index: 10;
+    }
+
+
+    .btn-catalogo {
+
+        text-decoration: none;
+
+        color: #ff66b2;
+
+        border:
+            2px solid #ff66b2;
+
+        padding:
+            10px 22px;
+
+        border-radius: 30px;
+
+        font-weight: bold;
+
+        font-size: 0.95rem;
+
+        transition: 0.3s;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        background:
+            rgba(
+                255,
+                102,
+                178,
+                0.1
+            );
+
+        backdrop-filter:
+            blur(8px);
+
+        box-shadow:
+            0 4px 15px
+            rgba(
+                255,
+                102,
+                178,
+                0.2
+            );
+    }
+
+
+    .btn-catalogo:hover {
+
+        background:
+            #ff66b2;
+
+        color: white;
+
+        transform:
+            scale(1.05);
+    }
+
+
+    .portada-box {
+
+        width: 220px;
+
+        height: 310px;
+
+        border-radius: 12px;
+
+        border:
+            2px solid #ff66b2;
+
+        box-shadow:
+            0 0 20px
+            rgba(
+                255,
+                102,
+                178,
+                0.4
+            );
+
+        background: #222;
+
+        margin-bottom: 25px;
+
+        overflow: hidden;
+    }
+
+
+    .portada-box img {
+
+        width: 100%;
+
+        height: 100%;
+
+        object-fit: cover;
+    }
+
+
+    .titulo-manga {
+
+        font-size: 2.2rem;
+
+        color: #ff66b2;
+
+        margin:
+            10px 0 15px 0;
+
+        font-family:
+            'Georgia',
+            serif;
+
+        font-weight: bold;
+
+        line-height: 1.3;
+
+        background:
+            linear-gradient(
+                90deg,
+                #ff66b2,
+                #ffd700,
+                #ff66b2
+            );
+
+        background-size:
+            200% auto;
+
+        -webkit-background-clip:
+            text;
+
+        color: transparent;
+
+        animation:
+            shineText 4s linear infinite;
+    }
+
+
+    @keyframes shineText {
+
+        to {
+
+            background-position:
+                200% center;
+
+        }
+
+    }
+
+
+    .sinopsis-texto {
+
+        font-size: 0.95rem;
+
+        line-height: 1.6;
+
+        color:
+            var(
+                --texto-rose,
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.85
+                )
+            );
+
+        margin:
+            0 0 30px 0;
+
+        font-family: sans-serif;
+
+        text-align: justify;
+
+        text-align-last: center;
+    }
+
+
+    .seccion-titulo {
+
+        width: 100%;
+
+        max-width: 500px;
+
+        margin:
+            20px 0 10px 0;
+
+        font-size: 1.1rem;
+
+        border-bottom:
+            2px solid #ff66b2;
+
+        padding-bottom: 8px;
+
+        color: #ff66b2;
+
+        text-transform: uppercase;
+
+        letter-spacing: 2px;
+
+        font-weight: bold;
+    }
+
+
+    .grid-caps {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(
+                    85px,
+                    1fr
+                )
+            );
+
+        gap: 15px;
+
+        width: 100%;
+
+        max-width: 500px;
+
+        padding-bottom: 60px;
+
+        margin-top: 15px;
+
+        z-index: 10;
+    }
+
+
+    .cap-btn-dinamico {
+
+        border:
+            1px solid #ff66b2;
+
+        color: white;
+
+        background:
+            rgba(
+                255,
+                102,
+                178,
+                0.15
+            );
+
+        text-align: center;
+
+        padding:
+            20px 0;
+
+        border-radius: 15px;
+
+        font-weight: bold;
+
+        transition: 0.4s ease;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 4px 15px
+            rgba(
+                0,
+                0,
+                0,
+                0.4
+            );
+    }
+
+
+    .cap-btn-dinamico:hover {
+
+        transform:
+            translateY(-5px);
+
+        box-shadow:
+            0 0 20px
+            rgba(
+                255,
+                102,
+                178,
+                0.6
+            );
+
+        background:
+            rgba(
+                255,
+                102,
+                178,
+                0.3
+            );
+    }
+
+
+    #lector {
+
+        display: none;
+
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background:
+            var(
+                --fondo-rose,
+                #000
+            );
+
+        z-index: 100;
+
         overflow-y: scroll;
     }
 
+
     #contenido-imagenes {
+
         width: 100%;
+
         max-width: 900px;
+
         margin: 0 auto;
-        padding: 0;
-    }
 
-    #contenido-imagenes img { 
-        width: 100%; 
-        display: block; 
-        margin-bottom: -1px; 
-    }
-
-    .pagina-pdf {
-        width: 100%;
-        display: block;
-        margin: 0;
         padding: 0;
+
         line-height: 0;
     }
 
-    .pagina-pdf canvas {
-        width: 100% !important;
-        height: auto !important;
+
+    #contenido-imagenes img {
+
+        width: 100%;
+
         display: block;
-        margin: 0;
-        padding: 0;
+
+        margin-bottom: -1px;
     }
 
+
+    .pagina-pdf {
+
+        width: 100%;
+
+        display: block;
+
+        margin: 0;
+
+        padding: 0;
+
+        line-height: 0;
+
+        font-size: 0;
+    }
+
+
+    .pagina-pdf canvas {
+
+        width: 100% !important;
+
+        height: auto !important;
+
+        display: block;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        border: 0;
+
+    }
+
+
     .cargando-pdf {
+
         text-align: center;
-        padding: 100px 20px;
+
+        padding:
+            100px 20px;
+
         color: #ff66b2;
+
         font-family: sans-serif;
+
         font-size: 1rem;
     }
 
+
     .error-pdf {
+
         text-align: center;
-        padding: 100px 20px;
+
+        padding:
+            100px 20px;
+
         color: #ff6666;
+
         font-family: sans-serif;
+
         line-height: 1.6;
     }
 
-    .nav-lector { 
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; 
-        background: var(--panel-rose, rgba(0, 0, 0, 0.96)); padding: 10px 20px; border-radius: 45px; border: 1.5px solid #ff66b2; 
-        backdrop-filter: blur(12px); z-index: 102; box-shadow: 0 0 35px rgba(255, 102, 178, 0.5); 
+
+    .nav-lector {
+
+        position: fixed;
+
+        bottom: 20px;
+
+        left: 50%;
+
+        transform:
+            translateX(-50%);
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        background:
+            var(
+                --panel-rose,
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.96
+                )
+            );
+
+        padding:
+            10px 20px;
+
+        border-radius: 45px;
+
+        border:
+            1.5px solid #ff66b2;
+
+        backdrop-filter:
+            blur(12px);
+
+        z-index: 102;
+
+        box-shadow:
+            0 0 35px
+            rgba(
+                255,
+                102,
+                178,
+                0.5
+            );
     }
 
-    .grupo-flechas { display: flex; gap: 8px; }
-    .nav-btn { background: #ff66b2; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-    .nav-btn:disabled { background: #333; opacity: 0.4; }
-    .btn-cerrar { background: #ff4d4d; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: none; color: white; cursor: pointer; }
 
-    .btn-votar-pink { position: relative; background: rgba(255, 102, 178, 0.2); border: 1.5px solid #ff66b2; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-    .thumb-icon { font-size: 1.4rem; filter: sepia(1) saturate(5) hue-rotate(285deg); } 
+    .grupo-flechas {
 
-    .popover-stats { display: none; position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 10, 0.98); border: 1.5px solid #ff66b2; padding: 12px 20px; border-radius: 40px; gap: 20px; z-index: 110; box-shadow: 0 0 25px rgba(255, 102, 178, 0.7); }
-    .popover-stats.active { display: flex; animation: slideUp 0.3s ease-out; }
+        display: flex;
 
-    .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid white; cursor: pointer; }
-    .stat-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-    .stat-item:hover { transform: scale(1.2); }
-    .emoji { font-size: 1.5rem; }
-    .pink-fx { filter: sepia(1) saturate(5) hue-rotate(285deg); }
-    .count { font-size: 0.9rem; font-weight: bold; color: #ffcce6; }
+        gap: 8px;
+    }
+
+
+    .nav-btn {
+
+        background:
+            #ff66b2;
+
+        color: white;
+
+        border: none;
+
+        padding:
+            10px 18px;
+
+        border-radius: 20px;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        font-size: 0.85rem;
+    }
+
+
+    .nav-btn:disabled {
+
+        background: #333;
+
+        opacity: 0.4;
+    }
+
+
+    .btn-cerrar {
+
+        background:
+            #ff4d4d;
+
+        width: 40px;
+
+        height: 40px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 1.2rem;
+
+        border: none;
+
+        color: white;
+
+        cursor: pointer;
+    }
+
+
+    .btn-votar-pink {
+
+        position: relative;
+
+        background:
+            rgba(
+                255,
+                102,
+                178,
+                0.2
+            );
+
+        border:
+            1.5px solid #ff66b2;
+
+        width: 45px;
+
+        height: 45px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        cursor: pointer;
+
+        transition: 0.3s;
+    }
+
+
+    .thumb-icon {
+
+        font-size: 1.4rem;
+
+        filter:
+            sepia(1)
+            saturate(5)
+            hue-rotate(285deg);
+    }
+
+
+    .popover-stats {
+
+        display: none;
+
+        position: absolute;
+
+        bottom: 65px;
+
+        left: 50%;
+
+        transform:
+            translateX(-50%);
+
+        background:
+            rgba(
+                10,
+                10,
+                10,
+                0.98
+            );
+
+        border:
+            1.5px solid #ff66b2;
+
+        padding:
+            12px 20px;
+
+        border-radius: 40px;
+
+        gap: 20px;
+
+        z-index: 110;
+
+        box-shadow:
+            0 0 25px
+            rgba(
+                255,
+                102,
+                178,
+                0.7
+            );
+    }
+
+
+    .popover-stats.active {
+
+        display: flex;
+
+        animation:
+            slideUp 0.3s ease-out;
+    }
+
+
+    .dot {
+
+        width: 18px;
+
+        height: 18px;
+
+        border-radius: 50%;
+
+        border:
+            1px solid white;
+
+        cursor: pointer;
+    }
+
+
+    .stat-item {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+
+    .stat-item:hover {
+
+        transform:
+            scale(1.2);
+    }
+
+
+    .emoji {
+
+        font-size: 1.5rem;
+    }
+
+
+    .pink-fx {
+
+        filter:
+            sepia(1)
+            saturate(5)
+            hue-rotate(285deg);
+    }
+
+
+    .count {
+
+        font-size: 0.9rem;
+
+        font-weight: bold;
+
+        color: #ffcce6;
+    }
+
 </style>
+
 </head>
+
+
 <body>
 
 <div id="barra-progreso-rose"></div>
 
+
 <div class="contenedor-regreso">
-    <a href="historias.html" class="btn-catalogo">🏠 Volver a Historias</a>
+
+    <a href="historias.html"
+       class="btn-catalogo">
+
+        🏠 Volver a Historias
+
+    </a>
+
 </div>
+
 
 <div class="contenedor-manga">
+
     <div class="portada-box">
-        <img src="confesion.jpg" id="portada-dinamica" onerror="this.src='portada-defecto.jpg';">
+
+        <img
+            src="confesion.jpg"
+            id="portada-dinamica"
+            onerror="this.src='portada-defecto.jpg';"
+        >
+
     </div>
 
-    <h1 id="titulo-proyecto" class="titulo-manga">Confesión</h1>
 
-    <p class="sinopsis-texto" id="sinopsis-dinamica">
+    <h1
+        id="titulo-proyecto"
+        class="titulo-manga"
+    >
+
+        Confesión
+
+    </h1>
+
+
+    <p
+        class="sinopsis-texto"
+        id="sinopsis-dinamica"
+    >
+
         ✨ Cargando los detalles... ✨
+
     </p>
 
-    <div class="seccion-titulo">Capítulos Disponibles</div>
 
-    <div class="grid-caps" id="grid"></div>
+    <div class="seccion-titulo">
+
+        Capítulos Disponibles
+
+    </div>
+
+
+    <div
+        class="grid-caps"
+        id="grid"
+    ></div>
+
 </div>
+
 
 <div id="lector">
 
+
     <div class="nav-lector">
 
-        <div style="position: relative; display: flex; align-items: center; border-right: 1px solid rgba(255,102,178,0.3); padding-right: 10px;">
 
-            <button onclick="toggleMenuLector(event)" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 5px;">
+        <div
+            style="
+                position: relative;
+                display: flex;
+                align-items: center;
+                border-right: 1px solid rgba(255,102,178,0.3);
+                padding-right: 10px;
+            "
+        >
+
+
+            <button
+                onclick="toggleMenuLector(event)"
+                style="
+                    background: none;
+                    border: none;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0 5px;
+                "
+            >
+
                 🎨
+
             </button>
 
-            <div id="sub-menu-colores-lector" class="sub-menu-colores">
 
-                <div class="dot"
-                     style="background: #000;"
-                     onclick="cambiarTemaRose('dark')"
-                     title="Modo Oscuro">
-                </div>
+            <div
+                id="sub-menu-colores-lector"
+                class="sub-menu-colores"
+            >
 
-                <div class="dot"
-                     style="background: #2c2c2c;"
-                     onclick="cambiarTemaRose('gris')"
-                     title="Modo Gris">
-                </div>
+                <div
+                    class="dot"
+                    style="background: #000;"
+                    onclick="cambiarTemaRose('dark')"
+                    title="Modo Oscuro"
+                ></div>
 
-                <div class="dot"
-                     style="background: #dfd3e3;"
-                     onclick="cambiarTemaRose('malva')"
-                     title="Modo Malva Suave">
-                </div>
+
+                <div
+                    class="dot"
+                    style="background: #2c2c2c;"
+                    onclick="cambiarTemaRose('gris')"
+                    title="Modo Gris"
+                ></div>
+
+
+                <div
+                    class="dot"
+                    style="background: #dfd3e3;"
+                    onclick="cambiarTemaRose('malva')"
+                    title="Modo Malva Suave"
+                ></div>
 
             </div>
 
         </div>
 
+
         <div class="grupo-flechas">
 
-            <button id="btn-ant" class="nav-btn">
+
+            <button
+                id="btn-ant"
+                class="nav-btn"
+            >
+
                 ← Ant.
+
             </button>
 
-            <button id="btn-sig" class="nav-btn">
+
+            <button
+                id="btn-sig"
+                class="nav-btn"
+            >
+
                 Sig. →
+
             </button>
 
         </div>
 
-        <button class="btn-cerrar" onclick="cerrarLector()">
+
+        <button
+            class="btn-cerrar"
+            onclick="cerrarLector()"
+        >
+
             ✕
+
         </button>
 
-        <div class="btn-votar-pink" onclick="toggleStats(event)">
 
-            <span class="thumb-icon">👍</span>
+        <div
+            class="btn-votar-pink"
+            onclick="toggleStats(event)"
+        >
 
-            <div class="popover-stats" id="stats-menu">
+            <span class="thumb-icon">
+                👍
+            </span>
 
-                <div class="stat-item" onclick="votar('loves', event)">
-                    <span class="emoji pink-fx">❤️</span>
-                    <span id="txt-loves" class="count">0</span>
+
+            <div
+                class="popover-stats"
+                id="stats-menu"
+            >
+
+
+                <div
+                    class="stat-item"
+                    onclick="votar('loves', event)"
+                >
+
+                    <span class="emoji pink-fx">
+                        ❤️
+                    </span>
+
+                    <span
+                        id="txt-loves"
+                        class="count"
+                    >
+                        0
+                    </span>
+
                 </div>
 
-                <div class="stat-item" onclick="votar('likes', event)">
-                    <span class="emoji pink-fx">👍</span>
-                    <span id="txt-likes" class="count">0</span>
+
+                <div
+                    class="stat-item"
+                    onclick="votar('likes', event)"
+                >
+
+                    <span class="emoji pink-fx">
+                        👍
+                    </span>
+
+                    <span
+                        id="txt-likes"
+                        class="count"
+                    >
+                        0
+                    </span>
+
                 </div>
 
-                <div class="stat-item" onclick="votar('haha', event)">
-                    <span class="emoji">😂</span>
-                    <span id="txt-haha" class="count">0</span>
+
+                <div
+                    class="stat-item"
+                    onclick="votar('haha', event)"
+                >
+
+                    <span class="emoji">
+                        😂
+                    </span>
+
+                    <span
+                        id="txt-haha"
+                        class="count"
+                    >
+                        0
+                    </span>
+
                 </div>
+
 
             </div>
 
@@ -230,64 +1069,119 @@
 
     </div>
 
-    <div id="contenido-imagenes"></div>
+
+    <div
+        id="contenido-imagenes"
+    ></div>
+
 
 </div>
 
+
 <script src="funciones-rose.js"></script>
+
 
 <script type="module">
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+        initializeApp
+    } from
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 
     import {
-        getFirestore,
-        collection,
-        getDocs,
-        doc,
-        getDoc,
-        updateDoc,
-        increment,
-        onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+        getFirestore,
+
+        collection,
+
+        getDocs,
+
+        doc,
+
+        getDoc,
+
+        updateDoc,
+
+        increment,
+
+        onSnapshot
+
+    } from
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+    import * as pdfjsLib from
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
 
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
 
 
     const firebaseConfig = {
-        apiKey: "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gs9Jcs",
-        authDomain: "prgs-f2ef8.firebaseapp.com",
-        projectId: "prgs-f2ef8",
-        storageBucket: "prgs-f2ef8.firebasestorage.app",
-        messagingSenderId: "639472415083",
-        appId: "1:639472415083:web:2940245a8a70ed6c88dc2e"
+
+        apiKey:
+            "AIzaSyBvTN_fjSZgGcEaraGeWSrnyUci_gs9Jcs",
+
+        authDomain:
+            "prgs-f2ef8.firebaseapp.com",
+
+        projectId:
+            "prgs-f2ef8",
+
+        storageBucket:
+            "prgs-f2ef8.firebasestorage.app",
+
+        messagingSenderId:
+            "639472415083",
+
+        appId:
+            "1:639472415083:web:2940245a8a70ed6c88dc2e"
+
     };
 
 
-    const app = initializeApp(firebaseConfig);
+    const app =
+        initializeApp(
+            firebaseConfig
+        );
 
-    const db = getFirestore(app);
 
-    const historiaID = "confesion";
+    const db =
+        getFirestore(app);
+
+
+    const historiaID =
+        "confesion";
+
 
     let capsOrdenados = [];
+
 
     let idCapActual = "";
 
 
-    if (window.conectarAdminConManga) {
+    if (
+        window.conectarAdminConManga
+    ) {
 
         window.conectarAdminConManga(
+
             db,
+
             getDoc,
+
             doc,
+
             historiaID,
+
             "portada-dinamica",
+
             "sinopsis-dinamica",
+
             onSnapshot
+
         );
 
     }
@@ -301,153 +1195,219 @@
 
         if (!url) return "";
 
-        if (url.includes('drive.google.com')) {
+        url =
+            url.trim();
+
+
+        if (
+            url.includes(
+                "drive.google.com"
+            )
+        ) {
 
             let id = "";
 
-            if (url.includes('id=')) {
+
+            /*
+             * FORMATO:
+             * /file/d/ID/view
+             */
+
+            if (
+                url.includes(
+                    "/file/d/"
+                )
+            ) {
 
                 id =
-                    url.split('id=')[1].split('&')[0];
-
-            } else if (url.includes('/d/')) {
-
-                id =
-                    url.split('/d/')[1].split('/')[0];
+                    url
+                        .split("/file/d/")[1]
+                        .split("/")[0];
 
             }
 
-            return `https://drive.google.com/uc?export=download&id=${id}`;
+
+            /*
+             * FORMATO:
+             * ?id=ID
+             */
+
+            else if (
+                url.includes("id=")
+            ) {
+
+                id =
+                    url
+                        .split("id=")[1]
+                        .split("&")[0];
+
+            }
+
+
+            if (id) {
+
+                return (
+                    "https://drive.google.com/uc" +
+                    "?export=download&id=" +
+                    id
+                );
+
+            }
+
         }
 
+
         return url;
+
     }
-        /* ============================================================
+
+
+    /* ============================================================
        CARGAR PROYECTO DESDE FIREBASE
        ============================================================ */
 
     async function cargarProyectoDesdeFirebase() {
 
         const grid =
-            document.getElementById('grid');
+            document.getElementById(
+                "grid"
+            );
+
 
         grid.innerHTML =
-            "<p style='grid-column: 1/-1; text-align:center;'>✨ Cargando capítulos... ✨";
+            "<p style='grid-column:1/-1;text-align:center;'>" +
+            "✨ Cargando capítulos... ✨" +
+            "</p>";
 
 
         try {
 
             const querySnapshot =
                 await getDocs(
-                    collection(db, historiaID)
+                    collection(
+                        db,
+                        historiaID
+                    )
                 );
 
 
             let disponibles = [];
 
 
-            querySnapshot.forEach((docSnap) => {
+            querySnapshot.forEach(
+                (docSnap) => {
 
-                if (docSnap.id.startsWith("capitulo_")) {
+                    if (
+                        docSnap.id.startsWith(
+                            "capitulo_"
+                        )
+                    ) {
 
-                    const idOriginal =
-                        docSnap.id.replace(
-                            "capitulo_",
-                            ""
+                        const idOriginal =
+                            docSnap.id.replace(
+                                "capitulo_",
+                                ""
+                            );
+
+
+                        disponibles.push(
+                            idOriginal
                         );
 
-                    disponibles.push(idOriginal);
+                    }
+
                 }
-
-            });
-
-
-            capsOrdenados =
-                disponibles.sort(
-                    (a, b) => parseFloat(a) - parseFloat(b)
-                );
-
-
-            grid.innerHTML = "";
-
-
-            capsOrdenados.forEach(idCap => {
-
-                const btn =
-                    document.createElement('div');
-
-                btn.className =
-                    'cap-btn-dinamico';
-
-                btn.innerText =
-                    idCap;
-
-                btn.onclick =
-                    () => abrirLector(idCap);
-
-                grid.appendChild(btn);
-
-            });
-
-
-            if (capsOrdenados.length === 0) {
-
-                grid.innerHTML =
-                    "<p style='grid-column: 1/-1; text-align:center;'>Próximamente más capítulos ✨</p>";
-
-            }
-
-
-        } catch (e) {
-
-            console.error(e);
-
-            grid.innerHTML =
-                "<p style='grid-column: 1/-1; text-align:center; color:#ff4d4d;'>Error cargando el servidor.</p>";
-
-        }
-
-    }
-
-
-    cargarProyectoDesdeFirebase();
-
-
+            );
     /* ============================================================
        MOSTRAR PDF COMO TIRA VERTICAL
        ============================================================ */
 
-    async function mostrarPDFComoTira(url, contenedor) {
+    async function mostrarPDFComoTira(
+        url,
+        contenedor
+    ) {
 
         try {
 
             contenedor.innerHTML =
-                "<div class='cargando-pdf'>✨ Preparando el capítulo... ✨</div>";
+                "<div class='cargando-pdf'>" +
+                "✨ Preparando el capítulo... ✨" +
+                "</div>";
 
 
-            /* ====================================================
-               PRUEBA:
-               PDF.js recibe directamente el enlace guardado
-               en Firebase, sin modificarlo.
-               ==================================================== */
+            /*
+             * AQUÍ ESTÁ EL CAMBIO IMPORTANTE.
+             *
+             * Firebase guarda el enlace normal de Drive:
+             *
+             * /file/d/ID/view
+             *
+             * Pero PDF.js necesita el enlace directo:
+             *
+             * /uc?export=download&id=ID
+             */
+
+            const enlaceDirecto =
+                arreglarLink(url);
+
+
+            console.log(
+                "PDF guardado en Firebase:",
+                url
+            );
+
+
+            console.log(
+                "PDF convertido para PDF.js:",
+                enlaceDirecto
+            );
+
+
+            /*
+             * CARGAMOS EL PDF.
+             */
 
             const pdf =
-                await pdfjsLib.getDocument({
-                    url: url
-                }).promise;
+                await pdfjsLib
+                    .getDocument({
+                        url:
+                            enlaceDirecto,
+
+                        withCredentials:
+                            false
+                    })
+                    .promise;
 
 
-            contenedor.innerHTML = "";
+            console.log(
+                "PDF cargado correctamente.",
+                "Páginas:",
+                pdf.numPages
+            );
 
+
+            contenedor.innerHTML =
+                "";
+
+
+            /*
+             * DIBUJAR TODAS LAS PÁGINAS
+             * UNA DEBAJO DE OTRA.
+             */
 
             for (
                 let numeroPagina = 1;
+
                 numeroPagina <= pdf.numPages;
+
                 numeroPagina++
             ) {
 
+
                 const pagina =
-                    await pdf.getPage(numeroPagina);
+                    await pdf.getPage(
+                        numeroPagina
+                    );
 
 
                 const viewportOriginal =
@@ -456,9 +1416,21 @@
                     });
 
 
+                /*
+                 * ANCHO MÁXIMO:
+                 *
+                 * En computadora:
+                 * máximo 900 px.
+                 *
+                 * En celular:
+                 * utiliza el ancho disponible.
+                 */
+
                 const anchoDisponible =
                     Math.min(
-                        contenedor.clientWidth || window.innerWidth,
+                        contenedor.clientWidth ||
+                        window.innerWidth,
+
                         900
                     );
 
@@ -470,40 +1442,63 @@
 
                 const viewport =
                     pagina.getViewport({
-                        scale: escala
+                        scale:
+                            escala
                     });
 
 
                 const paginaDiv =
-                    document.createElement('div');
+                    document.createElement(
+                        "div"
+                    );
+
 
                 paginaDiv.className =
-                    'pagina-pdf';
+                    "pagina-pdf";
 
 
                 const canvas =
-                    document.createElement('canvas');
+                    document.createElement(
+                        "canvas"
+                    );
 
 
                 const contexto =
-                    canvas.getContext('2d');
+                    canvas.getContext(
+                        "2d"
+                    );
 
 
                 canvas.width =
-                    Math.floor(viewport.width);
+                    Math.floor(
+                        viewport.width
+                    );
+
 
                 canvas.height =
-                    Math.floor(viewport.height);
+                    Math.floor(
+                        viewport.height
+                    );
 
 
-                paginaDiv.appendChild(canvas);
+                paginaDiv.appendChild(
+                    canvas
+                );
 
-                contenedor.appendChild(paginaDiv);
+
+                contenedor.appendChild(
+                    paginaDiv
+                );
 
 
                 await pagina.render({
-                    canvasContext: contexto,
-                    viewport: viewport
+
+                    canvasContext:
+                        contexto,
+
+                    viewport:
+                        viewport
+
                 }).promise;
 
             }
@@ -512,18 +1507,42 @@
         } catch (error) {
 
             console.error(
-                "Error cargando PDF:",
+                "ERROR CARGANDO PDF:",
                 error
             );
 
 
+            /*
+             * MOSTRAR INFORMACIÓN ÚTIL
+             * EN CASO DE ERROR.
+             */
+
             contenedor.innerHTML = `
+
                 <div class="error-pdf">
-                    ❌ No se pudo cargar este capítulo.<br><br>
+
+                    ❌ No se pudo cargar este capítulo.
+
+                    <br><br>
+
                     <small>
-                        Revisa que el enlace del PDF guardado en Firebase sea público y válido.
+
+                        El enlace del PDF fue encontrado,
+                        pero PDF.js no pudo leerlo.
+
                     </small>
+
+                    <br><br>
+
+                    <small>
+
+                        Revisa la consola del navegador
+                        para conocer el error exacto.
+
+                    </small>
+
                 </div>
+
             `;
 
         }
@@ -538,20 +1557,25 @@
     window.abrirLector =
         async function(idCap) {
 
+
             idCapActual =
                 idCap;
 
 
             const lector =
-                document.getElementById('lector');
+                document.getElementById(
+                    "lector"
+                );
 
 
             const contenedor =
-                document.getElementById('contenido-imagenes');
+                document.getElementById(
+                    "contenido-imagenes"
+                );
 
 
             lector.style.display =
-                'block';
+                "block";
 
 
             lector.scrollTop =
@@ -559,12 +1583,14 @@
 
 
             contenedor.innerHTML =
-                "<p style='text-align:center; padding-top:100px; color:#ff66b2;'>✨ Cargando... ✨</p>";
+                "<p style='text-align:center;padding-top:100px;color:#ff66b2;'>" +
+                "✨ Cargando... ✨" +
+                "</p>";
 
 
-            /* ----------------------------------------------------
-               BOTONES ANTERIOR / SIGUIENTE
-               ---------------------------------------------------- */
+            /*
+             * BOTONES ANTERIOR / SIGUIENTE
+             */
 
             const index =
                 capsOrdenados.indexOf(
@@ -572,51 +1598,59 @@
                 );
 
 
-            document.getElementById('btn-ant').onclick =
-                () => {
+            document.getElementById(
+                "btn-ant"
+            ).onclick = () => {
 
-                    if (index > 0) {
+                if (index > 0) {
 
-                        abrirLector(
-                            capsOrdenados[index - 1]
-                        );
+                    abrirLector(
+                        capsOrdenados[
+                            index - 1
+                        ]
+                    );
 
-                    }
+                }
 
-                };
-
-
-            document.getElementById('btn-sig').onclick =
-                () => {
-
-                    if (
-                        index <
-                        capsOrdenados.length - 1
-                    ) {
-
-                        abrirLector(
-                            capsOrdenados[index + 1]
-                        );
-
-                    }
-
-                };
+            };
 
 
-            document.getElementById('btn-ant').disabled =
-                (index <= 0);
+            document.getElementById(
+                "btn-sig"
+            ).onclick = () => {
 
-
-            document.getElementById('btn-sig').disabled =
-                (
-                    index >=
+                if (
+                    index <
                     capsOrdenados.length - 1
-                );
+                ) {
+
+                    abrirLector(
+                        capsOrdenados[
+                            index + 1
+                        ]
+                    );
+
+                }
+
+            };
 
 
-            /* ----------------------------------------------------
-               LEER CAPÍTULO DESDE FIREBASE
-               ---------------------------------------------------- */
+            document.getElementById(
+                "btn-ant"
+            ).disabled =
+                index <= 0;
+
+
+            document.getElementById(
+                "btn-sig"
+            ).disabled =
+                index >=
+                capsOrdenados.length - 1;
+
+
+            /*
+             * LEER CAPÍTULO DESDE FIREBASE
+             */
 
             try {
 
@@ -624,31 +1658,45 @@
                     doc(
                         db,
                         historiaID,
-                        "capitulo_" + idCap
+                        "capitulo_" +
+                        idCap
                     );
 
 
                 const snap =
-                    await getDoc(docRef);
+                    await getDoc(
+                        docRef
+                    );
 
 
-                if (snap.exists()) {
+                if (
+                    snap.exists()
+                ) {
+
 
                     const data =
                         snap.data();
 
 
-                    /* ------------------------------------------------
-                       REACCIONES
-                       ------------------------------------------------ */
+                    /*
+                     * REACCIONES
+                     */
 
-                    document.getElementById('txt-loves').innerText =
+                    document.getElementById(
+                        "txt-loves"
+                    ).innerText =
                         data.loves || 0;
 
-                    document.getElementById('txt-likes').innerText =
+
+                    document.getElementById(
+                        "txt-likes"
+                    ).innerText =
                         data.likes || 0;
 
-                    document.getElementById('txt-haha').innerText =
+
+                    document.getElementById(
+                        "txt-haha"
+                    ).innerText =
                         data.haha || 0;
 
 
@@ -656,9 +1704,12 @@
                         "";
 
 
-                    /* ------------------------------------------------
-                       BUSCAR PDF
-                       ------------------------------------------------ */
+                    /*
+                     * BUSCAR PDF
+                     *
+                     * Probamos los tres nombres
+                     * que ya utiliza tu proyecto.
+                     */
 
                     const enlacePDF =
                         data.pdf ||
@@ -667,71 +1718,122 @@
                         "";
 
 
+                    console.log(
+                        "Capítulo:",
+                        idCap
+                    );
+
+
+                    console.log(
+                        "Enlace PDF obtenido de Firebase:",
+                        enlacePDF
+                    );
+
+
                     if (
-                        typeof enlacePDF === "string" &&
+
+                        typeof enlacePDF ===
+                        "string"
+
+                        &&
+
                         enlacePDF.trim() !== ""
+
                     ) {
 
+
                         await mostrarPDFComoTira(
+
                             enlacePDF.trim(),
+
                             contenedor
+
                         );
+
 
                         return;
 
                     }
 
 
-                    /* ------------------------------------------------
-                       SISTEMA ANTIGUO DE IMÁGENES
-                       ------------------------------------------------ */
+                    /*
+                     * SISTEMA ANTIGUO
+                     * DE IMÁGENES
+                     */
 
                     let imgs =
-                        Array.isArray(data.imagenes)
-                            ? data.imagenes
-                            : (
-                                data.link
-                                    ? [data.link]
-                                    : []
-                            );
+
+                        Array.isArray(
+                            data.imagenes
+                        )
+
+                        ?
+
+                        data.imagenes
+
+                        :
+
+                        (
+                            data.link
+                            ?
+                            [data.link]
+                            :
+                            []
+                        );
 
 
-                    imgs.forEach(url => {
-
-                        if (
-                            url &&
-                            url.trim() !== ""
-                        ) {
-
-                            const img =
-                                document.createElement('img');
+                    imgs.forEach(
+                        (url) => {
 
 
-                            img.src =
-                                arreglarLink(
-                                    url.trim()
+                            if (
+
+                                url &&
+
+                                url.trim() !== ""
+
+                            ) {
+
+
+                                const img =
+                                    document.createElement(
+                                        "img"
+                                    );
+
+
+                                img.src =
+                                    arreglarLink(
+                                        url.trim()
+                                    );
+
+
+                                contenedor.appendChild(
+                                    img
                                 );
 
-
-                            contenedor.appendChild(
-                                img
-                            );
+                            }
 
                         }
+                    );
 
-                    });
 
+                    /*
+                     * SIN PDF NI IMÁGENES
+                     */
 
-                    /* ------------------------------------------------
-                       SIN PDF NI IMÁGENES
-                       ------------------------------------------------ */
-
-                    if (imgs.length === 0) {
+                    if (
+                        imgs.length === 0
+                    ) {
 
                         contenedor.innerHTML = `
+
                             <div class="error-pdf">
-                                ✨ Este capítulo todavía no tiene contenido disponible.
+
+                                ✨ Este capítulo todavía
+                                no tiene contenido disponible.
+
                             </div>
+
                         `;
 
                     }
@@ -739,10 +1841,16 @@
 
                 } else {
 
+
                     contenedor.innerHTML = `
+
                         <div class="error-pdf">
-                            ❌ No se encontró el capítulo ${idCap}.
+
+                            ❌ No se encontró
+                            el capítulo ${idCap}.
+
                         </div>
+
                     `;
 
                 }
@@ -750,92 +1858,154 @@
 
             } catch (e) {
 
-                console.error(e);
+                console.error(
+                    "Error abriendo capítulo:",
+                    e
+                );
 
 
                 contenedor.innerHTML = `
+
                     <div class="error-pdf">
-                        ❌ Ocurrió un error al cargar el capítulo.
+
+                        ❌ Ocurrió un error
+                        al cargar el capítulo.
+
+                        <br><br>
+
+                        <small>
+
+                            Revisa la consola
+                            para ver el detalle.
+
+                        </small>
+
                     </div>
+
                 `;
 
             }
 
         };
-        /* ============================================================
+    /* ============================================================
        VOTACIONES
        ============================================================ */
 
-    window.votar = async (tipo, e) => {
+    window.votar =
+        async (
+            tipo,
+            e
+        ) => {
 
-        e.stopPropagation();
 
-        const docRef =
-            doc(
-                db,
-                historiaID,
-                "capitulo_" + idCapActual
+            e.stopPropagation();
+
+
+            const docRef =
+                doc(
+                    db,
+                    historiaID,
+                    "capitulo_" +
+                    idCapActual
+                );
+
+
+            await updateDoc(
+
+                docRef,
+
+                {
+
+                    [tipo]:
+                        increment(1)
+
+                }
+
             );
 
-        await updateDoc(
-            docRef,
-            {
-                [tipo]: increment(1)
-            }
-        );
 
-        const txt =
-            document.getElementById(
-                'txt-' + tipo
-            );
+            const txt =
+                document.getElementById(
+                    "txt-" +
+                    tipo
+                );
 
-        txt.innerText =
-            parseInt(txt.innerText) + 1;
-    };
+
+            txt.innerText =
+                parseInt(
+                    txt.innerText
+                ) + 1;
+
+        };
 
 
     /* ============================================================
        MENÚ DE ESTADÍSTICAS
        ============================================================ */
 
-    window.toggleStats = (e) => {
+    window.toggleStats =
+        (e) => {
 
-        e.stopPropagation();
 
-        document
-            .getElementById('stats-menu')
-            .classList
-            .toggle('active');
-    };
+            e.stopPropagation();
+
+
+            document
+                .getElementById(
+                    "stats-menu"
+                )
+                .classList
+                .toggle(
+                    "active"
+                );
+
+        };
 
 
     /* ============================================================
        CERRAR LECTOR
        ============================================================ */
 
-    window.cerrarLector = () => {
+    window.cerrarLector =
+        () => {
 
-        document
-            .getElementById('lector')
-            .style
-            .display = 'none';
-    };
+
+            document
+                .getElementById(
+                    "lector"
+                )
+                .style
+                .display =
+                    "none";
+
+        };
 
 
     /* ============================================================
        CERRAR MENÚ AL HACER CLICK FUERA
        ============================================================ */
 
-    document.addEventListener('click', () => {
+    document.addEventListener(
+        "click",
+        () => {
 
-        document
-            .getElementById('stats-menu')
-            .classList
-            .remove('active');
 
-    });
+            document
+                .getElementById(
+                    "stats-menu"
+                )
+                .classList
+                .remove(
+                    "active"
+                );
+
+        }
+    );
+
 
 </script>
 
+
 </body>
+
 </html>
